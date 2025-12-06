@@ -9,6 +9,6 @@ npm create vite
 And then we need to install router-scroll for basic scrolling,
 npm install react-scroll
 
-## For Deployment
+## Live Page
 https://swastik45.github.io/Protfolio/
 
