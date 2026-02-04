@@ -1,4 +1,4 @@
-## This is My Protfolio App
+## This is My Portfolio App
 
 Here I build my protfolio using Frameworks like React and tailwindcss. I am basically Full Stack Developer.
 So, Let me proceed!
