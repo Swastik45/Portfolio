@@ -10,5 +10,5 @@ And then we need to install router-scroll for basic scrolling,
 npm install react-scroll
 
 ## Live Page
-https://swastik45.github.io/Protfolio/
+https://swastik45.github.io/Portfolio/
 
