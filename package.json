@@ -1,5 +1,5 @@
 {
-  "name": "protfolio",
+"name": "portfolio",
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -11,7 +11,7 @@
     "predeploy": "npm run build",
     "deploy": "gh-pages -d dist"
   },
-  "homepage": "https://YOUR_USERNAME.github.io/protfolio",
+"homepage": "https://Swastik45.github.io/Portfolio",
   "dependencies": {
     "lucide-react": "^0.555.0",
     "react-dom": "^19.2.0",

@@ -1,6 +1,6 @@
 ## This is My Portfolio App
 
-Here I build my protfolio using Frameworks like React and tailwindcss. I am basically Full Stack Developer.
+Here I build my portfolio using Frameworks like React and tailwindcss.
 So, Let me proceed!
 
 First of all you need to write this in terminal for creating your react folder,

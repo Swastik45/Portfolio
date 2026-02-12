@@ -1,5 +1,33 @@
 @import "tailwindcss";
 
+/* Navbar slide-in animation */
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Contact fade-in animation */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.3s ease-out;
+}
+
 @keyframes typing {
   from {
     width: 0;
@@ -50,7 +78,7 @@
 
 /* Full section background (show whole image) */
 .about-section {
-  background-image: linear-gradient(180deg, rgba(2,6,23,0.45), rgba(2,6,23,0.25)), url('/swastik.png');
+  background-image: linear-gradient(180deg, rgba(2,6,23,0.45), rgba(2,6,23,0.25)), url('swastik.png');
   background-repeat: no-repeat;
   background-position: center;
   background-size: cover;

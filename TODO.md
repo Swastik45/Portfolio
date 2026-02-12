@@ -1,5 +1,0 @@
-- [x] Add technical skills section with categories (Languages, Frameworks, Tools)
-- [ ] Add soft skills section
-- [ ] Add certifications section
-- [ ] Style sections with cards for visual appeal
-- [ ] Ensure responsive design
