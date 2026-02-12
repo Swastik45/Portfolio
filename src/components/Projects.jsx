@@ -16,7 +16,7 @@ const personalProjects = [
     title: 'Project 1: Youtube Clone For Old TV',
     description: 'A Youtube clone designed for old TV interfaces, providing a simplified and accessible video browsing experience with no extra loads only video links.',
     link: 'https://youtube-clone.kesug.com/?i=1',
-    image: process.env.PUBLIC_URL + '/youtube.png'
+    image: process.env.PUBLIC_URL + '/youtube.png',
     technologies: ['php', 'CSS', 'YouTube API'],
      github: 'https://github.com/Swastik45/Youtube-Clone-Old-TV/',
     date: '2024',
