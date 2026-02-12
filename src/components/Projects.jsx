@@ -1,4 +1,6 @@
 import React from 'react'
+import youtubeImg from '../../public/youtube.png'
+import contentImg from '../../public/content.png'
 
 const cardStyle = {
   background: 'rgba(255, 255, 255, 0.1)',
@@ -16,7 +18,7 @@ const personalProjects = [
     title: 'Project 1: Youtube Clone For Old TV',
     description: 'A Youtube clone designed for old TV interfaces, providing a simplified and accessible video browsing experience with no extra loads only video links.',
     link: 'https://youtube-clone.kesug.com/?i=1',
-    image: '/youtube.png',
+    image: youtubeImg,
     technologies: ['php', 'CSS', 'YouTube API'],
      github: 'https://github.com/Swastik45/Youtube-Clone-Old-TV/',
     date: '2024',
@@ -38,7 +40,7 @@ const personalProjects = [
     title: 'Project 2: Content Creating Platform',
     description: 'A content creating platform where users can create and share articles, blogs, and multimedia content with a community of readers.',
     link: 'https://content-creating-platform.web.app/',
-    image: '/content.png',
+    image: contentImg,
     technologies: ['React', 'Firebase', 'tailwindCSS'],
      github: 'https://github.com/Swastik45/ContentCreatingSite',
     date: '2024',
@@ -160,3 +162,4 @@ const Projects = () => {
 }
 
 export default Projects
+

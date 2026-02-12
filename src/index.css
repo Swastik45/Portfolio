@@ -1,5 +1,6 @@
 @import "tailwindcss";
 
+
 /* Navbar slide-in animation */
 @keyframes slideIn {
   from {
@@ -78,7 +79,7 @@
 
 /* Full section background (show whole image) */
 .about-section {
-  background-image: linear-gradient(180deg, rgba(2,6,23,0.45), rgba(2,6,23,0.25)), url('swastik.png');
+  background-image: linear-gradient(180deg, rgba(2,6,23,0.45), rgba(2,6,23,0.25)), url(https://swastik45.github.io/Portfolio/swastik.png);
   background-repeat: no-repeat;
   background-position: center;
   background-size: cover;
