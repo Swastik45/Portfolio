@@ -4,7 +4,7 @@ const personalProjects = [
   {
     title: 'CarbonCredit',
     description: 'A platform for tracking and trading carbon credits to incentivize environmental sustainability through a verifiable ledger.',
-    link: 'https://carboncredit-frontend.onrender.com/', 
+    link: 'https://carbon-credit-opal.vercel.app/', 
     image: 'https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&fit=crop&q=80&w=800',
     technologies: ['JavaScript', 'Node.js', 'Web3'],
     github: 'https://github.com/Swastik45/CarbonCredit',
