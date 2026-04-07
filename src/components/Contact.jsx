@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Mail, Phone, MapPin, Send, CheckCircle } from "lucide-react";
+import { Mail, Phone, MapPin, Send, CheckCircle, Terminal } from "lucide-react";
 
 export default function Contact() {
   const [formData, setFormData] = useState({
@@ -14,7 +14,7 @@ export default function Contact() {
   useEffect(() => {
     if (isSending) {
       setShowMessage(true);
-      const timer = setTimeout(() => setShowMessage(false), 2500);
+      const timer = setTimeout(() => setShowMessage(false), 3000);
       return () => clearTimeout(timer);
     }
   }, [isSending]);
@@ -23,174 +23,153 @@ export default function Contact() {
     e.preventDefault();
     if (!formData.message.trim()) return;
     setIsSending(true);
-    setTimeout(() => setIsSending(false), 2500);
+    // Logic for system transmission simulation
+    setTimeout(() => {
+      setIsSending(false);
+      setFormData({ name: "", email: "", subject: "", message: "" });
+    }, 2000);
   };
 
   const handleChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value
-    });
+    setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 py-12 px-4">
+    // FIX: Forced solid background (Deep Crimson) and killed gradients
+    <section id="contact" className="min-h-screen bg-[#8A1515] py-20 px-4 !opacity-100">
       <div className="max-w-7xl mx-auto">
-        {/* Header */}
-        <div className="text-center mb-12">
-          <h1 className="text-5xl md:text-6xl font-bold text-slate-800 mb-4">
-            Contact <span className="text-blue-600">Me</span>
+        
+        {/* Header - Industrial Style */}
+        <div className="mb-16 inline-block">
+          <h1 className="text-6xl md:text-7xl font-black text-[#FFFFFF] uppercase tracking-tighter">
+            Establish <span className="text-[#000000]">Link</span>
           </h1>
-          <p className="text-slate-600 text-lg max-w-2xl mx-auto">
-            Have any questions? I'd love to hear from you.
+          <div className="h-4 bg-[#000000] w-full mt-2"></div>
+          <p className="text-[#FFFFFF] font-bold mt-4 uppercase tracking-widest text-sm">
+            // Direct line for freelance inquiries and technical collaboration
           </p>
         </div>
 
-        <div className="grid md:grid-cols-3 gap-8">
-          {/* Left Side - Contact Info Cards */}
+        <div className="grid md:grid-cols-3 gap-10">
+          
+          {/* Left Side - System Nodes (Contact Info) */}
           <div className="space-y-6">
-            {/* Address Card */}
-            <div className="bg-white rounded-2xl p-6 shadow-lg hover:shadow-xl transition-shadow duration-300 border border-slate-100">
-              <div className="w-14 h-14 bg-blue-100 rounded-full flex items-center justify-center mb-4">
-                <MapPin className="w-7 h-7 text-blue-600" />
+            {[
+              { label: "Location", val: "Kathmandu, Nepal", icon: <MapPin />, color: "#DC2626" },
+              { label: "Comms", val: "+977 976-7929476", icon: <Phone />, color: "#2563EB" },
+              { label: "Interface", val: "psamarpaudel@gmail.com", icon: <Mail />, color: "#000000" }
+            ].map((node, i) => (
+              <div key={i} className="bg-[#FFFFFF] border-4 border-[#000000] p-6 shadow-[8px_8px_0px_0px_#000000]">
+                <div className="flex items-center gap-4 mb-4">
+                  <div className="p-3 bg-[#000000] text-[#FFFFFF] border-2 border-[#000000]">
+                    {node.icon}
+                  </div>
+                  <h3 className="text-lg font-black uppercase tracking-tighter text-[#000000]">{node.label}</h3>
+                </div>
+                <p className="font-black text-[#4B5563] break-all uppercase text-sm leading-tight">
+                  {node.val}
+                </p>
               </div>
-              <h3 className="text-xl font-bold text-slate-800 mb-2">Address</h3>
-              <p className="text-slate-600 leading-relaxed">
-                Kathmandu, Bagmati Province<br />
-                Nepal
-              </p>
-            </div>
+            ))}
 
-            {/* Phone Card */}
-            <div className="bg-white rounded-2xl p-6 shadow-lg hover:shadow-xl transition-shadow duration-300 border border-slate-100">
-              <div className="w-14 h-14 bg-green-100 rounded-full flex items-center justify-center mb-4">
-                <Phone className="w-7 h-7 text-green-600" />
+            {/* Terminal Aesthetic Note */}
+            <div className="bg-[#000000] p-4 border-2 border-[#FFFFFF] hidden md:block">
+              <div className="flex items-center gap-2 text-[#DC2626] mb-2">
+                <Terminal size={16} />
+                <span className="text-[10px] font-black tracking-widest uppercase">System_Log</span>
               </div>
-              <h3 className="text-xl font-bold text-slate-800 mb-2">Phone</h3>
-              <p className="text-slate-600">
-                +977 976-7929476
+              <p className="text-[#FFFFFF] text-[10px] font-mono leading-tight">
+                READY FOR DEPLOYMENT.<br/>
+                LOCATED IN NEPAL (UTC +5:45).<br/>
+                AVERAGE RESPONSE: &lt; 24H.
               </p>
-            </div>
-
-            {/* Email Card */}
-            <div className="bg-white rounded-2xl p-6 shadow-lg hover:shadow-xl transition-shadow duration-300 border border-slate-100">
-              <div className="w-14 h-14 bg-purple-100 rounded-full flex items-center justify-center mb-4">
-                <Mail className="w-7 h-7 text-purple-600" />
-              </div>
-              <h3 className="text-xl font-bold text-slate-800 mb-2">Email</h3>
-              <a 
-                href="mailto:psamarpaudel@gmail.com" 
-                className="text-blue-600 hover:text-blue-700 hover:underline break-all"
-              >
-                psamarpaudel@gmail.com
-              </a>
             </div>
           </div>
 
-          {/* Right Side - Contact Form */}
+          {/* Right Side - Transmission Form */}
           <div className="md:col-span-2">
-            <div className="bg-white rounded-2xl p-8 md:p-10 shadow-lg border border-slate-100">
-              <h2 className="text-3xl font-bold text-slate-800 mb-6">Send me a message</h2>
+            <div className="bg-[#FFFFFF] border-4 border-[#000000] p-8 md:p-12 shadow-[16px_16px_0px_0px_#000000]">
+              <h2 className="text-3xl font-black text-[#000000] mb-8 uppercase tracking-tighter">Initial Message Packet</h2>
               
-              <div className="space-y-5">
-                {/* Name and Email Row */}
-                <div className="grid md:grid-cols-2 gap-5">
+              <form onSubmit={handleSend} className="space-y-6">
+                <div className="grid md:grid-cols-2 gap-6">
                   <div>
-                    <label htmlFor="name" className="block text-sm font-semibold text-slate-700 mb-2">
-                      Your Name
-                    </label>
+                    <label className="block text-xs font-black text-[#000000] uppercase mb-2 tracking-widest">Operator Name</label>
                     <input
                       type="text"
-                      id="name"
                       name="name"
+                      required
                       value={formData.name}
                       onChange={handleChange}
-                      className="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 text-slate-800 placeholder-slate-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
-                      placeholder="John Doe"
+                      className="w-full px-4 py-3 border-4 border-[#000000] bg-[#F3F4F6] text-[#000000] font-bold focus:bg-[#FFFFFF] outline-none transition-all"
+                      placeholder="IDENTIFY YOURSELF"
                     />
                   </div>
                   <div>
-                    <label htmlFor="email" className="block text-sm font-semibold text-slate-700 mb-2">
-                      Your Email
-                    </label>
+                    <label className="block text-xs font-black text-[#000000] uppercase mb-2 tracking-widest">Return Address</label>
                     <input
                       type="email"
-                      id="email"
                       name="email"
+                      required
                       value={formData.email}
                       onChange={handleChange}
-                      className="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 text-slate-800 placeholder-slate-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
-                      placeholder="john@example.com"
+                      className="w-full px-4 py-3 border-4 border-[#000000] bg-[#F3F4F6] text-[#000000] font-bold focus:bg-[#FFFFFF] outline-none transition-all"
+                      placeholder="EMAIL@DOMAIN.COM"
                     />
                   </div>
                 </div>
 
-                {/* Subject */}
                 <div>
-                  <label htmlFor="subject" className="block text-sm font-semibold text-slate-700 mb-2">
-                    Subject
-                  </label>
+                  <label className="block text-xs font-black text-[#000000] uppercase mb-2 tracking-widest">Subject Header</label>
                   <input
                     type="text"
-                    id="subject"
                     name="subject"
                     value={formData.subject}
                     onChange={handleChange}
-                    className="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 text-slate-800 placeholder-slate-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
-                    placeholder="How can we help?"
+                    className="w-full px-4 py-3 border-4 border-[#000000] bg-[#F3F4F6] text-[#000000] font-bold focus:bg-[#FFFFFF] outline-none transition-all"
+                    placeholder="PROJECT_TYPE / INQUIRY"
                   />
                 </div>
 
-                {/* Message */}
                 <div>
-                  <label htmlFor="message" className="block text-sm font-semibold text-slate-700 mb-2">
-                    Message
-                  </label>
+                  <label className="block text-xs font-black text-[#000000] uppercase mb-2 tracking-widest">Message Data</label>
                   <textarea
-                    id="message"
                     name="message"
+                    required
                     value={formData.message}
                     onChange={handleChange}
-                    rows={6}
-                    className="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 text-slate-800 placeholder-slate-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none resize-none transition-all"
-                    placeholder="Write your message here..."
+                    rows={5}
+                    className="w-full px-4 py-3 border-4 border-[#000000] bg-[#F3F4F6] text-[#000000] font-bold focus:bg-[#FFFFFF] outline-none transition-all resize-none"
+                    placeholder="ENTER TECHNICAL DETAILS OR INQUIRY DATA..."
                   />
                 </div>
 
-                {/* Submit Button */}
                 <button
-                  onClick={handleSend}
+                  type="submit"
                   disabled={isSending}
-                  className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white font-bold px-8 py-4 rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl active:scale-98 disabled:cursor-not-allowed flex items-center justify-center gap-3"
+                  className="w-full bg-[#000000] text-[#FFFFFF] font-black py-5 uppercase tracking-[0.3em] flex items-center justify-center gap-4 hover:bg-[#DC2626] transition-colors border-4 border-[#000000] disabled:opacity-50"
                 >
                   {isSending ? (
-                    <>
-                      <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
-                      <span>Sending...</span>
-                    </>
+                    <span className="animate-pulse">TRANSMITTING DATA...</span>
                   ) : (
                     <>
-                      <span>Send Message</span>
-                      <Send className="w-5 h-5" />
+                      <span>Execute Send</span>
+                      <Send className="w-6 h-6" />
                     </>
                   )}
                 </button>
 
-                {/* Success Message */}
                 {showMessage && (
-                  <div className="bg-green-50 border border-green-200 rounded-xl p-4 flex items-center gap-3 animate-fade-in">
-                    <CheckCircle className="w-6 h-6 text-green-600 flex-shrink-0" />
-                    <span className="text-green-800 font-semibold">
-                      Message sent successfully!
-                    </span>
+                  <div className="bg-[#DC2626] text-[#FFFFFF] p-4 border-4 border-[#000000] flex items-center gap-4 animate-bounce">
+                    <CheckCircle className="w-6 h-6" />
+                    <span className="font-black uppercase tracking-tighter">Packet Delivered Successfully.</span>
                   </div>
                 )}
-              </div>
+              </form>
             </div>
           </div>
         </div>
       </div>
-
-    </div>
+    </section>
   );
 }
