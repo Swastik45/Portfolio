@@ -2,6 +2,26 @@ import React, { useState } from 'react'
 
 const personalProjects = [
   {
+    title: 'GovAudit NP',
+    description: 'An autonomous accountability dashboard that verifies the 100-point government reform agenda through automated OSINT data collection and AI-driven analysis.',
+    link: 'https://gova-audit-np.vercel.app/', // Update with your actual deployment link
+    image: 'https://images.unsplash.com/photo-1589391886645-d51941baf7fb?auto=format&fit=crop&q=80&w=800',
+    technologies: ['Next.js', 'TypeScript', 'Tailwind CSS', 'jsPDF'],
+    github: 'https://github.com/Swastik45/GovaAuditNP',
+    date: '2026',
+    role: 'Lead Systems Architect',
+    features: [
+      'Autonomous verification engine', 
+      'Real-time accountability metrics', 
+      'Programmatic PDF report generation'
+    ],
+    techHighlights: [
+      'OSINT data parsing', 
+      'Custom PDF vector rendering', 
+      'Dynamic mission tracking'
+    ]
+  },
+  {
     title: 'CarbonCredit',
     description: 'A platform for tracking and trading carbon credits to incentivize environmental sustainability through a verifiable ledger.',
     link: 'https://carbon-credit-opal.vercel.app/', 
