@@ -22,6 +22,26 @@ const personalProjects = [
     ]
   },
   {
+  title: 'Share Auditor NP',
+  description: 'A professional-grade financial auditing dashboard that transforms raw MeroShare transaction histories into actionable risk and growth intelligence.',
+  link: 'https://share-auditor-np.vercel.app/', // Update with your actual deployment link
+  image: 'https://images.unsplash.com/photo-1611974717482-98252c6a914e?auto=format&fit=crop&q=80&w=800',
+  technologies: ['Next.js', 'TypeScript', 'Tremor', 'Tailwind CSS'],
+  github: 'https://github.com/Swastik45/share-auditor-np',
+  date: '2026',
+  role: 'Systems Architect',
+  features: [
+    'Institutional risk concentration analysis', 
+    'Automated NEPSE sector mapping engine', 
+    'Privacy-first client-side data processing'
+  ],
+  techHighlights: [
+    'Complex CSV stream parsing', 
+    'Dynamic growth trend algorithms', 
+    'Low-latency Tremor visualization'
+  ]
+},
+  {
     title: 'CarbonCredit',
     description: 'A platform for tracking and trading carbon credits to incentivize environmental sustainability through a verifiable ledger.',
     link: 'https://carbon-credit-opal.vercel.app/', 
