@@ -24,10 +24,10 @@ const personalProjects = [
   {
   title: 'Share Auditor NP',
   description: 'A professional-grade financial auditing dashboard that transforms raw MeroShare transaction histories into actionable risk and growth intelligence.',
-  link: 'https://share-auditor-np.vercel.app/', // Update with your actual deployment link
-  image: 'https://images.unsplash.com/photo-1611974717482-98252c6a914e?auto=format&fit=crop&q=80&w=800',
+  link: 'https://share-audit-x4qa.vercel.app/', // Update with your actual deployment link
+  image: 'https://images.unsplash.com/photo-1551288049-bbbda5366392?auto=format&fit=crop&q=80&w=800',
   technologies: ['Next.js', 'TypeScript', 'Tremor', 'Tailwind CSS'],
-  github: 'https://github.com/Swastik45/share-auditor-np',
+  github: 'https://github.com/Swastik45/ShareAudit',
   date: '2026',
   role: 'Systems Architect',
   features: [
