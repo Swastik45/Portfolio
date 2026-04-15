@@ -4,54 +4,54 @@ const personalProjects = [
   {
     title: 'GovAudit NP',
     description: 'An autonomous accountability dashboard that verifies the 100-point government reform agenda through automated OSINT data collection and AI-driven analysis.',
-    link: 'https://gova-audit-np.vercel.app/', // Update with your actual deployment link
+    link: 'https://gova-audit-np.vercel.app/', 
     image: 'https://images.unsplash.com/photo-1589391886645-d51941baf7fb?auto=format&fit=crop&q=80&w=800',
     technologies: ['Next.js', 'TypeScript', 'Tailwind CSS', 'jsPDF'],
     github: 'https://github.com/Swastik45/GovaAuditNP',
     date: '2026',
     role: 'Lead Systems Architect',
     features: [
-      'Autonomous verification engine', 
+      'Autonomous OSINT verification engine', 
       'Real-time accountability metrics', 
       'Programmatic PDF report generation'
     ],
     techHighlights: [
-      'OSINT data parsing', 
+      'Automated public data parsing', 
       'Custom PDF vector rendering', 
-      'Dynamic mission tracking'
+      'Mission-critical data tracking'
     ]
   },
   {
-  title: 'Share Auditor NP',
-  description: 'A professional-grade financial auditing dashboard that transforms raw MeroShare transaction histories into actionable risk and growth intelligence.',
-  link: 'https://share-audit-x4qa.vercel.app/', // Update with your actual deployment link
-  image: 'https://images.unsplash.com/photo-1551288049-bbbda5366392?auto=format&fit=crop&q=80&w=800',
-  technologies: ['Next.js', 'TypeScript', 'Tremor', 'Tailwind CSS'],
-  github: 'https://github.com/Swastik45/ShareAudit',
-  date: '2026',
-  role: 'Systems Architect',
-  features: [
-    'Institutional risk concentration analysis', 
-    'Automated NEPSE sector mapping engine', 
-    'Privacy-first client-side data processing'
-  ],
-  techHighlights: [
-    'Complex CSV stream parsing', 
-    'Dynamic growth trend algorithms', 
-    'Low-latency Tremor visualization'
-  ]
-},
+    title: 'Share Auditor NP',
+    description: 'A professional-grade financial auditing dashboard that transforms raw MeroShare transaction histories into actionable risk and growth intelligence.',
+    link: 'https://share-audit-x4qa.vercel.app/', 
+    image: 'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+    technologies: ['Next.js', 'TypeScript', 'Tremor', 'Tailwind CSS', 'Supabase'],
+    github: 'https://github.com/Swastik45/ShareAudit',
+    date: '2026',
+    role: 'Systems Architect',
+    features: [
+      'Hidden Tax & WACC Auditing logic', 
+      'Institutional risk concentration analysis', 
+      'Privacy-first client-side data processing'
+    ],
+    techHighlights: [
+      'High-performance NEPSE data scraping', 
+      'Real-time financial dashboarding (Tremor UI)', 
+      'Edge-case resilient re-scraping logic'
+    ]
+  },
   {
     title: 'CarbonCredit',
-    description: 'A platform for tracking and trading carbon credits to incentivize environmental sustainability through a verifiable ledger.',
+    description: 'A Next.js marketplace for carbon credits utilizing satellite-verified data for a transparent environmental ledger.',
     link: 'https://carbon-credit-opal.vercel.app/', 
     image: 'https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&fit=crop&q=80&w=800',
-    technologies: ['JavaScript', 'Node.js', 'Web3'],
+    technologies: ['Next.js', 'TypeScript', 'Supabase', 'Tailwind CSS'],
     github: 'https://github.com/Swastik45/CarbonCredit',
-    date: '2024',
-    role: 'Backend/Logic Developer',
+    date: '2026',
+    role: 'Full-Stack Developer',
     features: ['Tokenized credits', 'Transaction ledger', 'Emissions calculator'],
-    techHighlights: ['Smart contract integration', 'Real-time ledger updates']
+    techHighlights: ['Satellite data integration', 'Real-time ledger updates']
   },
   {
     title: 'Lumino',
@@ -102,6 +102,7 @@ const personalProjects = [
     techHighlights: ['API Caching', 'Minimalist DOM structure']
   },
 ];
+
 
 const Projects = () => {
   const [expandedProject, setExpandedProject] = useState(null);
