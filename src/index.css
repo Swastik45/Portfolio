@@ -1,3 +1,166 @@
 @import "tailwindcss";
 
+html, body {
+  min-height: 100%;
+  background: linear-gradient(90deg, red 50%, blue 50%);
+  background-attachment: fixed;
+  overflow-x: hidden;
+}
+
+html::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image:
+    repeating-linear-gradient(0deg, rgba(255,255,255,0.04), rgba(255,255,255,0.04) 1px, transparent 2px),
+    repeating-linear-gradient(90deg, rgba(255,255,255,0.04), rgba(255,255,255,0.04) 1px, transparent 2px);
+  background-size: 32px 32px;
+  opacity: 0.2;
+  z-index: -5;
+  pointer-events: none;
+  animation: grid-flow 25s linear infinite;
+}
+
+html::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image:
+    radial-gradient(circle at 20% 20%, rgba(56,189,248,0.16), transparent 15%),
+    radial-gradient(circle at 80% 10%, rgba(248,113,113,0.18), transparent 18%),
+    radial-gradient(circle at 50% 88%, rgba(250,204,21,0.12), transparent 14%);
+  opacity: 0.65;
+  filter: blur(0.8px);
+  z-index: -4;
+  pointer-events: none;
+  animation: glow-drift 18s ease-in-out infinite;
+}
+
+body {
+  margin: 0;
+  position: relative;
+  z-index: 0;
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 2px;
+  height: 100%;
+  background: rgba(250, 204, 21, 0.28);
+  z-index: -3;
+  pointer-events: none;
+}
+
+body::after {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 8px;
+  height: 100%;
+  background: linear-gradient(180deg, transparent 0%, rgba(250,204,21,0) 30%, rgba(250,204,21,0.95) 50%, rgba(250,204,21,0) 70%, transparent 100%);
+  background-size: 100% 240%;
+  filter: drop-shadow(0 0 32px rgba(250,204,21,0.8));
+  z-index: -2;
+  pointer-events: none;
+  animation: running-light 1.4s linear infinite;
+}
+
+@keyframes running-light {
+  0% {
+    background-position: 0 -240%;
+  }
+  100% {
+    background-position: 0 240%;
+  }
+}
+
+@keyframes grid-flow {
+  0% {
+    background-position: 0 0;
+  }
+  100% {
+    background-position: 0 -64px;
+  }
+}
+
+@keyframes glow-drift {
+  0%, 100% {
+    transform: translate(0, 0);
+  }
+  50% {
+    transform: translate(12px, 10px);
+  }
+}
+
+.section-split {
+  position: relative;
+  overflow: hidden;
+}
+
+.section-split::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, rgba(14,165,233,0.16) 50%, rgba(138,21,21,0.16) 50%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.section-split::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image:
+    radial-gradient(circle at 22% 24%, rgba(56,189,248,0.14), transparent 16%),
+    radial-gradient(circle at 82% 16%, rgba(248,113,113,0.12), transparent 18%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.section-content {
+  position: relative;
+  z-index: 1;
+}
+
+@media (max-width: 768px) {
+  html, body {
+    background: linear-gradient(180deg, blue 48%, red 52%);
+  }
+
+  body::before {
+    top: 50%;
+    left: 0;
+    transform: translateY(-50%);
+    width: 100%;
+    height: 2px;
+    background: rgba(250, 204, 21, 0.22);
+  }
+
+  body::after {
+    top: 50%;
+    left: 0;
+    transform: translateY(-50%);
+    width: 100%;
+    height: 6px;
+    background: linear-gradient(90deg, transparent 0%, rgba(250,204,21,0) 30%, rgba(250,204,21,0.95) 50%, rgba(250,204,21,0) 70%, transparent 100%);
+    background-size: 240% 100%;
+    animation: running-light-horizontal 1.4s linear infinite;
+  }
+}
+
+@keyframes running-light-horizontal {
+  0% {
+    background-position: -240% 0;
+  }
+  100% {
+    background-position: 240% 0;
+  }
+}
+
 

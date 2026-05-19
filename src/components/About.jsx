@@ -1,28 +1,42 @@
 import React, { useEffect, useState } from 'react'
 
-function TypingSimple({ texts, typingSpeed = 100, deletingSpeed = 60, pause = 1000 }) {
+function TypingSimple({
+  texts = [],
+  typingSpeed = 100,
+  deletingSpeed = 60,
+  pause = 1000
+}) {
   const [index, setIndex] = useState(0);
   const [charIndex, setCharIndex] = useState(0);
   const [isDeleting, setIsDeleting] = useState(false);
 
   useEffect(() => {
-    const currentText = texts[index];
-    const timeout = setTimeout(() => {
-      if (!isDeleting) {
-        if (charIndex < currentText.length) {
+    if (!texts.length) return;
+
+    const currentText = texts[index] || "";
+    let timeout;
+
+    if (!isDeleting) {
+      if (charIndex < currentText.length) {
+        timeout = setTimeout(() => {
           setCharIndex(prev => prev + 1);
-        } else {
-          setTimeout(() => setIsDeleting(true), pause);
-        }
+        }, typingSpeed);
       } else {
-        if (charIndex > 0) {
-          setCharIndex(prev => prev - 1);
-        } else {
-          setIsDeleting(false);
-          setIndex((prev) => (prev + 1) % texts.length);
-        }
+        timeout = setTimeout(() => {
+          setIsDeleting(true);
+        }, pause);
       }
-    }, isDeleting ? deletingSpeed : typingSpeed);
+    } else {
+      if (charIndex > 0) {
+        timeout = setTimeout(() => {
+          setCharIndex(prev => prev - 1);
+        }, deletingSpeed);
+      } else {
+        setIsDeleting(false);
+        setIndex(prev => (prev + 1) % texts.length);
+        setCharIndex(0);
+      }
+    }
 
     return () => clearTimeout(timeout);
   }, [charIndex, isDeleting, index, texts, typingSpeed, deletingSpeed, pause]);
@@ -30,33 +44,45 @@ function TypingSimple({ texts, typingSpeed = 100, deletingSpeed = 60, pause = 10
   return (
     <div className="flex items-center h-12">
       <span className="text-2xl sm:text-3xl lg:text-4xl font-black text-[#000000] uppercase tracking-tighter">
-        {texts[index].slice(0, charIndex)}
+        {(texts[index] || "").slice(0, charIndex)}
       </span>
-      {/* Solid Red Cursor */}
-      <span className="inline-block w-2 h-8 sm:h-10 bg-[#DC2626] ml-2 animate-pulse border border-[#000000]"></span>
+
+      {/* improved cursor (cleaner than animate-pulse) */}
+      <span className="w-2 h-8 sm:h-10 ml-2 bg-[#DC2626] border border-[#000000] typing-cursor" />
+      
+      <style>{`
+        .typing-cursor {
+          animation: blink 0.8s infinite;
+        }
+
+        @keyframes blink {
+          0%, 49% { opacity: 1; }
+          50%, 100% { opacity: 0; }
+        }
+      `}</style>
     </div>
   );
 }
 
 const About = () => {
   return (
-    <section id="about" className="min-h-screen flex items-center justify-center py-20 px-4 sm:px-6 lg:px-8 bg-[#8A1515]">
-      <div className="max-w-7xl mx-auto w-full">
+    <section id="about" className="section-split min-h-screen flex items-center justify-center py-20 px-4 sm:px-6 lg:px-8 bg-transparent">
+      <div className="section-content relative z-10 max-w-7xl mx-auto w-full">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center">
-          
-          {/* Left column - Content */}
+
+          {/* LEFT */}
           <div className="order-2 lg:order-1 space-y-10">
             <div className="space-y-4">
               <div className="inline-block">
                 <h2 className="text-6xl sm:text-7xl lg:text-8xl font-black mb-2 text-[#FFFFFF] tracking-tighter uppercase">
                   About Me
                 </h2>
-                <div className="h-4 bg-[#000000] w-full max-w-[250px]"></div>
+                <div className="h-4 bg-gradient-to-r from-[#2563EB] via-[#000000] to-[#DC2626] w-full max-w-[250px]"></div>
               </div>
             </div>
 
-            {/* Bio Box */}
-            <div className="bg-[#FFFFFF] p-8 sm:p-12 border-4 border-[#000000] shadow-[12px_12px_0px_0px_rgba(0,0,0,1)]">
+            {/* BIO */}
+            <div className="bg-white/95 p-8 sm:p-12 border-4 border-[#000000] shadow-[12px_12px_0px_0px_rgba(0,0,0,1)] backdrop-blur-sm">
               <p className="text-xl sm:text-2xl text-[#111827] leading-tight font-black uppercase tracking-tight">
                 Hello Everyone! I'm{' '}
                 <span className="text-[#2563EB] underline decoration-4 underline-offset-4">
@@ -66,57 +92,59 @@ const About = () => {
               </p>
             </div>
 
-            {/* Status Box */}
-            <div className="bg-[#F3F4F6] p-6 sm:p-8 border-4 border-[#000000] shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
+            {/* STATUS */}
+            <div className="bg-slate-50/90 p-6 sm:p-8 border-4 border-[#000000] shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] backdrop-blur-sm">
               <div className="flex items-center gap-3 mb-6">
                 <div className="w-4 h-4 bg-[#DC2626] border-2 border-[#000000] animate-ping"></div>
                 <span className="text-sm sm:text-base text-[#000000] uppercase tracking-[0.2em] font-black">
-                    Active Developer
+                  Active Developer
                 </span>
               </div>
-              
-              <TypingSimple 
+
+              <TypingSimple
                 texts={[
                   "Full Stack Web Developer",
                   "Game Developer",
                   "AI Enthusiast",
-                ]} 
+                ]}
               />
             </div>
 
-            {/* GitHub Link */}
-            <a 
-              href="https://github.com/Swastik45" 
-              target="_blank" 
+            {/* GITHUB */}
+            <a
+              href="https://github.com/Swastik45"
+              target="_blank"
               rel="noopener noreferrer"
-              className="inline-block bg-[#000000] text-[#FFFFFF] px-8 py-4 border-4 border-[#000000] font-black uppercase tracking-tight text-lg hover:bg-[#DC2626] hover:border-[#000000] transition-all duration-300 shadow-[6px_6px_0px_0px_rgba(220,38,38,1)] hover:shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]"
+              className="inline-block bg-[#000000] text-[#FFFFFF] px-8 py-4 border-4 border-[#000000] font-black uppercase tracking-tight text-lg hover:bg-[#DC2626] transition-all duration-300 shadow-[6px_6px_0px_0px_rgba(220,38,38,1)] hover:shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]"
             >
               Visit GitHub →
             </a>
           </div>
 
-          {/* Right Column - Profile Image (FULL COLOR) */}
+          {/* RIGHT */}
           <div className="order-1 lg:order-2 flex justify-center lg:justify-end">
             <div className="relative group">
-              {/* This frame still moves on hover, but the picture stays color */}
+
               <div className="relative p-4 sm:p-6 bg-[#FFFFFF] border-[6px] border-[#000000] shadow-[20px_20px_0px_0px_#000000] transition-all duration-300 group-hover:translate-x-2 group-hover:translate-y-2 group-hover:shadow-none">
-                
+
                 <div className="relative aspect-square w-64 h-64 sm:w-80 sm:h-80 lg:w-96 lg:h-96 border-4 border-[#000000] bg-[#000000] overflow-hidden">
-                  <img 
-                    src="https://avatars.githubusercontent.com/u/149481053?v=4" 
-                    alt="Swastik Paudel" 
-                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" 
+                  <img
+                    src="https://avatars.githubusercontent.com/u/149481053?v=4"
+                    alt="Swastik Paudel"
+                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                   />
                 </div>
 
-                <div className="absolute -top-5 -left-5 bg-[#000000] text-[#FFFFFF] px-4 py-2 font-black text-xs tracking-tighter border-2 border-[#FFFFFF]">
-                  SWASTIK PAUDEL
+                <div className="absolute -top-5 -left-5 bg-[#000000] text-[#FFFFFF] px-4 py-2 font-black text-xs border-2 border-[#FFFFFF]">
+                  SWASTIK
                 </div>
-                
-                <div className="absolute -bottom-4 -right-4 bg-[#DC2626] text-[#FFFFFF] px-4 py-2 font-black text-xs tracking-tighter border-2 border-[#000000]">
-                  FULL STACK DEVELOPER
+
+                <div className="absolute -bottom-4 -right-4 bg-[#DC2626] text-[#FFFFFF] px-4 py-2 font-black text-xs border-2 border-[#000000]">
+                  FULL STACK
                 </div>
+
               </div>
+
             </div>
           </div>
 
