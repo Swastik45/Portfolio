@@ -71,19 +71,28 @@ const About = () => {
               <div className="flex items-center gap-3 mb-6">
                 <div className="w-4 h-4 bg-[#DC2626] border-2 border-[#000000] animate-ping"></div>
                 <span className="text-sm sm:text-base text-[#000000] uppercase tracking-[0.2em] font-black">
-                  System Status // Active
+                    Active Developer
                 </span>
               </div>
               
               <TypingSimple 
                 texts={[
-                  "Full Stack Developer",
-                  "Systems Auditor",
-                  "BCA Student",
-                  "Swastik Paudel"
+                  "Full Stack Web Developer",
+                  "Game Developer",
+                  "AI Enthusiast",
                 ]} 
               />
             </div>
+
+            {/* GitHub Link */}
+            <a 
+              href="https://github.com/Swastik45" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="inline-block bg-[#000000] text-[#FFFFFF] px-8 py-4 border-4 border-[#000000] font-black uppercase tracking-tight text-lg hover:bg-[#DC2626] hover:border-[#000000] transition-all duration-300 shadow-[6px_6px_0px_0px_rgba(220,38,38,1)] hover:shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]"
+            >
+              Visit GitHub →
+            </a>
           </div>
 
           {/* Right Column - Profile Image (FULL COLOR) */}
@@ -96,18 +105,16 @@ const About = () => {
                   <img 
                     src="https://avatars.githubusercontent.com/u/149481053?v=4" 
                     alt="Swastik Paudel" 
-                    // CHANGE: Removed grayscale, brightness, and color hover transition. 
-                    // It's now standard full color.
                     className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" 
                   />
                 </div>
 
                 <div className="absolute -top-5 -left-5 bg-[#000000] text-[#FFFFFF] px-4 py-2 font-black text-xs tracking-tighter border-2 border-[#FFFFFF]">
-                  ID: SWASTIK_45
+                  SWASTIK PAUDEL
                 </div>
                 
                 <div className="absolute -bottom-4 -right-4 bg-[#DC2626] text-[#FFFFFF] px-4 py-2 font-black text-xs tracking-tighter border-2 border-[#000000]">
-                  VERIFIED BUILDER
+                  FULL STACK DEVELOPER
                 </div>
               </div>
             </div>
