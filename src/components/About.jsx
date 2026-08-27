@@ -1,157 +1,132 @@
 import React, { useEffect, useState } from 'react'
+import { ArrowUpRight, Mail, Terminal } from 'lucide-react'
 
-function TypingSimple({
-  texts = [],
-  typingSpeed = 100,
-  deletingSpeed = 60,
-  pause = 1000
-}) {
-  const [index, setIndex] = useState(0);
-  const [charIndex, setCharIndex] = useState(0);
-  const [isDeleting, setIsDeleting] = useState(false);
+function TypingSimple({ texts = [], typingSpeed = 80, deletingSpeed = 45, pause = 1300 }) {
+  const [index, setIndex]           = useState(0)
+  const [charIndex, setCharIndex]   = useState(0)
+  const [isDeleting, setIsDeleting] = useState(false)
 
   useEffect(() => {
-    if (!texts.length) return;
-
-    const currentText = texts[index] || "";
-    let timeout;
-
+    if (!texts.length) return
+    const current = texts[index] || ''
+    let t
     if (!isDeleting) {
-      if (charIndex < currentText.length) {
-        timeout = setTimeout(() => {
-          setCharIndex(prev => prev + 1);
-        }, typingSpeed);
-      } else {
-        timeout = setTimeout(() => {
-          setIsDeleting(true);
-        }, pause);
-      }
+      if (charIndex < current.length) t = setTimeout(() => setCharIndex(p => p + 1), typingSpeed)
+      else t = setTimeout(() => setIsDeleting(true), pause)
     } else {
-      if (charIndex > 0) {
-        timeout = setTimeout(() => {
-          setCharIndex(prev => prev - 1);
-        }, deletingSpeed);
-      } else {
-        setIsDeleting(false);
-        setIndex(prev => (prev + 1) % texts.length);
-        setCharIndex(0);
-      }
+      if (charIndex > 0) t = setTimeout(() => setCharIndex(p => p - 1), deletingSpeed)
+      else { setIsDeleting(false); setIndex(p => (p + 1) % texts.length); setCharIndex(0) }
     }
-
-    return () => clearTimeout(timeout);
-  }, [charIndex, isDeleting, index, texts, typingSpeed, deletingSpeed, pause]);
+    return () => clearTimeout(t)
+  }, [charIndex, isDeleting, index, texts, typingSpeed, deletingSpeed, pause])
 
   return (
-    <div className="flex items-center h-12">
-      <span className="text-2xl sm:text-3xl lg:text-4xl font-black text-[#000000] uppercase tracking-tighter">
-        {(texts[index] || "").slice(0, charIndex)}
+    <div className="flex items-center h-6">
+      <span className="text-[10px] lg:text-sm font-bold text-blue-300 font-mono">
+        {(texts[index] || '').slice(0, charIndex)}
       </span>
-
-      {/* improved cursor (cleaner than animate-pulse) */}
-      <span className="w-2 h-8 sm:h-10 ml-2 bg-[#DC2626] border border-[#000000] typing-cursor" />
-      
-      <style>{`
-        .typing-cursor {
-          animation: blink 0.8s infinite;
-        }
-
-        @keyframes blink {
-          0%, 49% { opacity: 1; }
-          50%, 100% { opacity: 0; }
-        }
-      `}</style>
+      <span className="w-0.5 h-3 ml-1 bg-blue-400 animate-pulse" />
     </div>
-  );
+  )
 }
 
-const About = () => {
+export default function About() {
   return (
-    <section id="about" className="section-split min-h-screen flex items-center justify-center py-20 px-4 sm:px-6 lg:px-8 bg-transparent">
-      <div className="section-content relative z-10 max-w-7xl mx-auto w-full">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center">
+    <section
+      id="about"
+      className="relative overflow-hidden"
+      style={{ minHeight: '100svh' }}
+    >
+      {/* Explicit flex row — ALWAYS side by side on every screen size */}
+      <div
+        className="flex flex-row lg:pl-52 xl:pl-64"
+        style={{ minHeight: '100svh' }}
+      >
 
-          {/* LEFT */}
-          <div className="order-2 lg:order-1 space-y-10">
-            <div className="space-y-4">
-              <div className="inline-block">
-                <h2 className="text-6xl sm:text-7xl lg:text-8xl font-black mb-2 text-[#FFFFFF] tracking-tighter uppercase">
-                  About Me
-                </h2>
-                <div className="h-4 bg-gradient-to-r from-[#2563EB] via-[#000000] to-[#DC2626] w-full max-w-[250px]"></div>
-              </div>
-            </div>
+        {/* ── LEFT: text ── */}
+        <div
+          className="flex flex-col justify-center py-12 space-y-3 lg:space-y-5 shrink-0"
+          style={{ width: '50%', paddingInline: 'clamp(12px, 4vw, 48px)' }}
+        >
+          <span
+            className="font-black text-blue-400 uppercase tracking-widest"
+            style={{ fontSize: 'clamp(8px, 1.8vw, 12px)' }}
+          >
+            Software Engineer
+          </span>
 
-            {/* BIO */}
-            <div className="bg-white/95 p-8 sm:p-12 border-4 border-[#000000] shadow-[12px_12px_0px_0px_rgba(0,0,0,1)] backdrop-blur-sm">
-              <p className="text-xl sm:text-2xl text-[#111827] leading-tight font-black uppercase tracking-tight">
-                Hello Everyone! I'm{' '}
-                <span className="text-[#2563EB] underline decoration-4 underline-offset-4">
-                  Swastik Paudel
-                </span>
-                , a developer building high-execution web systems with a focus on logical infrastructure.
-              </p>
-            </div>
+          <h1
+            className="font-black text-white tracking-tight leading-tight"
+            style={{ fontSize: 'clamp(20px, 5.5vw, 72px)' }}
+          >
+            Swastik{' '}
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-indigo-300 to-cyan-400">
+              Paudel
+            </span>
+          </h1>
 
-            {/* STATUS */}
-            <div className="bg-slate-50/90 p-6 sm:p-8 border-4 border-[#000000] shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] backdrop-blur-sm">
-              <div className="flex items-center gap-3 mb-6">
-                <div className="w-4 h-4 bg-[#DC2626] border-2 border-[#000000] animate-ping"></div>
-                <span className="text-sm sm:text-base text-[#000000] uppercase tracking-[0.2em] font-black">
-                  Active Developer
-                </span>
-              </div>
+          <p
+            className="text-slate-400 leading-relaxed"
+            style={{ fontSize: 'clamp(10px, 1.8vw, 18px)' }}
+          >
+            Full-Stack Systems &amp; Web Application Developer
+          </p>
 
-              <TypingSimple
-                texts={[
-                  "Full Stack Web Developer",
-                  "Game Developer",
-                  "AI Enthusiast",
-                ]}
-              />
-            </div>
+          <div className="flex items-center gap-1.5">
+            <Terminal className="shrink-0 text-blue-400" style={{ width: 'clamp(10px, 2vw, 16px)', height: 'clamp(10px, 2vw, 16px)' }} />
+            <TypingSimple
+              texts={[
+                'Full-Stack Software Engineer',
+                'Systems Architect & OSINT Dev',
+                'Game Engineer · Rust & Bevy',
+              ]}
+            />
+          </div>
 
-            {/* GITHUB */}
+          <div className="flex flex-col sm:flex-row flex-wrap gap-2 pt-1">
             <a
               href="https://github.com/Swastik45"
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-block bg-[#000000] text-[#FFFFFF] px-8 py-4 border-4 border-[#000000] font-black uppercase tracking-tight text-lg hover:bg-[#DC2626] transition-all duration-300 shadow-[6px_6px_0px_0px_rgba(220,38,38,1)] hover:shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]"
+              className="inline-flex items-center justify-center gap-1 bg-blue-600 hover:bg-blue-500 text-white rounded-lg font-semibold transition-all duration-300 shadow-lg"
+              style={{ padding: 'clamp(6px,1.5vw,14px) clamp(10px,3vw,28px)', fontSize: 'clamp(9px,1.6vw,14px)' }}
             >
-              Visit GitHub →
+              GitHub <ArrowUpRight style={{ width: 'clamp(9px,1.5vw,16px)', height: 'clamp(9px,1.5vw,16px)' }} />
+            </a>
+            <a
+              href="#contact"
+              className="inline-flex items-center justify-center gap-1 bg-transparent hover:bg-slate-800 text-slate-300 border border-slate-700 rounded-lg font-semibold transition-all duration-300"
+              style={{ padding: 'clamp(6px,1.5vw,14px) clamp(10px,3vw,28px)', fontSize: 'clamp(9px,1.6vw,14px)' }}
+            >
+              <Mail className="text-blue-400" style={{ width: 'clamp(9px,1.5vw,16px)', height: 'clamp(9px,1.5vw,16px)' }} />
+              Contact
             </a>
           </div>
-
-          {/* RIGHT */}
-          <div className="order-1 lg:order-2 flex justify-center lg:justify-end">
-            <div className="relative group">
-
-              <div className="relative p-4 sm:p-6 bg-[#FFFFFF] border-[6px] border-[#000000] shadow-[20px_20px_0px_0px_#000000] transition-all duration-300 group-hover:translate-x-2 group-hover:translate-y-2 group-hover:shadow-none">
-
-                <div className="relative aspect-square w-64 h-64 sm:w-80 sm:h-80 lg:w-96 lg:h-96 border-4 border-[#000000] bg-[#000000] overflow-hidden">
-                  <img
-                    src="https://avatars.githubusercontent.com/u/149481053?v=4"
-                    alt="Swastik Paudel"
-                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                  />
-                </div>
-
-                <div className="absolute -top-5 -left-5 bg-[#000000] text-[#FFFFFF] px-4 py-2 font-black text-xs border-2 border-[#FFFFFF]">
-                  SWASTIK
-                </div>
-
-                <div className="absolute -bottom-4 -right-4 bg-[#DC2626] text-[#FFFFFF] px-4 py-2 font-black text-xs border-2 border-[#000000]">
-                  FULL STACK
-                </div>
-
-              </div>
-
-            </div>
-          </div>
-
         </div>
+
+        {/* ── RIGHT: photo fills the other half ── */}
+        <div
+          className="relative overflow-hidden shrink-0"
+          style={{ width: '50%' }}
+        >
+          {/* Subtle glow behind photo */}
+          <div className="absolute inset-0 bg-gradient-to-l from-blue-600/10 via-transparent to-transparent pointer-events-none" />
+
+          <img
+            src="./swastik-cutout.png"
+            alt="Swastik Paudel"
+            className="absolute inset-0 w-full h-full object-contain object-center select-none pointer-events-none"
+            style={{ filter: 'drop-shadow(-12px 0 32px rgba(0,0,0,0.7))' }}
+          />
+
+          {/* bottom vignette */}
+          <div
+            className="absolute inset-x-0 bottom-0 pointer-events-none"
+            style={{ height: '20%', background: 'linear-gradient(to top, #080a14, transparent)' }}
+          />
+        </div>
+
       </div>
     </section>
   )
 }
-
-export default About

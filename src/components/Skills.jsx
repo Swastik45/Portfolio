@@ -1,20 +1,18 @@
 import React from 'react'
+import { Cpu, Award } from 'lucide-react'
 
 const technicalStack = [
   {
     category: 'Development Architecture',
     skills: ['React.js', 'Next.js', 'TypeScript', 'Node.js', 'PHP', 'JavaScript (ES6+)'],
-    color: '#2563EB'
   },
   {
     category: 'Data & Systems',
-    skills: ['PostgreSQL', 'Prisma ORM', 'Supabase', 'MongoDB', 'Redis', 'Firebase/Firestore'],
-    color: '#DC2626'
+    skills: ['PostgreSQL', 'Prisma ORM', 'Supabase', 'MongoDB', 'Redis', 'Firebase / Firestore'],
   },
   {
     category: 'Tools & Infrastructure',
-    skills: ['WebAuthn', 'Twilio / Nodemailer', 'Tailwind CSS', 'Git/GitHub', 'KaTeX', 'System Auditing'],
-    color: '#000000'
+    skills: ['WebAuthn', 'Twilio / Nodemailer', 'Tailwind CSS', 'Git & GitHub', 'KaTeX', 'System Auditing'],
   }
 ]
 
@@ -34,76 +32,78 @@ const accomplishments = [
   {
     title: 'Systems Auditor',
     organization: 'Freelance & Open Source',
-    description: 'Managing and optimizing technical infrastructure for clients with a focus on clean execution.',
+    description: 'Managing and optimizing technical infrastructure for client platforms with focus on code quality.',
     icon: '⚙️'
   }
 ]
 
 const Skills = () => {
   return (
-    <section
-      id="skills"
-      className="section-split min-h-screen py-20 px-4 sm:px-6 bg-transparent"
-    >
-      <div className="section-content relative z-10 max-w-6xl mx-auto">
+    <section id="skills" className="min-h-screen py-24 px-4 sm:px-6 lg:px-8">
+      <div className="section-content max-w-6xl mx-auto px-4 sm:px-6 lg:pl-72 bg-slate-900/60 border border-slate-800/80 rounded-3xl p-6 sm:p-10 backdrop-blur-md shadow-2xl">
 
-        {/* HEADER */}
-        <div className="mb-16 inline-block">
-          <h2 className="text-6xl font-black uppercase tracking-tighter text-white">
+        {/* Section Header */}
+        <div className="mb-16">
+          <div className="flex items-center gap-3 mb-2">
+            <Cpu className="w-6 h-6 text-blue-400" />
+            <span className="text-sm font-semibold tracking-wider text-blue-400 uppercase">
+              Skills & Recognition
+            </span>
+          </div>
+          <h2 className="text-4xl sm:text-5xl font-extrabold tracking-tight text-white">
             Technical Arsenal
           </h2>
-          <div className="h-4 bg-gradient-to-r from-blue-600 via-black to-red-600 w-full mt-2" />
+          <div className="h-1 bg-gradient-to-r from-blue-500 to-indigo-500 w-24 mt-4 rounded-full" />
         </div>
 
-        {/* ACCOMPLISHMENTS */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-20">
+        {/* Accomplishments Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-16">
           {(accomplishments || []).map((item, idx) => (
             <div
               key={`${item.title}-${idx}`}
-              className="bg-white/95 border-4 border-black p-8 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] hover:translate-x-1 hover:translate-y-1 hover:shadow-none transition-all backdrop-blur-sm"
+              className="bg-slate-900/80 border border-slate-800/90 rounded-2xl p-6 sm:p-8 backdrop-blur-md hover:border-slate-700 transition-all shadow-xl space-y-3"
             >
-              <div className="text-4xl mb-4">{item.icon}</div>
+              <div className="text-3xl mb-2">{item.icon}</div>
 
-              <h3 className="text-xl font-black uppercase leading-tight mb-1 text-black">
+              <h3 className="text-xl font-bold text-white tracking-tight">
                 {item.title}
               </h3>
 
-              <p className="text-xs font-black text-red-600 uppercase tracking-widest mb-4">
+              <p className="text-xs font-semibold text-blue-400 uppercase tracking-wider">
                 {item.organization}
               </p>
 
-              <p className="text-sm font-bold text-gray-600 leading-relaxed uppercase">
+              <p className="text-sm text-slate-300 leading-relaxed font-normal">
                 {item.description}
               </p>
             </div>
           ))}
         </div>
 
-        {/* SKILLS GRID */}
+        {/* Tech Stack Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {(technicalStack || []).map((stack, idx) => (
             <div
               key={`${stack.category}-${idx}`}
-              className="relative bg-white/95 border-4 border-black shadow-[12px_12px_0px_0px_rgba(0,0,0,1)] overflow-hidden backdrop-blur-sm"
+              className="bg-slate-900/80 border border-slate-800/90 rounded-2xl overflow-hidden backdrop-blur-md shadow-xl"
             >
-
-              {/* HEADER */}
-              <div className="bg-black p-4 border-b-4 border-black">
-                <h3 className="text-lg font-black text-white uppercase tracking-widest text-center">
+              {/* Header */}
+              <div className="bg-slate-950/60 p-5 border-b border-slate-800">
+                <h3 className="text-base font-bold text-white uppercase tracking-wider text-center">
                   {stack.category}
                 </h3>
               </div>
 
-              {/* CONTENT */}
-              <div className="p-8">
-                <ul className="space-y-4">
+              {/* Skill List */}
+              <div className="p-6 sm:p-8">
+                <ul className="space-y-3.5">
                   {(stack.skills || []).map((skill) => (
                     <li
                       key={skill}
-                      className="flex items-center gap-4 group"
+                      className="flex items-center gap-3 text-slate-200"
                     >
-                      <div className="h-4 w-4 bg-red-600 border-2 border-black group-hover:rotate-45 transition-transform" />
-                      <span className="text-lg font-black text-black uppercase tracking-tighter">
+                      <span className="w-2 h-2 rounded-full bg-blue-400 shrink-0" />
+                      <span className="text-base font-medium">
                         {skill}
                       </span>
                     </li>
@@ -115,17 +115,15 @@ const Skills = () => {
           ))}
         </div>
 
-        {/* FOOTER */}
-        <div className="mt-20 border-t-4 border-black pt-8 flex justify-between items-end">
-          <div className="max-w-md">
-            <p className="text-2xl font-black text-white uppercase leading-none">
-              Always optimizing. <br /> Always building.
-            </p>
-          </div>
+        {/* Footer info */}
+        <div className="mt-16 border-t border-slate-800/80 pt-8 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 text-slate-400">
+          <p className="text-lg font-semibold text-slate-300">
+            Always optimizing. Always building.
+          </p>
 
-          <div className="bg-black text-white px-6 py-3 font-black uppercase text-sm tracking-widest border-2 border-white">
-            Ver. 2.0.26
-          </div>
+          <span className="px-3 py-1 text-xs font-medium bg-slate-900 border border-slate-800 rounded-full text-slate-400">
+            v2.0.26
+          </span>
         </div>
 
       </div>

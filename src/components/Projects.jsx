@@ -1,11 +1,12 @@
-import React, { useState, useCallback } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
+import { FolderGit2, ExternalLink, Github, ChevronDown, ChevronUp, Filter } from 'lucide-react'
 
 const personalProjects = [
   {
     title: 'ShareAudit',
-    description: 'A high-performance financial auditing dashboard designed to analyze stock portfolio risk concentration and growth metrics. Built with a focus on data accuracy and automated scraping logic for Nepal\'s NEPSE market.',
+    category: 'FinTech & Auditing',
+    description: 'A high-performance financial auditing dashboard designed to analyze stock portfolio risk concentration and growth metrics. Built with automated scraping logic for Nepal\'s NEPSE market.',
     link: 'https://share-audit.vercel.app/', 
-    image: 'https://raw.githubusercontent.com/Swastik45/ShareAudit/refs/heads/main/public/dashboard.png',
     technologies: ['Next.js', 'TypeScript', 'Tremor', 'Tailwind CSS'],
     github: 'https://github.com/Swastik45/ShareAudit',
     date: '2026',
@@ -23,9 +24,9 @@ const personalProjects = [
   },
   {
     title: 'GovAudit NP',
+    category: 'FinTech & Auditing',
     description: 'An autonomous accountability dashboard leveraging OSINT data collection to verify and track government reform agendas. Built to provide real-time, data-driven insights into governance milestones.',
     link: 'https://gova-audit-np.vercel.app/', 
-    image: 'https://raw.githubusercontent.com/Swastik45/GovaAuditNP/refs/heads/main/frontend/public/Screenshot%20from%202026-04-19%2017-59-32.png',
     technologies: ['Next.js', 'TypeScript', 'Python', 'jsPDF'],
     github: 'https://github.com/Swastik45/GovaAuditNP',
     date: '2026',
@@ -43,9 +44,9 @@ const personalProjects = [
   },
   {
     title: 'CarbonCredit',
-    description: 'A decentralized marketplace for tracking and trading verified carbon credits. Uses satellite-derived NDVI analysis to automate plantation health verification and ensure data-driven transparency in carbon sequestration.',
+    category: 'Web & Decentralized',
+    description: 'A decentralized marketplace for tracking and trading verified carbon credits. Uses satellite-derived NDVI analysis to automate plantation health verification and ensure data-driven transparency.',
     link: 'https://carbon-credit-opal.vercel.app/', 
-    image: 'https://raw.githubusercontent.com/Swastik45/CarbonCredit/refs/heads/main/public/Screenshot%20from%202026-04-19%2018-06-27.png',
     technologies: ['Next.js', 'TypeScript', 'Supabase', 'Tailwind CSS', 'Leaflet'],
     github: 'https://github.com/Swastik45/CarbonCredit',
     date: '2026',
@@ -63,9 +64,9 @@ const personalProjects = [
   },
   {
     title: 'Lumino',
-    description: 'An AI-powered image discovery platform that combines curated stock photography from Unsplash with AI-generated imagery. Search millions of photos or create unique visuals from text prompts in one beautiful interface.',
+    category: 'Web & Decentralized',
+    description: 'An AI-powered image discovery platform combining curated stock photography with generative AI visuals. Search millions of photos or create unique artwork from text prompts.',
     link: 'https://lumino-five.vercel.app/',
-    image: 'https://raw.githubusercontent.com/Swastik45/Lumino/refs/heads/main/Screenshot%20from%202026-05-14%2019-05-18.png',
     technologies: ['Next.js', 'React', 'TypeScript', 'Tailwind CSS'],
     github: 'https://github.com/Swastik45/Lumino',
     date: '2026',
@@ -75,9 +76,9 @@ const personalProjects = [
   },
   {
     title: '2D Shooting Game',
-    description: 'A dynamic action game where you control a player character that must survive waves of enemies. Defeat enemies by shooting them with your gun while managing your health and avoiding enemy fire.',
+    category: 'Game Dev & Systems',
+    description: 'A dynamic action game built with Rust and Bevy Engine. Control a player character that must survive waves of enemies with collision physics and score tracking.',
     link: 'https://github.com/Swastik45/2D-Shooting-Game',
-    image: 'https://raw.githubusercontent.com/Swastik45/2D-Shooting-Game/refs/heads/main/Screenshot%20from%202026-04-30%2018-26-25.png',
     technologies: ['Rust', 'Bevy Engine'],
     github: 'https://github.com/Swastik45/2D-Shooting-Game',
     date: '2026',
@@ -85,200 +86,220 @@ const personalProjects = [
     features: ['Enemy AI waves', 'Combat system', 'Score tracking'],
     techHighlights: ['ECS architecture', 'Collision detection', 'Tile-based world']
   },
- 
 ];
 
+const categories = ['All', 'FinTech & Auditing', 'Web & Decentralized', 'Game Dev & Systems']
+const ProjectPreview = ({ project }) => {
+  const [previewImage, setPreviewImage] = useState(null)
+
+  useEffect(() => {
+    const controller = new AbortController()
+
+    fetch(`https://api.microlink.io/?url=${encodeURIComponent(project.link)}&screenshot=true&meta=false`, {
+      signal: controller.signal
+    })
+      .then(response => response.ok ? response.json() : Promise.reject(new Error('Preview request failed')))
+      .then(data => setPreviewImage(data.data?.screenshot?.url || null))
+      .catch(() => setPreviewImage(null))
+
+    return () => controller.abort()
+  }, [project.link])
+
+  return previewImage ? (
+    <img
+      src={previewImage}
+      alt={project.title}
+      loading="lazy"
+      className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
+      onError={() => setPreviewImage(null)}
+    />
+  ) : (
+    <div className="flex h-full items-center justify-center bg-slate-900 text-sm font-semibold tracking-wider text-slate-500">
+      Loading preview...
+    </div>
+  )
+}
+
 const Projects = () => {
-  const [expandedProject, setExpandedProject] = useState(null)
+  const [activeCategory, setActiveCategory] = useState('All')
+  const [expandedProject, setExpandedProject] = useState(0)
 
   const toggleProject = useCallback((index) => {
     setExpandedProject(prev => (prev === index ? null : index))
   }, [])
 
-  return (
-    <section
-      id="projects"
-      className="section-split min-h-screen py-20 px-4 sm:px-6 bg-transparent"
-    >
-      <div className="section-content relative z-10 max-w-5xl mx-auto">
+  const filteredProjects = personalProjects.filter(p =>
+    activeCategory === 'All' ? true : p.category === activeCategory
+  )
 
-        {/* Heading */}
-        <div className="mb-16 inline-block">
-          <h2 className="text-6xl font-black uppercase tracking-tighter text-white">
+  return (
+    <section id="projects" className="min-h-screen py-24 px-4 sm:px-6 lg:px-8">
+      <div className="section-content max-w-6xl mx-auto px-4 sm:px-6 lg:pl-72">
+
+        {/* Section Header */}
+        <div className="mb-12">
+          <div className="flex items-center gap-3 mb-2">
+            <FolderGit2 className="w-6 h-6 text-blue-400" />
+            <span className="text-sm font-semibold tracking-wider text-blue-400 uppercase">
+              Portfolio & Open Source
+            </span>
+          </div>
+          <h2 className="text-4xl sm:text-5xl font-extrabold tracking-tight text-white">
             Selected Works
           </h2>
-          <div className="h-4 bg-gradient-to-r from-blue-600 via-black to-red-600 w-full mt-2" />
+          <div className="h-1 bg-gradient-to-r from-blue-500 to-indigo-500 w-24 mt-4 rounded-full" />
         </div>
 
-        <div className="grid grid-cols-1 gap-12">
+        {/* CATEGORY FILTER TABS */}
+        <div className="flex flex-wrap items-center gap-2 mb-10 pb-2">
+          <span className="text-xs font-semibold text-slate-400 mr-2 flex items-center gap-1">
+            <Filter className="w-3.5 h-3.5 text-blue-400" />
+            Filter:
+          </span>
+          {categories.map((cat) => {
+            const isActive = activeCategory === cat
 
-          {personalProjects.map((project, index) => {
+            return (
+              <button
+                key={cat}
+                onClick={() => {
+                  setActiveCategory(cat)
+                  setExpandedProject(0)
+                }}
+                className={`
+                  px-4 py-2 text-xs font-semibold rounded-xl border transition-all duration-200
+                  ${isActive
+                    ? 'bg-blue-600 border-blue-500 text-white shadow-lg shadow-blue-500/20'
+                    : 'bg-slate-900/80 border-slate-800 text-slate-400 hover:text-white hover:border-slate-700'}
+                `}
+              >
+                {cat}
+              </button>
+            )
+          })}
+        </div>
+
+        {/* Projects List */}
+        <div className="space-y-6">
+          {filteredProjects.map((project, index) => {
             const isExpanded = expandedProject === index
 
             return (
               <div
                 key={`${project.title}-${index}`}
-                className="relative bg-white/95 border-4 border-black shadow-[12px_12px_0px_0px_rgba(0,0,0,1)] overflow-hidden backdrop-blur-sm"
+                className="bg-slate-900/80 border border-slate-800/90 rounded-2xl overflow-hidden backdrop-blur-md transition-all duration-300 hover:border-slate-700 shadow-xl"
               >
-
-                {/* top accent */}
-                <div className="absolute inset-x-0 top-0 h-2 bg-gradient-to-r from-blue-600 to-red-600" />
-
-                <div className="pt-4">
-
-                  {/* HEADER */}
-                  <div
-                    role="button"
-                    tabIndex={0}
-                    className={`
-                      p-6 cursor-pointer flex flex-col md:flex-row md:items-center justify-between transition-all duration-200
-                      ${isExpanded ? "bg-black text-white" : "hover:bg-gray-100 text-black"}
-                    `}
-                    onClick={() => toggleProject(index)}
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter' || e.key === ' ') {
-                        e.preventDefault()
-                        toggleProject(index)
-                      }
-                    }}
-                  >
-
-                    <div className="flex items-center gap-6">
-
-                      <span className={`text-4xl font-black ${isExpanded ? "text-white/40" : "text-black/20"}`}>
-                        {String(index + 1).padStart(2, '0')}
-                      </span>
-
-                      <div>
-                        <h3 className="text-2xl font-black uppercase tracking-tight">
-                          {project.title}
-                        </h3>
-
-                        <div className="flex flex-wrap gap-2 mt-2">
-                          {(project.technologies || []).map((tech) => (
-                            <span
-                              key={tech}
-                              className={`
-                                text-[10px] font-black uppercase tracking-widest border-2 px-2 py-1
-                                ${isExpanded ? "border-white" : "border-black"}
-                              `}
-                            >
-                              {tech}
-                            </span>
-                          ))}
-                        </div>
-                      </div>
-
-                    </div>
-
-                    <div className="mt-4 md:mt-0">
-                      <span className={`text-xs font-black uppercase px-4 py-2 border-2 ${isExpanded ? "border-white" : "border-black"}`}>
-                        {isExpanded ? "HIDE DETAILS [-]" : "VIEW DETAILS [+]"}
-                      </span>
-                    </div>
-
-                  </div>
-
-                  {/* EXPANDED CONTENT */}
-                  {isExpanded && (
-                    <div className="p-8 border-t-4 border-black bg-white/95">
-
-                      <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
-
-                        {/* LEFT */}
-                        <div className="space-y-6">
-
-                          <p className="text-xl font-bold leading-tight border-l-8 border-red-600 pl-4 uppercase">
-                            {project.description}
-                          </p>
-
-                          <div className="grid sm:grid-cols-2 gap-4">
-
-                            <div className="p-4 border-2 border-black bg-gray-100">
-                              <h4 className="font-black uppercase text-xs mb-3 text-red-600 tracking-widest">
-                                Core Features
-                              </h4>
-
-                              <ul className="space-y-2 text-xs font-black">
-                                {(project.features || []).map((f) => (
-                                  <li key={f} className="flex gap-2">
-                                    <span>//</span>{f}
-                                  </li>
-                                ))}
-                              </ul>
-                            </div>
-
-                            <div className="p-4 border-2 border-black bg-gray-100">
-                              <h4 className="font-black uppercase text-xs mb-3 text-blue-600 tracking-widest">
-                                Engineering
-                              </h4>
-
-                              <ul className="space-y-2 text-xs font-black">
-                                {(project.techHighlights || []).map((t) => (
-                                  <li key={t} className="flex gap-2">
-                                    <span>&gt;</span>{t}
-                                  </li>
-                                ))}
-                              </ul>
-                            </div>
-
-                          </div>
-
-                          <div className="flex flex-col sm:flex-row gap-4 pt-4">
-
-                            <a
-                              href={project.github}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="flex-1 bg-black text-white text-center py-4 border-2 border-black font-black uppercase tracking-widest hover:bg-red-600 transition-colors"
-                            >
-                              Source Code
-                            </a>
-
-                            <a
-                              href={project.link}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="flex-1 border-4 border-black text-center py-3 font-black uppercase tracking-widest hover:bg-black hover:text-white transition-all"
-                            >
-                              Live System
-                            </a>
-
-                          </div>
-
-                        </div>
-
-                        {/* IMAGE */}
-                        <div className="relative border-4 border-black bg-black aspect-video">
-
-                          <img
-                            src={project.image}
-                            alt={project.title}
-                            loading="lazy"
-                            className="w-full h-full object-cover"
-                            onError={(e) => {
-                              e.currentTarget.src =
-                                "https://placehold.co/800x400/000000/FFFFFF?text=NO+IMAGE"
-                            }}
-                          />
-
-                          <div className="absolute bottom-2 right-2 bg-black text-white text-[10px] px-2 py-1 border border-white font-bold">
-                            REF_IMG_{index + 1}
-                          </div>
-
-                        </div>
-
-                      </div>
-
-                    </div>
-                  )}
-
+                {/* Always-visible project screenshot */}
+                <div className="relative w-full aspect-video overflow-hidden bg-slate-950 border-b border-slate-800">
+                  <ProjectPreview project={project} />
+                  <div className="absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-slate-900/90 to-transparent pointer-events-none" />
+                  <span className="absolute top-3 left-3 px-2 py-0.5 text-[10px] font-semibold text-slate-300 bg-slate-900/80 backdrop-blur-sm rounded-md border border-slate-700">
+                    {project.category}
+                  </span>
                 </div>
 
+                {/* Header Toggle */}
+                <div
+                  role="button"
+                  tabIndex={0}
+                  onClick={() => toggleProject(index)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggleProject(index) }
+                  }}
+                  className="p-5 sm:p-6 cursor-pointer flex flex-col sm:flex-row sm:items-center justify-between gap-4 hover:bg-slate-800/40 transition-colors"
+                >
+                  <div className="flex items-start sm:items-center gap-4">
+                    <span className="text-xl font-bold text-slate-500 shrink-0">
+                      {String(index + 1).padStart(2, '0')}
+                    </span>
+                    <div className="space-y-1.5">
+                      <h3 className="text-lg sm:text-xl font-bold text-white tracking-tight">
+                        {project.title}
+                      </h3>
+                      <div className="flex flex-wrap gap-1.5">
+                        {(project.technologies || []).map((tech) => (
+                          <span key={tech} className="px-2 py-0.5 text-[10px] font-medium text-blue-300 bg-blue-950/60 border border-blue-800/50 rounded-md">
+                            {tech}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-1.5 text-sm font-semibold text-blue-400 shrink-0">
+                    <span>{isExpanded ? 'Hide' : 'Details'}</span>
+                    {isExpanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+                  </div>
+                </div>
+
+                {/* Expanded Project Content */}
+                {isExpanded && (
+                  <div className="px-6 pb-8 pt-4 sm:px-8 border-t border-slate-800/80 bg-slate-950/40 space-y-8">
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
+
+                      {/* Left Column: Info & Links */}
+                      <div className="space-y-6">
+                        <p className="text-sm sm:text-base text-slate-300 leading-relaxed border-l-4 border-blue-500 pl-4">
+                          {project.description}
+                        </p>
+
+                        <div className="grid sm:grid-cols-2 gap-4 text-xs">
+                          <div className="p-4 bg-slate-900/90 border border-slate-800 rounded-xl space-y-2">
+                            <h4 className="font-bold text-blue-400 uppercase tracking-wider">
+                              Core Features
+                            </h4>
+                            <ul className="space-y-1.5 text-slate-300">
+                              {(project.features || []).map((f) => (
+                                <li key={f} className="flex items-center gap-2">
+                                  <span className="w-1.5 h-1.5 rounded-full bg-blue-400" />
+                                  <span>{f}</span>
+                                </li>
+                              ))}
+                            </ul>
+                          </div>
+
+                          <div className="p-4 bg-slate-900/90 border border-slate-800 rounded-xl space-y-2">
+                            <h4 className="font-bold text-indigo-400 uppercase tracking-wider">
+                              Engineering
+                            </h4>
+                            <ul className="space-y-1.5 text-slate-300">
+                              {(project.techHighlights || []).map((t) => (
+                                <li key={t} className="flex items-center gap-2">
+                                  <span className="w-1.5 h-1.5 rounded-full bg-indigo-400" />
+                                  <span>{t}</span>
+                                </li>
+                              ))}
+                            </ul>
+                          </div>
+                        </div>
+
+                      {/* Links */}
+                      <div className="flex flex-col sm:flex-row gap-3 pt-2">
+                        <a
+                          href={project.github}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="flex-1 inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-slate-800 hover:bg-slate-700 text-white text-sm font-semibold rounded-xl border border-slate-700 transition-colors"
+                        >
+                          <Github className="w-4 h-4" />
+                          <span>Source Code</span>
+                        </a>
+                        <a
+                          href={project.link}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="flex-1 inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-blue-600 hover:bg-blue-500 text-white text-sm font-semibold rounded-xl transition-colors shadow-md"
+                        >
+                          <span>Live Project</span>
+                          <ExternalLink className="w-4 h-4" />
+                        </a>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                )}
               </div>
             )
           })}
-
         </div>
 
       </div>
