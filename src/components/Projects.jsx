@@ -46,7 +46,7 @@ const personalProjects = [
     title: 'CarbonCredit',
     category: 'Web & Decentralized',
     description: 'A decentralized marketplace for tracking and trading verified carbon credits. Uses satellite-derived NDVI analysis to automate plantation health verification and ensure data-driven transparency.',
-    link: 'https://carbon-credit-opal.vercel.app/', 
+    link: 'https://carbon-credit1.vercel.app/', 
     technologies: ['Next.js', 'TypeScript', 'Supabase', 'Tailwind CSS', 'Leaflet'],
     github: 'https://github.com/Swastik45/CarbonCredit',
     date: '2026',
