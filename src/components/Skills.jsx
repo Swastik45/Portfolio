@@ -1,134 +1,114 @@
 import React from 'react'
-import { Cpu, Award } from 'lucide-react'
 
-const technicalStack = [
+const stackGroups = [
   {
-    category: 'Development Architecture',
-    skills: ['React.js', 'Next.js', 'TypeScript', 'Node.js', 'PHP', 'JavaScript (ES6+)'],
+    category: 'Languages & Core',
+    items: ['TypeScript', 'JavaScript (ES6+)', 'Rust', 'Python', 'PHP', 'SQL', 'HTML5 & CSS3'],
   },
   {
-    category: 'Data & Systems',
-    skills: ['PostgreSQL', 'Prisma ORM', 'Supabase', 'MongoDB', 'Redis', 'Firebase / Firestore'],
+    category: 'Frameworks & Frontend',
+    items: ['Next.js (App Router)', 'React 19', 'Tailwind CSS v4', 'KaTeX Math', 'Vite'],
   },
   {
-    category: 'Tools & Infrastructure',
-    skills: ['WebAuthn', 'Twilio / Nodemailer', 'Tailwind CSS', 'Git & GitHub', 'KaTeX', 'System Auditing'],
-  }
+    category: 'Backend & Data Systems',
+    items: ['Node.js', 'PostgreSQL', 'Prisma ORM', 'Supabase', 'Redis', 'MongoDB', 'REST APIs'],
+  },
+  {
+    category: 'Systems & Infrastructure',
+    items: ['Bevy Engine (ECS)', 'Capacitor (Android)', 'Git & GitHub', 'WebAuthn', 'Linux / Bash', 'System Auditing'],
+  },
 ]
 
-const accomplishments = [
+const credentials = [
   {
     title: '2nd Runner Up',
-    organization: 'Code for Change +2 Grads Hackathon',
-    description: 'Awarded for technical execution and innovative problem solving among top secondary graduates.',
-    icon: '🏆'
+    issuer: 'Code for Change +2 Grads Hackathon',
+    year: '2025',
+    detail: 'Awarded for technical execution, speed, and innovative problem solving among top secondary graduates.',
   },
   {
     title: 'Certified Developer',
-    organization: 'freeCodeCamp',
-    description: 'Completed comprehensive curriculum covering Responsive Web Design and JavaScript Algorithms.',
-    icon: '📜'
+    issuer: 'freeCodeCamp',
+    year: '2024',
+    detail: 'Completed comprehensive curriculum covering Responsive Web Design, Data Structures, and JavaScript Algorithms.',
   },
   {
-    title: 'Systems Auditor',
-    organization: 'Freelance & Open Source',
-    description: 'Managing and optimizing technical infrastructure for client platforms with focus on code quality.',
-    icon: '⚙️'
-  }
+    title: 'Systems Auditor & Contributor',
+    issuer: 'Freelance & Open Source',
+    year: 'Active',
+    detail: 'Auditing and optimizing technical infrastructure for client platforms with a focus on code quality and security.',
+  },
 ]
 
-const Skills = () => {
+export default function Skills() {
   return (
-    <section id="skills" className="min-h-screen py-24 px-4 sm:px-6 lg:px-8">
-      <div className="section-content max-w-6xl mx-auto px-4 sm:px-6 lg:pl-72 bg-slate-900/60 border border-slate-800/80 rounded-3xl p-6 sm:p-10 backdrop-blur-md shadow-2xl">
-
+    <section id="skills" className="py-20 border-t border-zinc-800/80">
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
+        
         {/* Section Header */}
-        <div className="mb-16">
-          <div className="flex items-center gap-3 mb-2">
-            <Cpu className="w-6 h-6 text-blue-400" />
-            <span className="text-sm font-semibold tracking-wider text-blue-400 uppercase">
-              Skills & Recognition
-            </span>
-          </div>
-          <h2 className="text-4xl sm:text-5xl font-extrabold tracking-tight text-white">
-            Technical Arsenal
+        <div className="space-y-1">
+          <p className="text-xs font-mono uppercase tracking-widest text-zinc-500">
+            03 / Skills &amp; Credentials
+          </p>
+          <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-zinc-100">
+            Technical Stack
           </h2>
-          <div className="h-1 bg-gradient-to-r from-blue-500 to-indigo-500 w-24 mt-4 rounded-full" />
+          <p className="text-xs sm:text-sm font-mono text-zinc-500">
+            Languages, frameworks, data stores, and tools used day-to-day
+          </p>
         </div>
 
-        {/* Accomplishments Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-16">
-          {(accomplishments || []).map((item, idx) => (
+        {/* Desktop 4-Column Directory Grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          {stackGroups.map((group) => (
             <div
-              key={`${item.title}-${idx}`}
-              className="bg-slate-900/80 border border-slate-800/90 rounded-2xl p-6 sm:p-8 backdrop-blur-md hover:border-slate-700 transition-all shadow-xl space-y-3"
+              key={group.category}
+              className="rounded-xl border border-zinc-800 bg-zinc-900/40 p-5 space-y-4"
             >
-              <div className="text-3xl mb-2">{item.icon}</div>
-
-              <h3 className="text-xl font-bold text-white tracking-tight">
-                {item.title}
+              <h3 className="text-xs font-mono uppercase tracking-wider text-zinc-400 border-b border-zinc-800 pb-2">
+                {group.category}
               </h3>
 
-              <p className="text-xs font-semibold text-blue-400 uppercase tracking-wider">
-                {item.organization}
-              </p>
-
-              <p className="text-sm text-slate-300 leading-relaxed font-normal">
-                {item.description}
-              </p>
+              <ul className="space-y-2 font-mono text-xs text-zinc-300">
+                {group.items.map((item) => (
+                  <li key={item} className="flex items-center gap-2">
+                    <span className="w-1 h-1 rounded-full bg-zinc-500" />
+                    <span>{item}</span>
+                  </li>
+                ))}
+              </ul>
             </div>
           ))}
         </div>
 
-        {/* Tech Stack Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {(technicalStack || []).map((stack, idx) => (
-            <div
-              key={`${stack.category}-${idx}`}
-              className="bg-slate-900/80 border border-slate-800/90 rounded-2xl overflow-hidden backdrop-blur-md shadow-xl"
-            >
-              {/* Header */}
-              <div className="bg-slate-950/60 p-5 border-b border-slate-800">
-                <h3 className="text-base font-bold text-white uppercase tracking-wider text-center">
-                  {stack.category}
-                </h3>
+        {/* Credentials / Honors Section */}
+        <div className="space-y-4 pt-4">
+          <h3 className="text-xs font-mono uppercase tracking-widest text-zinc-500">
+            Recognition &amp; Credentials
+          </h3>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {credentials.map((c) => (
+              <div
+                key={c.title}
+                className="rounded-xl border border-zinc-800 bg-zinc-900/30 p-5 space-y-2"
+              >
+                <div className="flex items-center justify-between font-mono text-xs text-zinc-500">
+                  <span>{c.issuer}</span>
+                  <span>{c.year}</span>
+                </div>
+                <h4 className="text-base font-bold text-zinc-200 tracking-tight">
+                  {c.title}
+                </h4>
+                <p className="text-xs text-zinc-400 leading-relaxed">
+                  {c.detail}
+                </p>
               </div>
-
-              {/* Skill List */}
-              <div className="p-6 sm:p-8">
-                <ul className="space-y-3.5">
-                  {(stack.skills || []).map((skill) => (
-                    <li
-                      key={skill}
-                      className="flex items-center gap-3 text-slate-200"
-                    >
-                      <span className="w-2 h-2 rounded-full bg-blue-400 shrink-0" />
-                      <span className="text-base font-medium">
-                        {skill}
-                      </span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-
-            </div>
-          ))}
-        </div>
-
-        {/* Footer info */}
-        <div className="mt-16 border-t border-slate-800/80 pt-8 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 text-slate-400">
-          <p className="text-lg font-semibold text-slate-300">
-            Always optimizing. Always building.
-          </p>
-
-          <span className="px-3 py-1 text-xs font-medium bg-slate-900 border border-slate-800 rounded-full text-slate-400">
-            v2.0.26
-          </span>
+            ))}
+          </div>
         </div>
 
       </div>
     </section>
   )
 }
-
-export default Skills

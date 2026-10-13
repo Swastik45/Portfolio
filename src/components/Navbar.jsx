@@ -1,119 +1,150 @@
-import { Link } from "react-scroll";
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from 'react'
+import { Github, ArrowUpRight, Search, Menu, X } from 'lucide-react'
 
-export default function Navbar() {
-  const [open, setOpen] = useState(false);
+const navLinks = [
+  { label: 'About', href: '#about' },
+  { label: 'Experience', href: '#experience' },
+  { label: 'Projects', href: '#projects' },
+  { label: 'Stack', href: '#skills' },
+  { label: 'Contact', href: '#contact' },
+]
 
-  const links = [
-    { id: "about", label: "About" },
-    { id: "experience", label: "Experience" },
-    { id: "projects", label: "Projects" },
-    { id: "skills", label: "Skills" },
-    { id: "contact", label: "Contact" },
-  ];
+export default function Navbar({ onOpenCommandPalette }) {
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const [activeSection, setActiveSection] = useState('about')
 
-  // close mobile menu on resize to desktop
   useEffect(() => {
-    const handleResize = () => {
-      if (window.innerWidth >= 768) setOpen(false);
-    };
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
-  }, []);
+    const handleScroll = () => {
+      const ids = ['about', 'experience', 'projects', 'skills', 'contact']
+      const offset = window.scrollY + window.innerHeight * 0.35
+
+      for (const id of ids) {
+        const el = document.getElementById(id)
+        if (el) {
+          const { offsetTop, offsetHeight } = el
+          if (offset >= offsetTop && offset < offsetTop + offsetHeight) {
+            setActiveSection(id)
+            break
+          }
+        }
+      }
+    }
+    window.addEventListener('scroll', handleScroll, { passive: true })
+    handleScroll()
+    return () => window.removeEventListener('scroll', handleScroll)
+  }, [])
 
   return (
-    <nav className="fixed top-0 left-0 w-full z-[100] bg-slate-950/85 backdrop-blur-md border-b border-slate-800/80 h-16 sm:h-20">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-full">
-        <div className="flex items-center justify-between h-full">
+    <>
+      {/* Floating Pill Nav with Zero Border Lines */}
+      <header className="fixed top-4 sm:top-6 inset-x-0 z-50 flex justify-center px-4 pointer-events-none">
+        <div className="pointer-events-auto flex items-center justify-between gap-3 sm:gap-6 px-3.5 sm:px-5 py-2 rounded-full bg-zinc-900/85 backdrop-blur-xl border border-zinc-800/90 shadow-2xl shadow-black/60 text-xs">
+          
+          {/* Brand Mark */}
+          <a
+            href="#about"
+            className="flex items-center gap-2 font-mono font-semibold text-zinc-100 hover:text-white transition-colors pl-1"
+          >
+            <span className="w-2 h-2 rounded-full bg-emerald-400" />
+            <span>swastik.dev</span>
+          </a>
 
-          {/* LOGO */}
-          <div className="flex items-center">
-            <a
-              href="#"
-              className="text-xl sm:text-2xl font-black text-white tracking-wider flex items-center gap-2"
-            >
-              <span className="w-2.5 h-2.5 rounded-full bg-blue-500"></span>
-              SWASTIK
-            </a>
-          </div>
+          <div className="h-4 w-px bg-zinc-800 hidden md:block" />
 
-          {/* DESKTOP LINKS */}
-          <div className="hidden md:flex items-center h-full space-x-1">
-            {links.map((l) => (
-              <Link
-                key={l.id}
-                to={l.id}
-                smooth={true}
-                duration={500}
-                offset={-80}
-                spy={true}
-                activeClass="text-blue-400 font-semibold border-b-2 border-blue-400"
-                className="
-                  cursor-pointer h-full flex items-center px-4 text-slate-300
-                  font-medium text-sm transition-colors hover:text-white
-                "
-              >
-                {l.label}
-              </Link>
-            ))}
-          </div>
+          {/* Desktop Nav Links */}
+          <nav className="hidden md:flex items-center gap-1 font-mono">
+            {navLinks.map((link) => {
+              const id = link.href.replace('#', '')
+              const isActive = activeSection === id
+              return (
+                <a
+                  key={link.label}
+                  href={link.href}
+                  className={`px-3 py-1 rounded-full text-xs transition-all ${
+                    isActive
+                      ? 'bg-zinc-800 text-zinc-100 font-semibold shadow-sm'
+                      : 'text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/40'
+                  }`}
+                >
+                  {link.label}
+                </a>
+              )
+            })}
+          </nav>
 
-          {/* MOBILE BUTTON */}
+          <div className="h-4 w-px bg-zinc-800 hidden sm:block" />
+
+          {/* Command Palette Trigger Button (Hallmark of elite UI developer sites) */}
           <button
-            onClick={() => setOpen((prev) => !prev)}
-            onKeyDown={(e) => {
-              if (e.key === "Enter" || e.key === " ") {
-                setOpen((prev) => !prev);
-              }
-            }}
-            className="md:hidden p-2 text-slate-300 hover:text-white bg-slate-900 border border-slate-800 rounded-lg"
+            onClick={onOpenCommandPalette}
+            className="flex items-center gap-2 px-2.5 py-1 rounded-full bg-zinc-800/80 hover:bg-zinc-800 text-zinc-400 hover:text-zinc-200 border border-zinc-700/60 transition-colors font-mono text-[11px]"
+            title="Search & Commands (Ctrl+K)"
+          >
+            <Search className="w-3 h-3 text-zinc-400" />
+            <span className="hidden sm:inline">Search</span>
+            <kbd className="px-1.5 py-0.2 rounded bg-zinc-900 border border-zinc-700/80 text-[10px] text-zinc-400">
+              ⌘K
+            </kbd>
+          </button>
+
+          {/* GitHub Icon Link */}
+          <a
+            href="https://github.com/Swastik45"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="p-1.5 text-zinc-400 hover:text-white hover:bg-zinc-800/80 rounded-full transition-colors hidden sm:inline-flex"
+            title="GitHub Profile"
+          >
+            <Github className="w-3.5 h-3.5" />
+          </a>
+
+          {/* Mobile Toggle Button */}
+          <button
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            className="md:hidden p-1 text-zinc-400 hover:text-white"
             aria-label="Toggle menu"
           >
-            <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d={
-                  open
-                    ? "M6 18L18 6M6 6l12 12"
-                    : "M4 6h16M4 12h16M4 18h16"
-                }
-              />
-            </svg>
+            {mobileMenuOpen ? <X className="w-4 h-4" /> : <Menu className="w-4 h-4" />}
           </button>
 
         </div>
-      </div>
+      </header>
 
-      {/* MOBILE MENU */}
-      <div
-        className={`
-          md:hidden absolute top-full left-0 w-full bg-slate-950/95 backdrop-blur-lg
-          border-b border-slate-800 overflow-hidden transition-all duration-300
-          ${open ? "max-h-96 opacity-100" : "max-h-0 opacity-0"}
-        `}
-      >
-        <div className="flex flex-col py-2 px-4 space-y-1">
-          {links.map((l) => (
-            <Link
-              key={l.id}
-              to={l.id}
-              smooth={true}
-              duration={500}
-              offset={-80}
-              onClick={() => setOpen(false)}
-              className="
-                px-4 py-3 text-slate-300 font-medium text-sm rounded-lg
-                hover:bg-slate-900 hover:text-white transition-colors
-              "
+      {/* Mobile Drawer */}
+      {mobileMenuOpen && (
+        <div className="md:hidden fixed top-20 inset-x-4 z-40 bg-zinc-900/95 border border-zinc-800/90 rounded-2xl p-4 shadow-2xl backdrop-blur-2xl space-y-2">
+          {navLinks.map((link) => (
+            <a
+              key={link.label}
+              href={link.href}
+              onClick={() => setMobileMenuOpen(false)}
+              className="block px-3 py-2 rounded-xl text-sm font-mono text-zinc-300 hover:text-white hover:bg-zinc-800 transition-colors"
             >
-              {l.label}
-            </Link>
+              {link.label}
+            </a>
           ))}
+          <div className="pt-2 border-t border-zinc-800 flex items-center justify-between text-xs font-mono">
+            <a
+              href="https://github.com/Swastik45"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-zinc-400 hover:text-white flex items-center gap-1.5"
+            >
+              <Github className="w-3.5 h-3.5" />
+              <span>GitHub</span>
+            </a>
+            <button
+              onClick={() => {
+                setMobileMenuOpen(false)
+                onOpenCommandPalette()
+              }}
+              className="px-3 py-1 rounded-full bg-zinc-800 text-zinc-300"
+            >
+              Search (⌘K)
+            </button>
+          </div>
         </div>
-      </div>
-
-    </nav>
-  );
+      )}
+    </>
+  )
 }

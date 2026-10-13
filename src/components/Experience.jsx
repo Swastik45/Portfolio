@@ -1,173 +1,163 @@
-import React, { useState, useCallback } from 'react'
-import { Briefcase, Calendar, MapPin, ExternalLink, ChevronDown, ChevronUp } from 'lucide-react'
+import React from 'react'
+import { ArrowUpRight, ExternalLink, Globe } from 'lucide-react'
 
-const experiences = [
-  {
-    company: 'Madargaach Holdings',
-    role: 'Software Intern → Full Stack Developer',
-    period: '2025 — Present',
-    location: 'Nepal',
-    description:
-      'Led end-to-end full-stack software development for high-performance entrance preparation platforms, interactive testing systems, and progress analytics tools.',
-    technologies: [
-      'Next.js 16',
-      'React 19',
-      'TypeScript',
-      'Prisma',
-      'PostgreSQL',
-      'Supabase',
-      'Tailwind CSS',
-      'Redis',
-      'WebAuthn',
-    ],
-    highlights: [
-      'Designed and built multi-provider auth supporting OTP, Google OAuth, and WebAuthn passkeys.',
-      'Created interactive MCQ test engine with server-side grading and anti-cheat checks.',
-      'Migrated production database from SQLite to Supabase PostgreSQL using Prisma ORM.',
-      'Implemented WMA rating system, global leaderboards, milestone badges, and revision vault.',
-      'Built VimGolf formula recall arena with fill-in-the-blank LaTeX math rendering.',
-      'Shipped admin dashboard, payment flows, and question bank tools with duplicate detection.',
-    ],
-    org: 'https://github.com/Madargaach-Holdings',
-  },
+const highlights = [
+  'Engineered interactive mock test interfaces with timer mechanics, evaluation logic, and score summaries.',
+  'Implemented caching layers with Redis and client-side optimization to support fast page transitions.',
+  'Configured cross-platform mobile application builds for Android utilizing Capacitor.',
+  'Built user progress tracking dashboards, practice streaks, and subject-level performance metrics.',
+  'Integrated secure user authentication, modern passkey capabilities, and protected route access.',
 ]
 
-const Experience = () => {
-  const [expandedIndex, setExpandedIndex] = useState(0)
+const stack = [
+  'Next.js',
+  'React',
+  'TypeScript',
+  'Tailwind CSS',
+  'PostgreSQL',
+  'Prisma',
+  'Redis',
+  'Capacitor',
+]
 
-  const toggleExperience = useCallback((index) => {
-    setExpandedIndex((prev) => (prev === index ? null : index))
-  }, [])
-
+export default function Experience() {
   return (
-    <section id="experience" className="min-h-screen py-24 px-4 sm:px-6 lg:px-8">
-      <div className="section-content max-w-6xl mx-auto px-4 sm:px-6 lg:pl-72">
+    <section id="experience" className="py-20 border-t border-zinc-800/80">
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 space-y-10">
+        
         {/* Section Header */}
-        <div className="mb-16">
-          <div className="flex items-center gap-3 mb-2">
-            <Briefcase className="w-6 h-6 text-blue-400" />
-            <span className="text-sm font-semibold tracking-wider text-blue-400 uppercase">
-              Work Experience
-            </span>
-          </div>
-          <h2 className="text-4xl sm:text-5xl font-extrabold tracking-tight text-white">
-            Professional Experience
+        <div className="space-y-1">
+          <p className="text-xs font-mono uppercase tracking-widest text-zinc-500">
+            01 / Work Experience
+          </p>
+          <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-zinc-100">
+            Commercial Engineering
           </h2>
-          <div className="h-1 bg-gradient-to-r from-blue-500 to-indigo-500 w-24 mt-4 rounded-full" />
+          <p className="text-xs sm:text-sm font-mono text-zinc-500">
+            Full-stack development for production educational platforms
+          </p>
         </div>
 
-        {/* Experience List */}
-        <div className="space-y-8">
-          {experiences.map((exp, index) => {
-            const isExpanded = expandedIndex === index
+        {/* Widescreen Desktop Card for Madargaach Holdings & prepNep */}
+        <div className="rounded-2xl border border-zinc-800 bg-zinc-900/40 p-6 sm:p-8 space-y-8">
+          
+          {/* Header Row */}
+          <div className="flex flex-col sm:flex-row sm:items-baseline justify-between gap-2 border-b border-zinc-800/80 pb-5">
+            <div>
+              <h3 className="text-xl sm:text-2xl font-bold text-zinc-100 tracking-tight">
+                Full Stack Developer
+              </h3>
+              <p className="text-sm sm:text-base text-zinc-400 mt-0.5">
+                Madargaach Holdings · <span className="text-zinc-200 font-medium">prepNep</span>
+              </p>
+            </div>
 
-            return (
-              <div
-                key={`${exp.company}-${index}`}
-                className="bg-slate-900/80 border border-slate-800/90 rounded-2xl overflow-hidden backdrop-blur-md transition-all duration-300 hover:border-slate-700 shadow-xl"
-              >
-                {/* Header Toggle Bar */}
-                <div
-                  role="button"
-                  tabIndex={0}
-                  onClick={() => toggleExperience(index)}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter' || e.key === ' ') {
-                      e.preventDefault()
-                      toggleExperience(index)
-                    }
-                  }}
-                  className="p-6 sm:p-8 cursor-pointer flex flex-col md:flex-row md:items-center justify-between gap-6 hover:bg-slate-800/40 transition-colors"
+            <div className="flex items-center gap-3 text-xs font-mono text-zinc-500">
+              <span>2025 — Present</span>
+              <span>•</span>
+              <span>Kathmandu, Nepal</span>
+            </div>
+          </div>
+
+          {/* Desktop 2-Column Split */}
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+            
+            {/* Left Column (6 cols): Prose, Deliverables, Stack */}
+            <div className="lg:col-span-6 space-y-5">
+              <p className="text-sm sm:text-base text-zinc-300 leading-relaxed font-normal">
+                Full-stack software developer on <a href="https://prepnep.com" target="_blank" rel="noopener noreferrer" className="text-zinc-100 font-medium underline underline-offset-4 decoration-zinc-600 hover:decoration-zinc-200 transition-colors">prepNep</a> (prepnep.com), an exam preparation platform serving thousands of engineering and medical entrance aspirants across Nepal. Focused on core examination interfaces, caching architectures, and mobile client releases.
+              </p>
+
+              <div className="space-y-2.5 pt-2">
+                <h4 className="text-xs font-mono uppercase tracking-wider text-zinc-400">
+                  Key Engineering Responsibilities
+                </h4>
+                <ul className="space-y-2 text-sm text-zinc-400">
+                  {highlights.map((item) => (
+                    <li key={item} className="flex items-start gap-2.5">
+                      <span className="text-zinc-600 font-mono select-none">→</span>
+                      <span>{item}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
+              <div className="flex flex-wrap gap-1.5 font-mono text-xs pt-2">
+                {stack.map((t) => (
+                  <span
+                    key={t}
+                    className="px-2 py-0.5 rounded bg-zinc-900 text-zinc-300 border border-zinc-800"
+                  >
+                    {t}
+                  </span>
+                ))}
+              </div>
+
+              <div className="flex items-center gap-4 pt-3 text-xs font-mono">
+                <a
+                  href="https://prepnep.com"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-zinc-100 hover:bg-white text-zinc-900 font-sans font-semibold transition-colors"
                 >
-                  <div className="space-y-2">
-                    <div className="flex flex-wrap items-center gap-3 text-xs font-medium text-slate-400">
-                      <span className="flex items-center gap-1.5 text-blue-400 font-semibold">
-                        <Calendar className="w-3.5 h-3.5" />
-                        {exp.period}
-                      </span>
-                      <span>•</span>
-                      <span className="flex items-center gap-1.5 text-slate-400">
-                        <MapPin className="w-3.5 h-3.5" />
-                        {exp.location}
-                      </span>
-                    </div>
+                  <Globe className="w-3.5 h-3.5" />
+                  <span>Visit prepnep.com</span>
+                  <ArrowUpRight className="w-3.5 h-3.5" />
+                </a>
 
-                    <h3 className="text-2xl font-bold text-white tracking-tight">
-                      {exp.role}
-                    </h3>
+                <a
+                  href="https://github.com/Madargaach-Holdings"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1 text-zinc-400 hover:text-white transition-colors"
+                >
+                  <span>GitHub Org</span>
+                  <ExternalLink className="w-3.5 h-3.5" />
+                </a>
+              </div>
+            </div>
 
-                    <p className="text-base font-medium text-slate-300">
-                      {exp.company}
-                    </p>
-
-                    {/* Tech Stack Badges */}
-                    <div className="flex flex-wrap gap-2 pt-2">
-                      {exp.technologies.map((tech) => (
-                        <span
-                          key={tech}
-                          className="px-2.5 py-1 text-xs font-medium text-blue-300 bg-blue-950/60 border border-blue-800/50 rounded-md"
-                        >
-                          {tech}
-                        </span>
-                      ))}
-                    </div>
+            {/* Right Column (6 cols): Desktop Live Browser Frame */}
+            <div className="lg:col-span-6">
+              <div className="rounded-xl overflow-hidden border border-zinc-800 bg-zinc-950 shadow-xl">
+                {/* Browser top pill */}
+                <div className="px-3.5 py-2.5 bg-zinc-900/90 border-b border-zinc-800 flex items-center justify-between text-xs font-mono">
+                  <div className="flex items-center gap-2 text-zinc-400">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                    <span>https://prepnep.com</span>
                   </div>
-
-                  <div className="flex items-center gap-2 text-sm font-semibold text-blue-400 shrink-0 self-start md:self-center">
-                    <span>{isExpanded ? 'Hide Details' : 'View Details'}</span>
-                    {isExpanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
-                  </div>
+                  <a
+                    href="https://prepnep.com"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-zinc-400 hover:text-white transition-colors"
+                    title="Open live site"
+                  >
+                    <ArrowUpRight className="w-3.5 h-3.5" />
+                  </a>
                 </div>
 
-                {/* Expanded Details Body */}
-                {isExpanded && (
-                  <div className="px-6 pb-8 pt-4 sm:px-8 border-t border-slate-800/80 bg-slate-950/40 space-y-8">
-                    {/* Role Description */}
-                    <div className="bg-slate-900/90 border border-slate-800/90 rounded-2xl p-6 space-y-3 shadow-lg">
-                      <p className="text-sm sm:text-base text-slate-300 leading-relaxed">
-                        {exp.description}
-                      </p>
-                    </div>
-
-                    {/* Work Responsibilities */}
-                    <div className="space-y-3 pt-2">
-                      <h4 className="text-xs font-bold uppercase tracking-wider text-slate-400">
-                        Responsibilities & Engineering Accomplishments
-                      </h4>
-                      <ul className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs sm:text-sm text-slate-300">
-                        {exp.highlights.map((item, i) => (
-                          <li key={i} className="flex items-start gap-3 bg-slate-900/60 border border-slate-800/80 p-3.5 rounded-xl">
-                            <span className="w-1.5 h-1.5 rounded-full bg-blue-400 mt-2 shrink-0" />
-                            <span className="leading-snug">{item}</span>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-
-                    {/* Bottom Actions */}
-                    <div className="pt-2 flex flex-col sm:flex-row justify-end gap-3 border-t border-slate-800/80">
-                      <a
-                        href={exp.org}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-slate-800 hover:bg-slate-700 text-white text-xs sm:text-sm font-semibold rounded-xl transition-colors border border-slate-700"
-                      >
-                        <span>GitHub Organization</span>
-                        <ExternalLink className="w-4 h-4" />
-                      </a>
-                    </div>
-                  </div>
-                )}
+                <a
+                  href="https://prepnep.com"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="block relative aspect-[16/10] overflow-hidden group cursor-pointer"
+                >
+                  <img
+                    src="./project-previews/prepnep.png"
+                    alt="prepNep live deployment"
+                    className="w-full h-full object-cover object-top transition-transform duration-500 group-hover:scale-[1.02]"
+                    loading="lazy"
+                  />
+                </a>
               </div>
-            )
-          })}
+            </div>
+
+          </div>
+
         </div>
+
       </div>
     </section>
   )
 }
-
-export default Experience
-
-
-
