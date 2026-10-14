@@ -16,10 +16,13 @@ export default function WindowFrame({
   onToggleMaximize,
   onFocus,
   onUpdatePosition,
+  onUpdateSize,
   children
 }) {
   const [isDragging, setIsDragging] = useState(false)
+  const [isResizing, setIsResizing] = useState(false)
   const dragOffsetRef = useRef({ x: 0, y: 0 })
+  const resizeStartRef = useRef(null)
   const windowRef = useRef(null)
 
   // Reactive mobile state with resize listener
@@ -57,14 +60,51 @@ export default function WindowFrame({
     onUpdatePosition?.({ x: newX, y: newY })
   }
 
-  const handlePointerUp = (e) => {
-    if (!isDragging) return
+  const handlePointerUp = () => {
+    if (!isDragging && !isResizing) return
     setIsDragging(false)
-    try {
-      e.currentTarget.releasePointerCapture?.(e.pointerId)
-    } catch (err) {
-      void err
+    setIsResizing(false)
+    resizeStartRef.current = null
+  }
+
+  const handleResizeStart = (direction, e) => {
+    if (isMobile || isMaximized) return
+    e.preventDefault()
+    e.stopPropagation()
+    onFocus?.()
+    resizeStartRef.current = {
+      direction,
+      pointerX: e.clientX,
+      pointerY: e.clientY,
+      position,
+      size
     }
+    setIsResizing(true)
+    e.currentTarget.setPointerCapture?.(e.pointerId)
+  }
+
+  const handleResizeMove = (e) => {
+    const start = resizeStartRef.current
+    if (!start || isMobile || isMaximized) return
+
+    const minWidth = 320
+    const minHeight = 240
+    const maxRight = window.innerWidth - 8
+    const maxBottom = window.innerHeight - 72
+    const deltaX = e.clientX - start.pointerX
+    const deltaY = e.clientY - start.pointerY
+    let left = start.position.x
+    let top = start.position.y
+    let right = left + start.size.w
+    let bottom = top + start.size.h
+
+    if (start.direction.includes('e')) right = Math.min(maxRight, Math.max(left + minWidth, right + deltaX))
+    if (start.direction.includes('s')) bottom = Math.min(maxBottom, Math.max(top + minHeight, bottom + deltaY))
+    if (start.direction.includes('w')) left = Math.max(8, Math.min(right - minWidth, left + deltaX))
+    if (start.direction.includes('n')) top = Math.max(8, Math.min(bottom - minHeight, top + deltaY))
+
+    onUpdatePosition?.({ x: left, y: top })
+    onUpdateSize?.({ w: right - left, h: bottom - top })
   }
 
   if (!isOpen || isMinimized) return null
@@ -106,7 +146,7 @@ export default function WindowFrame({
       style={windowStyle}
       onMouseDown={onFocus}
       className={`pointer-events-auto rounded-lg border border-white/15 bg-[#20242d]/95 shadow-[0_24px_64px_rgba(0,0,0,0.48)] backdrop-blur-2xl flex flex-col overflow-hidden select-auto animate-in fade-in zoom-in-95 duration-150 ${
-        isDragging ? 'opacity-95 ring-1 ring-[#39a9f8]/50 shadow-2xl' : ''
+        isDragging || isResizing ? 'opacity-95 ring-1 ring-[#39a9f8]/50 shadow-2xl' : ''
       }`}
     >
       {/* Title Bar (Draggable handle on desktop) */}
@@ -171,6 +211,33 @@ export default function WindowFrame({
       <div className="flex-1 overflow-y-auto overflow-x-hidden text-[#dcd7ba] text-sm relative overscroll-contain">
         {children}
       </div>
+
+      {!isMobile && !isMaximized && (
+        <>
+          {[
+            ['n', 'top-0 left-2 right-2 h-1.5 cursor-ns-resize'],
+            ['s', 'bottom-0 left-2 right-2 h-1.5 cursor-ns-resize'],
+            ['e', 'right-0 top-2 bottom-2 w-1.5 cursor-ew-resize'],
+            ['w', 'left-0 top-2 bottom-2 w-1.5 cursor-ew-resize'],
+            ['ne', 'right-0 top-0 h-3 w-3 cursor-nesw-resize'],
+            ['nw', 'left-0 top-0 h-3 w-3 cursor-nwse-resize'],
+            ['se', 'right-0 bottom-0 h-3 w-3 cursor-nwse-resize'],
+            ['sw', 'left-0 bottom-0 h-3 w-3 cursor-nesw-resize']
+          ].map(([direction, classes]) => (
+            <button
+              key={direction}
+              type="button"
+              aria-label={`Resize ${title} ${direction}`}
+              title="Drag to resize"
+              onPointerDown={(e) => handleResizeStart(direction, e)}
+              onPointerMove={handleResizeMove}
+              onPointerUp={handlePointerUp}
+              onPointerCancel={handlePointerUp}
+              className={`absolute z-30 touch-none bg-transparent hover:bg-[#39a9f8]/20 ${classes}`}
+            />
+          ))}
+        </>
+      )}
     </div>
   )
 }

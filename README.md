@@ -10,6 +10,7 @@ A personal Windows-inspired desktop portfolio built with React and Vite. It star
 - Select the Windows-style Start button to browse pinned apps and running windows.
 - Desktop shortcuts open with one click or tap; they are also keyboard accessible.
 - Taskbar app indicators show open and active windows; select the active app again to minimize it.
+- On desktop, drag a window by its title bar and resize it from any edge or corner; use the title-bar controls or double-click to maximize and restore. Windows remain full-screen on mobile.
 - Use the taskbar search button for universal search, and the system-tray controls for Quick Settings.
 
 ## Portfolio apps

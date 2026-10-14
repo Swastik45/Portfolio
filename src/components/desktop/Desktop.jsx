@@ -306,6 +306,13 @@ export default function Desktop() {
     }))
   }
 
+  const updateSize = (appId, size) => {
+    setWindows((prev) => ({
+      ...prev,
+      [appId]: { ...prev[appId], size }
+    }))
+  }
+
   const activeWindowIdRef = useRef(activeWindowId)
   useEffect(() => {
     activeWindowIdRef.current = activeWindowId
@@ -388,6 +395,7 @@ export default function Desktop() {
           onToggleMaximize={() => toggleMaximizeApp('about')}
           onFocus={() => bringToFront('about')}
           onUpdatePosition={(pos) => updatePosition('about', pos)}
+          onUpdateSize={(size) => updateSize('about', size)}
         >
           <AboutApp onOpenApp={openApp} />
         </WindowFrame>
@@ -400,6 +408,7 @@ export default function Desktop() {
           onToggleMaximize={() => toggleMaximizeApp('projects')}
           onFocus={() => bringToFront('projects')}
           onUpdatePosition={(pos) => updatePosition('projects', pos)}
+          onUpdateSize={(size) => updateSize('projects', size)}
         >
           <ProjectsApp
             key={projectsSearchResetKey}
@@ -417,6 +426,7 @@ export default function Desktop() {
           onToggleMaximize={() => toggleMaximizeApp('terminal')}
           onFocus={() => bringToFront('terminal')}
           onUpdatePosition={(pos) => updatePosition('terminal', pos)}
+          onUpdateSize={(size) => updateSize('terminal', size)}
         >
           <TerminalApp 
             onOpenApp={openApp} 
@@ -434,6 +444,7 @@ export default function Desktop() {
           onToggleMaximize={() => toggleMaximizeApp('ask')}
           onFocus={() => bringToFront('ask')}
           onUpdatePosition={(pos) => updatePosition('ask', pos)}
+          onUpdateSize={(size) => updateSize('ask', size)}
         >
           <AskSwastikApp onOpenApp={openApp} />
         </WindowFrame>
@@ -446,6 +457,7 @@ export default function Desktop() {
           onToggleMaximize={() => toggleMaximizeApp('experience')}
           onFocus={() => bringToFront('experience')}
           onUpdatePosition={(pos) => updatePosition('experience', pos)}
+          onUpdateSize={(size) => updateSize('experience', size)}
         >
           <ExperienceApp />
         </WindowFrame>
@@ -458,6 +470,7 @@ export default function Desktop() {
           onToggleMaximize={() => toggleMaximizeApp('skills')}
           onFocus={() => bringToFront('skills')}
           onUpdatePosition={(pos) => updatePosition('skills', pos)}
+          onUpdateSize={(size) => updateSize('skills', size)}
         >
           <SkillsApp onOpenApp={openApp} />
         </WindowFrame>
@@ -470,6 +483,7 @@ export default function Desktop() {
           onToggleMaximize={() => toggleMaximizeApp('resume')}
           onFocus={() => bringToFront('resume')}
           onUpdatePosition={(pos) => updatePosition('resume', pos)}
+          onUpdateSize={(size) => updateSize('resume', size)}
         >
           <ResumeApp />
         </WindowFrame>
@@ -482,6 +496,7 @@ export default function Desktop() {
           onToggleMaximize={() => toggleMaximizeApp('mail')}
           onFocus={() => bringToFront('mail')}
           onUpdatePosition={(pos) => updatePosition('mail', pos)}
+          onUpdateSize={(size) => updateSize('mail', size)}
         >
           <MailApp />
         </WindowFrame>
@@ -494,6 +509,7 @@ export default function Desktop() {
           onToggleMaximize={() => toggleMaximizeApp('music')}
           onFocus={() => bringToFront('music')}
           onUpdatePosition={(pos) => updatePosition('music', pos)}
+          onUpdateSize={(size) => updateSize('music', size)}
         >
           <MusicApp />
         </WindowFrame>
