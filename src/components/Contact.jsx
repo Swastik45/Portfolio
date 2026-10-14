@@ -1,12 +1,8 @@
 import React, { useState } from 'react'
-import emailjs from '@emailjs/browser'
 import { Mail, Phone, MapPin, Send, CheckCircle2, AlertCircle, Copy, Check, Github, ArrowUpRight } from 'lucide-react'
+import { sendContactMessage } from '../lib/contactApi'
 
 export default function Contact() {
-  const SERVICE_ID = import.meta.env.VITE_EMAILJS_SERVICE_ID
-  const TEMPLATE_ID = import.meta.env.VITE_EMAILJS_TEMPLATE_ID
-  const PUBLIC_KEY = import.meta.env.VITE_EMAILJS_PUBLIC_KEY
-
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -14,6 +10,7 @@ export default function Contact() {
     message: ''
   })
 
+  const [website, setWebsite] = useState('')
   const [isSending, setIsSending] = useState(false)
   const [status, setStatus] = useState(null)
   const [copiedEmail, setCopiedEmail] = useState(false)
@@ -48,24 +45,11 @@ export default function Contact() {
       return
     }
 
-    if (!SERVICE_ID || !TEMPLATE_ID || !PUBLIC_KEY) {
-      console.warn('Missing EmailJS environment configuration')
-      setStatus('error_config')
-      return
-    }
-
     setIsSending(true)
     setStatus(null)
 
-    const templateParams = {
-      from_name: formData.name,
-      from_email: formData.email,
-      subject: formData.subject || 'Portfolio Inquiry',
-      message: formData.message
-    }
-
     try {
-      await emailjs.send(SERVICE_ID, TEMPLATE_ID, templateParams, PUBLIC_KEY)
+      await sendContactMessage({ ...formData, website })
       setStatus('success')
       setFormData({
         name: '',
@@ -73,12 +57,13 @@ export default function Contact() {
         subject: '',
         message: ''
       })
-    } catch (err) {
-      console.error('EmailJS error:', err)
-      setStatus('error_send')
+      setWebsite('')
+    } catch (error) {
+      console.error('Contact form submission failed:', error)
+      setStatus(error.status === 429 ? 'error_rate_limit' : error.status === 503 ? 'error_config' : 'error_send')
+    } finally {
+      setIsSending(false)
     }
-
-    setIsSending(false)
   }
 
   return (
@@ -175,6 +160,18 @@ export default function Contact() {
             </h3>
 
             <form onSubmit={handleSend} className="space-y-4">
+              <div className="absolute -left-[10000px]" aria-hidden="true">
+                <label htmlFor="contact-website">Leave this field empty</label>
+                <input
+                  id="contact-website"
+                  name="website"
+                  type="text"
+                  tabIndex={-1}
+                  autoComplete="off"
+                  value={website}
+                  onChange={(event) => setWebsite(event.target.value)}
+                />
+              </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-xs font-mono text-zinc-400 mb-1.5">
@@ -184,6 +181,7 @@ export default function Contact() {
                     name="name"
                     type="text"
                     required
+                    maxLength={100}
                     placeholder="Jane Doe"
                     value={formData.name}
                     onChange={handleChange}
@@ -199,6 +197,7 @@ export default function Contact() {
                     name="email"
                     type="email"
                     required
+                    maxLength={254}
                     placeholder="jane@example.com"
                     value={formData.email}
                     onChange={handleChange}
@@ -214,6 +213,7 @@ export default function Contact() {
                 <input
                   name="subject"
                   type="text"
+                  maxLength={120}
                   placeholder="Role inquiry / Collaboration"
                   value={formData.subject}
                   onChange={handleChange}
@@ -229,6 +229,7 @@ export default function Contact() {
                   name="message"
                   required
                   rows={4}
+                  maxLength={5000}
                   placeholder="Share details about your project or inquiry..."
                   value={formData.message}
                   onChange={handleChange}
@@ -278,6 +279,18 @@ export default function Contact() {
                   <AlertCircle className="w-4 h-4 shrink-0" />
                   <span>Failed to send. Please reach out directly at psamarpaudel@gmail.com</span>
                 </div>
+              )}
+
+              {status === 'error_rate_limit' && (
+                <p role="alert" className="text-xs text-amber-400">
+                  Too many messages were sent recently. Please wait before trying again.
+                </p>
+              )}
+
+              {status === 'error_config' && (
+                <p role="alert" className="text-xs text-red-400">
+                  The contact service is temporarily unavailable. Please email psamarpaudel@gmail.com directly.
+                </p>
               )}
 
             </form>

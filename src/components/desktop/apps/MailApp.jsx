@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
-import emailjs from '@emailjs/browser'
 import { Send, CheckCircle2, AlertCircle, Copy, Check, Mail as MailIcon, Sparkles } from 'lucide-react'
 import { soundFX } from '../soundEffects'
+import { sendContactMessage } from '../../../lib/contactApi'
 
 const TEMPLATES = [
   {
@@ -22,10 +22,6 @@ const TEMPLATES = [
 ]
 
 export default function MailApp() {
-  const SERVICE_ID = import.meta.env.VITE_EMAILJS_SERVICE_ID
-  const TEMPLATE_ID = import.meta.env.VITE_EMAILJS_TEMPLATE_ID
-  const PUBLIC_KEY = import.meta.env.VITE_EMAILJS_PUBLIC_KEY
-
   const [formData, setFormData] = useState(() => {
     try {
       const saved = localStorage.getItem('swastik_mail_draft')
@@ -39,6 +35,7 @@ export default function MailApp() {
   const [isSending, setIsSending] = useState(false)
   const [status, setStatus] = useState(null)
   const [copiedEmail, setCopiedEmail] = useState(false)
+  const [website, setWebsite] = useState('')
 
   // Auto-save draft to localStorage
   useEffect(() => {
@@ -90,37 +87,22 @@ export default function MailApp() {
 
     soundFX.play('click')
 
-    if (!SERVICE_ID || !TEMPLATE_ID || !PUBLIC_KEY) {
-      window.location.href = `mailto:psamarpaudel@gmail.com?subject=${encodeURIComponent(
-        formData.subject || 'Portfolio Inquiry'
-      )}&body=${encodeURIComponent(formData.message)}`
-      setStatus('success')
-      try { localStorage.removeItem('swastik_mail_draft'); } catch (err) { console.debug(err); }
-      return
-    }
-
     setIsSending(true)
     setStatus(null)
 
-    const templateParams = {
-      from_name: formData.name,
-      from_email: formData.email,
-      subject: formData.subject || 'Portfolio Inquiry',
-      message: formData.message
-    }
-
     try {
-      await emailjs.send(SERVICE_ID, TEMPLATE_ID, templateParams, PUBLIC_KEY)
+      await sendContactMessage({ ...formData, website })
       setStatus('success')
       setFormData({ name: '', email: '', subject: '', message: '' })
+      setWebsite('')
       try { localStorage.removeItem('swastik_mail_draft'); } catch (err) { console.debug(err); }
       soundFX.play('open')
-    } catch (err) {
-      console.error('EmailJS send error:', err)
-      setStatus('error_send')
+    } catch (error) {
+      console.error('Mail app submission failed:', error)
+      setStatus(error.status === 429 ? 'error_rate_limit' : error.status === 503 ? 'error_config' : 'error_send')
+    } finally {
+      setIsSending(false)
     }
-
-    setIsSending(false)
   }
 
   return (
@@ -186,11 +168,37 @@ export default function MailApp() {
         {status === 'error_send' && (
           <div className="p-3.5 rounded-xl bg-[#e46876]/20 border border-[#e46876]/30 text-white flex items-center gap-2.5 text-xs">
             <AlertCircle className="w-4 h-4 text-[#e46876] shrink-0" />
-            <span>Transmission error. You can directly write to psamarpaudel@gmail.com</span>
+            <span>Message delivery failed. You can directly write to psamarpaudel@gmail.com</span>
+          </div>
+        )}
+
+        {status === 'error_rate_limit' && (
+          <div role="alert" className="p-3.5 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-200 flex items-center gap-2.5 text-xs">
+            <AlertCircle className="w-4 h-4 shrink-0" />
+            <span>Too many messages were sent recently. Please wait before trying again.</span>
+          </div>
+        )}
+
+        {status === 'error_config' && (
+          <div role="alert" className="p-3.5 rounded-xl bg-[#e46876]/20 border border-[#e46876]/30 text-white flex items-center gap-2.5 text-xs">
+            <AlertCircle className="w-4 h-4 text-[#e46876] shrink-0" />
+            <span>The contact service is temporarily unavailable. Please email psamarpaudel@gmail.com directly.</span>
           </div>
         )}
 
         <form onSubmit={handleSend} className="space-y-3 text-xs">
+          <div className="absolute -left-[10000px]" aria-hidden="true">
+            <label htmlFor="mail-website">Leave this field empty</label>
+            <input
+              id="mail-website"
+              name="website"
+              type="text"
+              tabIndex={-1}
+              autoComplete="off"
+              value={website}
+              onChange={(event) => setWebsite(event.target.value)}
+            />
+          </div>
           {/* To Field */}
           <div className="flex items-center gap-2 p-2 rounded-xl bg-white/5 border border-white/10">
             <span className="font-mono text-[#938aa9] w-14 shrink-0">To:</span>
@@ -204,6 +212,8 @@ export default function MailApp() {
               <input
                 type="text"
                 name="name"
+                required
+                maxLength={100}
                 value={formData.name}
                 onChange={handleChange}
                 placeholder="Your Name"
@@ -216,6 +226,8 @@ export default function MailApp() {
               <input
                 type="email"
                 name="email"
+                required
+                maxLength={254}
                 value={formData.email}
                 onChange={handleChange}
                 placeholder="your.email@example.com"
@@ -230,6 +242,7 @@ export default function MailApp() {
             <input
               type="text"
               name="subject"
+              maxLength={120}
               value={formData.subject}
               onChange={handleChange}
               placeholder="Engineering Opportunity / Collaboration"
@@ -241,7 +254,9 @@ export default function MailApp() {
           <div className="space-y-1">
             <textarea
               name="message"
+              required
               rows={6}
+              maxLength={5000}
               value={formData.message}
               onChange={handleChange}
               placeholder="Type your message here..."
