@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { WALLPAPERS } from './wallpapersData'
-import { Terminal, Folder, Mail, Github, Volume2, VolumeX, Moon, Check, Sparkles, Maximize, Minimize } from 'lucide-react'
+import { Terminal, Folder, Mail, Github, Volume2, VolumeX, Check, Sparkles, Maximize, Minimize, PanelsTopLeft } from 'lucide-react'
 import { soundFX } from './soundEffects'
 
 export default function ControlCenter({
@@ -9,6 +9,7 @@ export default function ControlCenter({
   wallpaper,
   onSelectWallpaper,
   onOpenApp,
+  onToggleMissionControl,
   soundEnabled,
   onToggleSound
 }) {
@@ -143,6 +144,18 @@ export default function ControlCenter({
 
       {/* Quick App Launchers */}
       <div className="pt-2 border-t border-white/10 flex items-center justify-between gap-1">
+        <button
+          type="button"
+          onClick={() => {
+            soundFX.play('open')
+            onToggleMissionControl()
+            onClose()
+          }}
+          className="p-2 rounded-lg bg-white/5 hover:bg-white/15 text-white/70 hover:text-white transition-colors cursor-pointer"
+          title="Open Mission Control"
+        >
+          <PanelsTopLeft className="w-4 h-4" />
+        </button>
         <button
           type="button"
           onClick={() => { soundFX.play('open'); onOpenApp('terminal'); onClose(); }}

@@ -1,10 +1,12 @@
 import React, { useState, useEffect, useRef } from 'react'
-import { Wifi, Battery, SlidersHorizontal, Terminal, Sparkles, Command, Search } from 'lucide-react'
+import { Wifi, Battery, SlidersHorizontal, Terminal, Sparkles, Search, PanelsTopLeft } from 'lucide-react'
 
 export default function TopMenuBar({
   activeAppName = 'Swastik Paudel',
   onToggleLaunchpad,
   onToggleControlCenter,
+  onToggleSpotlight,
+  onToggleMissionControl,
   isControlCenterOpen,
   onOpenApp,
   onCloseActiveWindow,
@@ -86,6 +88,7 @@ export default function TopMenuBar({
       children: [
         { label: 'Close Active Window', action: () => onCloseActiveWindow() },
         { label: 'Show Desktop (Minimize All)', action: () => onMinimizeAll?.() },
+        { label: 'Mission Control', action: () => onToggleMissionControl?.() },
         { divider: true },
         { label: 'About Swastik', action: () => onOpenApp('about') }
       ]
@@ -167,12 +170,22 @@ export default function TopMenuBar({
         {/* Spotlight Search Launcher */}
         <button
           type="button"
-          onClick={onToggleLaunchpad}
+          onClick={onToggleSpotlight}
           className="hidden sm:flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-white/5 hover:bg-white/10 text-white/70 hover:text-white transition-colors cursor-pointer border border-white/5"
-          title="Spotlight Search / Launchpad (Cmd+K / Ctrl+K)"
+          title="Spotlight Search (Cmd+K / Ctrl+K)"
         >
           <Search className="w-3 h-3 text-[#7e9cd8]" />
           <span className="text-[10px] font-mono">⌘K</span>
+        </button>
+
+        <button
+          type="button"
+          onClick={onToggleMissionControl}
+          className="hidden md:flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-white/5 hover:bg-white/10 text-white/70 hover:text-white transition-colors cursor-pointer border border-white/5"
+          title="Mission Control (F3)"
+        >
+          <PanelsTopLeft className="w-3 h-3 text-[#dca561]" />
+          <span className="text-[10px] font-mono">F3</span>
         </button>
 
         {/* Availability indicator */}

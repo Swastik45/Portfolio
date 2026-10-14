@@ -1,6 +1,13 @@
 # Swastik Paudel — Portfolio
 
-A macOS-inspired interactive portfolio built with React and Vite. The desktop includes draggable app windows, a dock, Launchpad, Control Center, project and experience views, a local mail draft, and a server-backed contact flow.
+A macOS-inspired interactive portfolio built with React and Vite. The desktop includes draggable app windows, Spotlight search across projects and technologies, Mission Control, a dock, Launchpad, Control Center, project and experience views, a local mail draft, and a server-backed contact flow.
+
+## Desktop shortcuts
+
+- `⌘K` / `Ctrl+K` — search apps, projects, and technologies with Spotlight; use the arrow keys and Enter to open a result.
+- `F3` / `⌃↑` — open Mission Control to switch, restore, or close windows.
+- `Esc` — dismiss the current desktop overlay without closing the active app.
+- Use the dock's Launchpad icon to browse apps, or open Mission Control from Control Center on touch devices.
 
 ## Stack
 

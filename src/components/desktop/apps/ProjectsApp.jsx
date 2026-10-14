@@ -16,95 +16,15 @@ import {
   Smartphone
 } from 'lucide-react'
 import { soundFX } from '../soundEffects'
-
-const PROJECTS_DATA = [
-  {
-    id: 'prepnep',
-    title: 'prepNep',
-    category: 'Production',
-    badge: 'Flagship Platform',
-    headline: 'High-concurrency exam preparation & testing platform for thousands of students',
-    description: 'Lead engineering at Madargaach Holdings. Architected reliable real-time test runtimes, low-latency scoring pipelines, and high-availability state synchronization under high concurrent traffic.',
-    tech: ['Next.js', 'React', 'TypeScript', 'PostgreSQL', 'Redis', 'Docker'],
-    previewImg: './project-previews/prepnep.png',
-    liveUrl: 'https://prepnep.com',
-    githubUrl: null,
-    metrics: ['Tens of thousands of active questions', 'Sub-50ms test session state sync', '99.9% uptime across national exam cycles']
-  },
-  {
-    id: 'shareaudit',
-    title: 'ShareAudit',
-    category: 'Web',
-    badge: 'FinTech',
-    headline: 'Portfolio analytics, dividend intelligence & financial asset auditing',
-    description: 'Engineered an interactive asset auditing dashboard with real-time portfolio valuation, dividend schedules, and risk metrics calculation for individual investors.',
-    tech: ['React', 'TypeScript', 'Tailwind CSS', 'Chart.js', 'Vite'],
-    previewImg: './project-previews/shareaudit.png',
-    liveUrl: 'https://share-audit.vercel.app',
-    githubUrl: 'https://github.com/Swastik45',
-    metrics: ['Dynamic capital gains calculation', 'Comprehensive dividend timeline', 'Automated portfolio rebalancing views']
-  },
-  {
-    id: 'govaudit',
-    title: 'GovAudit NP',
-    category: 'Web',
-    badge: 'Civic Tech',
-    headline: 'Public expenditure tracking & municipal budget audit transparency platform',
-    description: 'Designed an open-source citizen watchdog dashboard aggregating municipal expenditure reports and public sector procurement records to improve civic accountability.',
-    tech: ['React', 'TypeScript', 'Tailwind CSS', 'Open Data API'],
-    previewImg: './project-previews/govaudit.png',
-    liveUrl: 'https://gova-audit-np.vercel.app',
-    githubUrl: 'https://github.com/Swastik45',
-    metrics: ['Visual municipal budget breakdown', 'Procurement discrepancy alerts', 'Fast client-side tabular search']
-  },
-  {
-    id: 'carboncredit',
-    title: 'CarbonCredit',
-    category: 'Web',
-    badge: 'CleanTech',
-    headline: 'Transparent ecological credit registry & carbon emissions offset ledger',
-    description: 'Decentralized ecological project monitoring interface enabling corporate carbon accounting, verified emission reduction tracking, and transparent certificate retirement.',
-    tech: ['React', 'Next.js', 'Tailwind CSS', 'Web3 / Ledger Sync'],
-    previewImg: './project-previews/carboncredit.png',
-    liveUrl: 'https://carbon-credit1.vercel.app',
-    githubUrl: 'https://github.com/Swastik45',
-    metrics: ['Real-time emission certificate ledger', 'Audit-ready compliance export', 'Zero-knowledge credit retirement verification']
-  },
-  {
-    id: 'lumino',
-    title: 'Lumino',
-    category: 'Web',
-    badge: 'Frontend',
-    headline: 'Modern responsive web application platform with fluid animations',
-    description: 'Crafted a sleek user application interface with micro-interactions, responsive typography, and optimized asset pipelines for instantaneous page loading.',
-    tech: ['React', 'Tailwind CSS', 'Vite', 'Framer Motion'],
-    previewImg: './project-previews/lumino.png',
-    liveUrl: 'https://lumino-five.vercel.app',
-    githubUrl: 'https://github.com/Swastik45',
-    metrics: ['Perfect 100 Lighthouse performance score', 'Sub-second initial paint', 'Accessible semantic design system']
-  },
-  {
-    id: 'rustgame',
-    title: '2D Shooting Game',
-    category: 'Systems',
-    badge: 'Rust Engine',
-    headline: 'Deterministic 2D arcade shooter built from scratch in Rust with Bevy',
-    description: 'Built a game engine prototype in Rust utilizing Entity-Component-System (ECS) architecture, deterministic physics simulation, spatial hashing, and zero-garbage-collection memory safety.',
-    tech: ['Rust', 'Bevy Engine', 'ECS Architecture', 'Systems Programming'],
-    previewImg: null,
-    liveUrl: null,
-    githubUrl: 'https://github.com/Swastik45',
-    metrics: ['Locked 120 FPS frame timing', 'Memory-safe deterministic physics', 'Zero runtime GC pauses']
-  }
-]
+import { PROJECTS_DATA } from '../portfolioData'
 
 // Extract unique technology tags
 const ALL_TAGS = Array.from(new Set(PROJECTS_DATA.flatMap((p) => p.tech)))
 
-export default function ProjectsApp({ onOpenApp }) {
+export default function ProjectsApp({ onOpenApp, initialSearch = '' }) {
   const [selectedCategory, setSelectedCategory] = useState('All')
   const [selectedTag, setSelectedTag] = useState(null)
-  const [search, setSearch] = useState('')
+  const [search, setSearch] = useState(initialSearch)
   const [viewMode, setViewMode] = useState('grid') // 'grid' | 'list'
   const [inspectProject, setInspectProject] = useState(null)
   const [previewDevice, setPreviewDevice] = useState('desktop') // 'desktop' | 'mobile'
@@ -122,9 +42,10 @@ export default function ProjectsApp({ onOpenApp }) {
   const filteredProjects = PROJECTS_DATA.filter((p) => {
     const matchesCategory = selectedCategory === 'All' || p.category === selectedCategory
     const matchesTag = !selectedTag || p.tech.includes(selectedTag)
-    const matchesSearch = 
+    const matchesSearch =
       p.title.toLowerCase().includes(search.toLowerCase()) ||
       p.headline.toLowerCase().includes(search.toLowerCase()) ||
+      p.description.toLowerCase().includes(search.toLowerCase()) ||
       p.tech.some((t) => t.toLowerCase().includes(search.toLowerCase()))
     return matchesCategory && matchesTag && matchesSearch
   })

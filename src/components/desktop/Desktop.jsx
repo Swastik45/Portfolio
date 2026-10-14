@@ -6,6 +6,8 @@ import Launchpad from './Launchpad'
 import ControlCenter from './ControlCenter'
 import DesktopIcons from './DesktopIcons'
 import WindowFrame from './WindowFrame'
+import Spotlight from './Spotlight'
+import MissionControl from './MissionControl'
 import { soundFX } from './soundEffects'
 import { StickyNote, X, Check } from 'lucide-react'
 
@@ -140,8 +142,11 @@ export default function Desktop() {
 
   // System trays & Sound
   const [isLaunchpadOpen, setIsLaunchpadOpen] = useState(false)
+  const [isSpotlightOpen, setIsSpotlightOpen] = useState(false)
+  const [isMissionControlOpen, setIsMissionControlOpen] = useState(false)
   const [isControlCenterOpen, setIsControlCenterOpen] = useState(false)
   const [soundEnabled, setSoundEnabled] = useState(true)
+  const [spotlightProjectQuery, setSpotlightProjectQuery] = useState('')
 
   // Desktop Sticky Note State
   const [showStickyNote, setShowStickyNote] = useState(true)
@@ -200,6 +205,7 @@ export default function Desktop() {
   // Open or toggle app from Dock / Desktop
   const openApp = (appId) => {
     if (!windows[appId]) return
+    if (appId === 'projects') setSpotlightProjectQuery('')
 
     soundFX.play('open')
     const target = windows[appId]
@@ -239,6 +245,44 @@ export default function Desktop() {
     })
 
     setActiveWindowId(appId)
+  }
+
+  const focusApp = (appId) => {
+    if (!windows[appId]) return
+
+    soundFX.play('open')
+    const isSmallScreen = typeof window !== 'undefined' && window.innerWidth < 1024
+    highestZRef.current += 1
+    const nextZ = highestZRef.current
+
+    setWindows((prev) => {
+      const updated = { ...prev }
+      if (isSmallScreen) {
+        Object.keys(updated).forEach((key) => {
+          if (key !== appId && updated[key].isOpen) {
+            updated[key] = { ...updated[key], isMinimized: true }
+          }
+        })
+      }
+      updated[appId] = {
+        ...updated[appId],
+        isOpen: true,
+        isMinimized: false,
+        zIndex: nextZ
+      }
+      return updated
+    })
+    setActiveWindowId(appId)
+  }
+
+  const handleSpotlightSelect = (appId, projectQuery) => {
+    setIsSpotlightOpen(false)
+    if (projectQuery) {
+      setSpotlightProjectQuery(projectQuery)
+      focusApp(appId)
+    } else {
+      openApp(appId)
+    }
   }
 
   // Close app
@@ -293,24 +337,31 @@ export default function Desktop() {
     activeWindowIdRef.current = activeWindowId
   }, [activeWindowId])
 
-  // Keyboard shortcut listener (Ctrl+K or Cmd+K)
+  // Global shortcuts for Spotlight, Mission Control, and overlay dismissal.
   useEffect(() => {
     const handleKeyDown = (e) => {
       if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
         e.preventDefault()
         soundFX.play('click')
-        setIsLaunchpadOpen((prev) => !prev)
-      } else if (e.key === 'Escape') {
+        setIsSpotlightOpen((prev) => !prev)
         setIsLaunchpadOpen(false)
-        setIsControlCenterOpen(false)
-        if (activeWindowIdRef.current) {
-          closeApp(activeWindowIdRef.current)
-        }
+        setIsMissionControlOpen(false)
+      } else if (e.key === 'F3' || ((e.metaKey || e.ctrlKey) && e.key === 'ArrowUp')) {
+        e.preventDefault()
+        soundFX.play('click')
+        setIsMissionControlOpen((prev) => !prev)
+        setIsSpotlightOpen(false)
+        setIsLaunchpadOpen(false)
+      } else if (e.key === 'Escape') {
+        if (isSpotlightOpen) setIsSpotlightOpen(false)
+        else if (isMissionControlOpen) setIsMissionControlOpen(false)
+        else if (isLaunchpadOpen) setIsLaunchpadOpen(false)
+        else if (isControlCenterOpen) setIsControlCenterOpen(false)
       }
     }
     window.addEventListener('keydown', handleKeyDown)
     return () => window.removeEventListener('keydown', handleKeyDown)
-  }, [closeApp])
+  }, [isControlCenterOpen, isLaunchpadOpen, isMissionControlOpen, isSpotlightOpen])
 
   // Calculate open apps map for Dock dots
   const openAppsMap = Object.keys(windows).reduce((acc, k) => {
@@ -337,8 +388,10 @@ export default function Desktop() {
   return (
     <div 
       className="fixed inset-0 w-screen h-screen overflow-hidden select-none bg-[#1F1F28] font-sans"
-      onClick={() => {
-        setIsControlCenterOpen(false)
+      onClick={(event) => {
+        if (event.target === event.currentTarget) {
+          setIsControlCenterOpen(false)
+        }
       }}
     >
       {/* 1. Wallpaper Background Canvas */}
@@ -354,6 +407,18 @@ export default function Desktop() {
         onToggleControlCenter={() => {
           soundFX.play('click')
           setIsControlCenterOpen((prev) => !prev)
+        }}
+        onToggleSpotlight={() => {
+          soundFX.play('click')
+          setIsSpotlightOpen((prev) => !prev)
+          setIsLaunchpadOpen(false)
+          setIsMissionControlOpen(false)
+        }}
+        onToggleMissionControl={() => {
+          soundFX.play('click')
+          setIsMissionControlOpen((prev) => !prev)
+          setIsSpotlightOpen(false)
+          setIsLaunchpadOpen(false)
         }}
         isControlCenterOpen={isControlCenterOpen}
         onOpenApp={openApp}
@@ -416,7 +481,10 @@ export default function Desktop() {
           onFocus={() => bringToFront('projects')}
           onUpdatePosition={(pos) => updatePosition('projects', pos)}
         >
-          <ProjectsApp onOpenApp={openApp} />
+          <ProjectsApp
+            onOpenApp={openApp}
+            initialSearch={spotlightProjectQuery}
+          />
         </WindowFrame>
 
         {/* Terminal App */}
@@ -516,6 +584,11 @@ export default function Desktop() {
         wallpaper={wallpaper}
         onSelectWallpaper={handleSelectWallpaper}
         onOpenApp={openApp}
+        onToggleMissionControl={() => {
+          setIsMissionControlOpen(true)
+          setIsSpotlightOpen(false)
+          setIsLaunchpadOpen(false)
+        }}
         soundEnabled={soundEnabled}
         onToggleSound={handleToggleSound}
       />
@@ -536,6 +609,23 @@ export default function Desktop() {
         isOpen={isLaunchpadOpen}
         onClose={() => setIsLaunchpadOpen(false)}
         onOpenApp={openApp}
+      />
+
+      {isSpotlightOpen && (
+        <Spotlight
+          onClose={() => setIsSpotlightOpen(false)}
+          onSelect={handleSpotlightSelect}
+        />
+      )}
+
+      <MissionControl
+        isOpen={isMissionControlOpen}
+        windows={windows}
+        activeWindowId={activeWindowId}
+        onFocusApp={focusApp}
+        onLaunchApp={openApp}
+        onCloseApp={closeApp}
+        onClose={() => setIsMissionControlOpen(false)}
       />
     </div>
   )
