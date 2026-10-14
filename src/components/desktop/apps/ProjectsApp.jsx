@@ -20,7 +20,10 @@ import {
   Globe2,
   ChevronRight,
   FolderOpen,
-  RefreshCw
+  RefreshCw,
+  FileCode2,
+  FileText,
+  Image as ImageIcon
 } from 'lucide-react'
 import { soundFX } from '../soundEffects'
 import { PROJECTS_DATA } from '../portfolioData'
@@ -233,35 +236,63 @@ export default function ProjectsApp({ onOpenApp, search = '', onSearchChange }) 
                 role="button"
                 tabIndex={0}
                 aria-pressed={selectedProjectId === p.id}
-                className={`group flex cursor-pointer flex-col overflow-hidden rounded-xl border bg-[#1a232d] transition-all duration-150 hover:shadow-md ${
+                className={`explorer-project group flex cursor-pointer flex-col overflow-hidden rounded-xl border bg-[#1a232d] transition-all duration-200 hover:shadow-md ${
                   selectedProjectId === p.id ? 'border-[#4da3ff] ring-1 ring-[#4da3ff]' : 'border-[#303b48] hover:border-[#526477]'
                 }`}
+                aria-label={`${p.title} project folder`}
               >
-                {/* Screenshot or Canvas Frame */}
-                <div className="relative flex h-40 items-center justify-center overflow-hidden border-b border-[#303b48] bg-[#141c24]">
-                  {p.previewImg ? (
-                    <img
-                      src={p.previewImg}
-                      alt={p.title}
-                      className="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-300"
-                    />
-                  ) : (
-                    <div className="flex flex-col items-center justify-center text-center p-4">
-                      <div className="mb-2 flex h-12 w-12 items-center justify-center rounded-xl border border-[#63383d] bg-[#321f24] font-mono text-lg font-bold text-[#ff858c]">
-                        🦀
-                      </div>
-                      <span className="font-mono text-xs text-[#a4b1bf]">Rust &amp; Bevy Engine</span>
-                    </div>
-                  )}
+                <div className="explorer-folder-view border-b border-[#303b48] bg-[#141c24] p-2.5">
+                  <div className="mb-2 flex items-center gap-1.5 truncate rounded-md border border-[#303b48] bg-[#111820] px-2 py-1.5 font-mono text-[9px] text-[#91a0b1]">
+                    <FolderOpen className="h-3 w-3 shrink-0 text-[#e8bd63]" />
+                    <span className="shrink-0">Projects</span>
+                    <span className="text-[#526174]">/</span>
+                    <span className="truncate text-[#dbe5ef]">{p.id}</span>
+                  </div>
 
-                  {/* Badge */}
-                  <span className="absolute left-2.5 top-2.5 rounded-full border border-[#465566] bg-[#111820]/90 px-2 py-0.5 font-mono text-[10px] text-[#dbe5ef] shadow-sm backdrop-blur-md">
-                    {p.badge}
-                  </span>
+                  <div className="grid min-h-[112px] grid-cols-[minmax(0,1fr)_minmax(72px,0.82fr)] gap-2">
+                    <div className="space-y-1 rounded-md border border-[#303b48] bg-[#18222c] p-1.5">
+                      <div className="mb-1 px-1 font-mono text-[8px] uppercase tracking-[0.12em] text-[#718092]">Project files</div>
+                      <div className="flex items-center gap-1.5 rounded px-1 py-1 text-[9px] text-[#d5dee8] group-hover:bg-[#263442]">
+                        <Folder className="h-3 w-3 shrink-0 text-[#e8bd63]" />
+                        <span className="truncate">src</span>
+                        <span className="ml-auto text-[8px] text-[#718092]">DIR</span>
+                      </div>
+                      <div className="flex items-center gap-1.5 rounded px-1 py-1 text-[9px] text-[#c1ccd8] group-hover:bg-[#263442]">
+                        <FileText className="h-3 w-3 shrink-0 text-[#82b7e8]" />
+                        <span className="truncate">README.md</span>
+                      </div>
+                      <div className="flex items-center gap-1.5 rounded px-1 py-1 text-[9px] text-[#c1ccd8] group-hover:bg-[#263442]">
+                        <FileCode2 className="h-3 w-3 shrink-0 text-[#b9a0e8]" />
+                        <span className="truncate">package.json</span>
+                      </div>
+                    </div>
+
+                    <div className="relative flex min-w-0 flex-col overflow-hidden rounded-md border border-[#394653] bg-[#10171e]">
+                      <div className="flex h-5 shrink-0 items-center gap-1 border-b border-[#303b48] px-1.5 font-mono text-[8px] text-[#91a0b1]">
+                        <ImageIcon className="h-2.5 w-2.5 shrink-0 text-[#9fbd77]" />
+                        <span className="truncate">preview.png</span>
+                      </div>
+                      {p.previewImg ? (
+                        <img
+                          src={p.previewImg}
+                          alt={`${p.title} project preview`}
+                          className="min-h-0 flex-1 object-cover object-top transition-transform duration-300 group-hover:scale-105"
+                          loading="lazy"
+                        />
+                      ) : (
+                        <div className="flex min-h-0 flex-1 items-center justify-center bg-[#171f28]">
+                          <div className="flex flex-col items-center gap-1 text-[#e8bd63]">
+                            <FolderOpen className="h-7 w-7" />
+                            <span className="font-mono text-[8px] text-[#91a0b1]">Rust / Bevy</span>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
                 </div>
 
                 {/* Info */}
-                <div className="p-3.5 flex-1 flex flex-col justify-between space-y-3">
+                <div className="flex flex-1 flex-col justify-between space-y-3 p-3.5">
                   <div>
                     <div className="flex items-center justify-between">
                       <h3 className="text-sm font-bold text-[#e8edf3] transition-colors group-hover:text-[#72b7ff]">
