@@ -8,8 +8,176 @@ export default function ResumeApp() {
   const sheetRef = useRef(null)
   const sections = ['Profile', 'Experience', 'Projects', 'Skills']
 
-  const handlePrint = () => {
-    window.print()
+  const handlePrint = async () => {
+    const printWindow = window.open('', '_blank')
+    if (!printWindow) {
+      console.error('The résumé print window was blocked. Allow pop-ups and try again.')
+      return
+    }
+
+    printWindow.opener = null
+    const printDocument = printWindow.document
+    printDocument.open()
+    printDocument.write('<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Swastik Paudel — Résumé</title></head><body></body></html>')
+    printDocument.close()
+
+    const base = printDocument.createElement('base')
+    base.href = document.baseURI
+    printDocument.head.appendChild(base)
+
+    const stylesheetLoads = Array.from(document.querySelectorAll('link[rel="stylesheet"]')).map((source) => (
+      new Promise((resolve, reject) => {
+        const link = printDocument.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = source.href
+        link.onload = resolve
+        link.onerror = () => reject(new Error(`Unable to load résumé print styles: ${source.href}`))
+        printDocument.head.appendChild(link)
+      })
+    ))
+
+    document.querySelectorAll('style').forEach((source) => {
+      printDocument.head.appendChild(source.cloneNode(true))
+    })
+
+    const printStyles = printDocument.createElement('style')
+    printStyles.textContent = `
+      @page {
+        size: A4;
+        margin: 13mm 14mm 15mm;
+      }
+
+      html,
+      body {
+        width: auto !important;
+        height: auto !important;
+        min-height: 0 !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        overflow: visible !important;
+        background: #fff !important;
+      }
+
+      body {
+        color: #263445 !important;
+        font: 9.5pt/1.4 Arial, Helvetica, sans-serif !important;
+        print-color-adjust: exact;
+        -webkit-print-color-adjust: exact;
+      }
+
+      .resume-print-sheet {
+        display: block !important;
+        width: auto !important;
+        max-width: none !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        overflow: visible !important;
+        border: 0 !important;
+        border-radius: 0 !important;
+        background: #fff !important;
+        color: #263445 !important;
+        box-shadow: none !important;
+        zoom: 1 !important;
+      }
+
+      .resume-print-sheet,
+      .resume-print-sheet * {
+        box-shadow: none !important;
+        text-shadow: none !important;
+      }
+
+      .resume-print-sheet,
+      .resume-print-sheet * {
+        color: #263445 !important;
+      }
+
+      .resume-print-sheet [data-resume-section] {
+        break-inside: avoid;
+        page-break-inside: avoid;
+      }
+
+      .resume-print-sheet [data-resume-section="2"] {
+        break-before: page;
+        page-break-before: always;
+      }
+
+      .resume-print-sheet [data-resume-section="2"] > .grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+      }
+
+      .resume-print-sheet [data-resume-section="2"] > .grid > div {
+        break-inside: avoid;
+        page-break-inside: avoid;
+      }
+
+      .resume-print-sheet .text-white,
+      .resume-print-sheet .text-white\\/90,
+      .resume-print-sheet .text-white\\/80,
+      .resume-print-sheet .text-white\\/60 {
+        color: #263445 !important;
+      }
+
+      .resume-print-sheet h1,
+      .resume-print-sheet h2,
+      .resume-print-sheet h3 {
+        color: #111827 !important;
+        break-after: avoid;
+        page-break-after: avoid;
+      }
+
+      .resume-print-sheet a {
+        color: #245da8 !important;
+        text-decoration: none !important;
+      }
+
+      .resume-print-sheet .bg-white\\/\\[0\\.03\\],
+      .resume-print-sheet .bg-white\\/5,
+      .resume-print-sheet .bg-\\[\\#202b35\\],
+      .resume-print-sheet .bg-\\[\\#1a232d\\] {
+        background-color: #fff !important;
+      }
+
+      .resume-print-sheet .border-white\\/10,
+      .resume-print-sheet .border-\\[\\#354250\\] {
+        border-color: #d7dee7 !important;
+      }
+
+      .resume-print-sheet .text-\\[\\#dca561\\] {
+        color: #344e70 !important;
+      }
+
+      .resume-print-sheet .text-\\[\\#7e9cd8\\] {
+        color: #315f9a !important;
+      }
+
+      .resume-print-sheet .text-\\[\\#938aa9\\] {
+        color: #566273 !important;
+      }
+    `
+    printDocument.head.appendChild(printStyles)
+
+    const printedSheet = sheetRef.current?.cloneNode(true)
+    if (!printedSheet) {
+      printWindow.close()
+      console.error('The résumé content was unavailable for printing.')
+      return
+    }
+
+    printedSheet.classList.add('resume-print-sheet')
+    printDocument.body.appendChild(printedSheet)
+    printWindow.addEventListener('afterprint', () => printWindow.close(), { once: true })
+
+    try {
+      await Promise.all(stylesheetLoads)
+      await printDocument.fonts.ready
+      await Promise.all(Array.from(printDocument.images, (image) => image.decode()))
+      printWindow.requestAnimationFrame(() => {
+        printWindow.requestAnimationFrame(() => printWindow.print())
+      })
+    } catch (error) {
+      printWindow.close()
+      console.error('Could not prepare the résumé for printing.', error)
+    }
   }
 
   const handleCopyMd = () => {
@@ -64,7 +232,7 @@ Software Engineer — Madargaach Holdings (prepNep · prepnep.com)
         <span className="ml-auto hidden text-[9px] text-[#91a0b1] sm:block">Resume document preview</span>
       </div>
 
-      <div className="flex shrink-0 flex-wrap items-center justify-between gap-2 border-b border-[#303b48] bg-[#151e27] px-3 py-2 text-xs">
+      <div className="resume-print-toolbar flex shrink-0 flex-wrap items-center justify-between gap-2 border-b border-[#303b48] bg-[#151e27] px-3 py-2 text-xs">
         <div className="flex items-center gap-2">
           <button type="button" onClick={() => goToSection(sectionIndex - 1)} disabled={sectionIndex === 0} aria-label="Previous resume section" className="rounded p-1.5 text-[#b6c2ce] hover:bg-[#263442] disabled:opacity-35"><ChevronLeft className="h-3.5 w-3.5" /></button>
           <span className="min-w-28 text-center text-[10px] text-[#b6c2ce]">{sections[sectionIndex]} · {sectionIndex + 1} of {sections.length}</span>
@@ -100,8 +268,8 @@ Software Engineer — Madargaach Holdings (prepNep · prepnep.com)
         </div>
       </div>
 
-      <div className="min-h-0 flex-1 overflow-auto bg-[#111820] p-3 sm:p-6">
-        <div ref={sheetRef} className="mx-auto max-w-3xl space-y-6 rounded-sm border border-[#354250] bg-[#1a232d] p-5 shadow-[0_8px_30px_rgba(0,0,0,.35)] sm:p-8" style={{ zoom: `${zoom}%` }}>
+      <div className="resume-print-scroll min-h-0 flex-1 overflow-auto bg-[#111820] p-3 sm:p-6">
+        <div ref={sheetRef} className="resume-print-sheet mx-auto max-w-3xl space-y-6 rounded-sm border border-[#354250] bg-[#1a232d] p-5 shadow-[0_8px_30px_rgba(0,0,0,.35)] sm:p-8" style={{ zoom: `${zoom}%` }}>
           
           {/* Header Card */}
           <div data-resume-section="0" className="scroll-mt-3 space-y-3 rounded-xl border border-[#354250] bg-[#202b35] p-6">
@@ -270,10 +438,6 @@ Software Engineer — Madargaach Holdings (prepNep · prepnep.com)
               <div>
                 <span className="text-white/60 block font-mono text-[11px] mb-1">Languages:</span>
                 <span className="text-white font-medium">TypeScript, JavaScript (ESNext), Rust, Python, C/C++, SQL</span>
-              </div>
-              <div className="flex h-7 shrink-0 items-center justify-between border-t border-[#303b48] bg-[#1a232d] px-3 text-[9px] text-[#91a0b1]">
-                <span>PDF-style preview · Use Print / Save PDF to export</span>
-                <span>{zoom}% · {sections[sectionIndex]}</span>
               </div>
               <div>
                 <span className="text-white/60 block font-mono text-[11px] mb-1">Frontend:</span>
