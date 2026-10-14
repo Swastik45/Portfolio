@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Search, X } from 'lucide-react'
+import { Search, X, LayoutGrid, PanelsTopLeft } from 'lucide-react'
 
 const LAUNCHPAD_APPS = [
   {
@@ -98,78 +98,177 @@ const LAUNCHPAD_APPS = [
   }
 ]
 
+const PINNED_APP_IDS = ['projects', 'experience', 'about', 'skills', 'resume', 'mail']
+
 export default function Launchpad({
   isOpen,
   onClose,
-  onOpenApp
+  onOpenApp,
+  onFocusApp,
+  onToggleMissionControl,
+  windows = {}
 }) {
   const [search, setSearch] = useState('')
+  const [showAllApps, setShowAllApps] = useState(false)
 
   if (!isOpen) return null
 
+  const query = search.trim().toLowerCase()
   const filteredApps = LAUNCHPAD_APPS.filter((app) =>
-    app.name.toLowerCase().includes(search.toLowerCase()) ||
-    app.category.toLowerCase().includes(search.toLowerCase())
+    app.name.toLowerCase().includes(query) ||
+    app.category.toLowerCase().includes(query)
   )
+  const displayedApps = filteredApps.filter((app) =>
+    query || showAllApps || PINNED_APP_IDS.includes(app.id)
+  )
+  const openApps = Object.values(windows).filter((app) => app.isOpen).slice(0, 3)
+
+  const launchApp = (appId) => {
+    if (windows[appId]?.isOpen) onFocusApp?.(appId)
+    else onOpenApp(appId)
+    onClose()
+  }
 
   return (
-    <div 
-      className="fixed inset-0 z-[120] bg-black/60 backdrop-blur-2xl flex flex-col items-center justify-start pt-16 sm:pt-24 px-4 select-none animate-in fade-in duration-200"
+    <div
+      className="fixed inset-0 z-[88] text-white"
       onClick={onClose}
     >
-      {/* Search Bar */}
-      <div 
-        className="w-full max-w-md relative mb-12"
-        onClick={(e) => e.stopPropagation()}
+      <section
+        role="dialog"
+        aria-label="Start menu"
+        className="absolute bottom-[62px] left-2 flex max-h-[calc(100dvh-78px)] w-[min(640px,calc(100vw-16px))] flex-col overflow-hidden rounded-2xl border border-white/15 bg-[#171a23]/95 shadow-[0_24px_80px_rgba(0,0,0,0.55)] backdrop-blur-2xl animate-in fade-in slide-in-from-bottom-2 duration-150 sm:bottom-[66px] sm:left-3"
+        onClick={(event) => event.stopPropagation()}
       >
-        <Search className="w-4 h-4 text-white/50 absolute left-4 top-1/2 -translate-y-1/2" />
-        <input
-          type="text"
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          placeholder="Search applications..."
-          autoFocus
-          className="w-full pl-11 pr-4 py-2.5 rounded-2xl bg-white/10 border border-white/20 text-white placeholder-white/40 text-sm focus:outline-none focus:ring-2 focus:ring-[#7e9cd8] backdrop-blur-xl"
-        />
-        {search && (
-          <button 
-            onClick={() => setSearch('')}
-            className="absolute right-3.5 top-1/2 -translate-y-1/2 text-white/50 hover:text-white"
-          >
-            <X className="w-4 h-4" />
-          </button>
-        )}
-      </div>
+        <div className="shrink-0 border-b border-white/10 px-4 pb-4 pt-4 sm:px-6 sm:pt-5">
+          <div className="mb-3 flex items-center gap-2 text-[10px] font-mono uppercase tracking-[0.2em] text-white/45">
+            <LayoutGrid className="h-3.5 w-3.5 text-[#39a9f8]" />
+            Swastik’s PC
+          </div>
+          <label className="relative block">
+            <Search className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-white/45" />
+            <input
+              type="search"
+              value={search}
+              onChange={(event) => setSearch(event.target.value)}
+              placeholder="Search apps..."
+              aria-label="Search Start menu apps"
+              autoFocus
+              className="w-full rounded-lg border border-white/10 bg-[#242832] py-2.5 pl-10 pr-10 text-sm text-white placeholder-white/40 outline-none transition-colors focus:border-[#39a9f8]/70 focus:ring-2 focus:ring-[#39a9f8]/25"
+            />
+            {search && (
+              <button
+                type="button"
+                onClick={() => setSearch('')}
+                aria-label="Clear Start menu search"
+                className="absolute right-2.5 top-1/2 -translate-y-1/2 rounded p-1 text-white/45 hover:text-white"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            )}
+          </label>
+        </div>
 
-      {/* App Grid */}
-      <div 
-        className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-6 sm:gap-10 max-w-3xl w-full"
-        onClick={(e) => e.stopPropagation()}
-      >
-        {filteredApps.map((app) => (
-          <button
-            key={app.id}
-            onClick={() => {
-              onOpenApp(app.id)
-              onClose()
-            }}
-            className="flex flex-col items-center group transition-transform duration-150 hover:scale-105 active:scale-95 text-center"
-          >
-            <div 
-              className="w-16 h-16 sm:w-20 sm:h-20 rounded-[22px] flex items-center justify-center shadow-2xl border border-white/10 group-hover:shadow-[0_10px_30px_rgba(255,255,255,0.15)] transition-all"
-              style={{ background: app.bg }}
-            >
-              {app.renderIcon()}
+        <div className="min-h-0 flex-1 overflow-y-auto px-4 py-4 sm:px-6">
+          <div className="mb-3 flex items-center justify-between">
+            <h1 className="text-sm font-semibold text-white/90">
+              {query ? 'Search results' : showAllApps ? 'All apps' : 'Pinned'}
+            </h1>
+            {!query && (
+              <button
+                type="button"
+                onClick={() => setShowAllApps((current) => !current)}
+                className="rounded-md border border-white/10 bg-white/[0.04] px-2.5 py-1 text-[11px] text-white/70 transition-colors hover:bg-white/10 hover:text-white"
+              >
+                {showAllApps ? 'Pinned' : 'All apps'}
+              </button>
+            )}
+          </div>
+
+          {displayedApps.length > 0 ? (
+            <div className="grid grid-cols-3 gap-1.5 sm:grid-cols-4 sm:gap-2">
+              {displayedApps.map((app) => {
+                const isOpen = Boolean(windows[app.id]?.isOpen)
+                const isMinimized = windows[app.id]?.isMinimized
+                return (
+                  <button
+                    key={app.id}
+                    type="button"
+                    onClick={() => launchApp(app.id)}
+                    aria-label={`${isOpen ? 'Switch to' : 'Open'} ${app.name}`}
+                    className="group flex min-h-[96px] flex-col items-center justify-center gap-2 rounded-xl px-1.5 py-3 text-center transition-colors hover:bg-white/[0.08] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#39a9f8] active:bg-white/[0.12]"
+                  >
+                    <span
+                      className="relative flex h-11 w-11 items-center justify-center rounded-[13px] border border-white/10 shadow-lg transition-transform group-hover:scale-105 sm:h-12 sm:w-12"
+                      style={{ background: app.bg }}
+                    >
+                      {app.renderIcon()}
+                      {isOpen && (
+                        <span className="absolute -right-1 -top-1 h-3 w-3 rounded-full border-2 border-[#171a23] bg-[#39a9f8]" />
+                      )}
+                    </span>
+                    <span className="max-w-full truncate text-[11px] text-white/85 group-hover:text-white">
+                      {app.name}
+                    </span>
+                    {isMinimized && <span className="-mt-1 text-[9px] text-white/35">Minimized</span>}
+                  </button>
+                )
+              })}
             </div>
-            <span className="mt-2.5 text-xs sm:text-sm font-medium text-white/90 group-hover:text-white drop-shadow">
-              {app.name}
+          ) : (
+            <div className="rounded-xl border border-dashed border-white/15 px-4 py-8 text-center">
+              <p className="text-sm font-medium text-white/75">No apps found</p>
+              <p className="mt-1 text-xs text-white/40">Try another app or project name.</p>
+            </div>
+          )}
+
+          {!query && openApps.length > 0 && (
+            <section className="mt-4 border-t border-white/[0.08] pt-4" aria-labelledby="start-open-apps">
+              <h2 id="start-open-apps" className="mb-2 text-[11px] font-semibold text-white/65">Open now</h2>
+              <div className="space-y-1">
+                {openApps.map((app) => (
+                  <button
+                    key={app.id}
+                    type="button"
+                    onClick={() => launchApp(app.id)}
+                    className="flex w-full items-center gap-2.5 rounded-lg px-2 py-2 text-left text-xs text-white/75 transition-colors hover:bg-white/[0.07] hover:text-white"
+                  >
+                    <span className="flex h-7 w-7 items-center justify-center rounded-md bg-white/[0.07] text-sm">{app.icon}</span>
+                    <span className="min-w-0 flex-1 truncate">{app.title}</span>
+                    <span className="text-[10px] text-white/35">{app.isMinimized ? 'Minimized' : 'Running'}</span>
+                  </button>
+                ))}
+              </div>
+            </section>
+          )}
+        </div>
+
+        <footer className="flex shrink-0 items-center justify-between gap-3 border-t border-white/10 bg-white/[0.035] px-4 py-3 sm:px-6">
+          <div className="flex min-w-0 items-center gap-2.5">
+            <span className="flex h-8 w-8 shrink-0 items-center justify-center overflow-hidden rounded-full border border-white/15 bg-[#272b35]">
+              <img src="/swastik-cutout.png" alt="" className="h-full w-full object-cover object-top" />
             </span>
-            <span className="text-[10px] text-white/40">
-              {app.category}
+            <span className="min-w-0 truncate">
+              <span className="block truncate text-xs font-medium text-white/85">Swastik Paudel</span>
+              <span className="block truncate text-[10px] text-white/40">Kathmandu, Nepal</span>
             </span>
-          </button>
-        ))}
-      </div>
+          </div>
+          <div className="flex shrink-0 items-center gap-1">
+            <button
+              type="button"
+              onClick={() => {
+                onToggleMissionControl()
+                onClose()
+              }}
+              title="Task View"
+              aria-label="Open Task View"
+              className="rounded-lg p-2 text-white/55 transition-colors hover:bg-white/10 hover:text-white"
+            >
+              <PanelsTopLeft className="h-4 w-4" />
+            </button>
+          </div>
+        </footer>
+      </section>
     </div>
   )
 }

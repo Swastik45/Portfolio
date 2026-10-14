@@ -8,6 +8,8 @@ const COMMAND_LIST = [
 ]
 
 const WALLPAPER_MAP = {
+  '0': 'kathmandu',
+  'kathmandu': 'kathmandu',
   '1': 'samurai',
   'samurai': 'samurai',
   '2': 'fuji',
@@ -88,7 +90,7 @@ Tech: Rust, Bevy Engine, ECS | Zero-GC 120 FPS simulation`
 const HELP_TEXT = `Developer Terminal v2.6 — Interactive bash emulator
 
 System & Desktop Commands:
-  theme [name|number]  - Switch desktop wallpaper immediately (samurai, fuji, sakura, kanagawa)
+  theme [name|number]  - Switch wallpaper (kathmandu, samurai, fuji, sakura, kanagawa)
   open <app>           - Launch desktop window (projects, resume, mail, prepnep, ask, music)
   music [play|next]    - Control Chillhop audio player or launch window
   top / htop           - Live system process monitor & resource stats
@@ -118,7 +120,7 @@ export default function TerminalApp({ onOpenApp, onSelectWallpaper, onClose, cur
     {
       type: 'system',
       text: `Swastik Paudel — Developer Shell (Kathmandu, Nepal)
-Type 'help' for commands, 'theme fuji' to change wallpaper, or 'open projects'.`
+Type 'help' for commands, 'theme kathmandu' to reset the wallpaper, or 'open projects'.`
     }
   ])
   const [input, setInput] = useState('')

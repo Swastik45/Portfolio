@@ -1,5 +1,10 @@
 export const WALLPAPERS = [
   {
+    id: 'kathmandu',
+    name: 'Kathmandu Valley at Dusk',
+    thumbnailColor: 'linear-gradient(160deg, #111a2d 0%, #29384f 48%, #765265 78%, #df9877 100%)'
+  },
+  {
     id: 'samurai',
     name: 'Samurai at Dusk',
     thumbnailColor: 'linear-gradient(135deg, #15141b 0%, #2e1a27 50%, #e46876 100%)'

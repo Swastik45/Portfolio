@@ -1,13 +1,26 @@
 # Swastik Paudel — Portfolio
 
-A macOS-inspired interactive portfolio built with React and Vite. The desktop includes draggable app windows, Spotlight search across projects and technologies, Mission Control, a dock, Launchpad, Control Center, project and experience views, a local mail draft, and a server-backed contact flow.
+A personal Windows-inspired desktop portfolio built with React and Vite. It starts with a Kathmandu dusk wallpaper, Swastik's portrait, and a minimal identity label. Desktop items open into distinct app-style interfaces: Projects in an Explorer-like folder, the bio as a Notepad document, the prepNep case study as a document viewer, and Contact as a mail composer.
 
 ## Desktop shortcuts
 
-- `⌘K` / `Ctrl+K` — search apps, projects, and technologies with Spotlight; use the arrow keys and Enter to open a result.
-- `F3` / `⌃↑` — open Mission Control to switch, restore, or close windows.
+- `Ctrl+K` / `⌘K` — search apps, projects, and technologies; use the arrow keys and Enter to open a result.
+- `F3` / `Ctrl+↑` — open Task View to switch, restore, or close windows.
 - `Esc` — dismiss the current desktop overlay without closing the active app.
-- Use the dock's Launchpad icon to browse apps, or open Mission Control from Control Center on touch devices.
+- Select the Windows-style Start button to browse pinned apps and running windows.
+- Desktop shortcuts open with one click or tap; they are also keyboard accessible.
+- Taskbar app indicators show open and active windows; select the active app again to minimize it.
+- Use the taskbar search button for universal search, and the system-tray controls for Quick Settings.
+
+## Portfolio apps
+
+- App windows use a Windows-inspired dark palette and file-type shortcuts are drawn as SVGs for text, folders, PDF, mail, and system tools.
+- **Projects / File Explorer:** browse Projects, Production, Web, or Systems folders; go back and forward through folder history; search project details or technologies; filter by stack; switch between icon and details views; select and open a project for its preview and links.
+- **About / Notepad:** edit the profile document, create a new document, open a local `.txt` file with `Ctrl+O`, save it in this browser with `Ctrl+S`, download a `.txt` copy, toggle word wrap, print, or jump to Projects, the case study, and Contact. Browser storage is local to the current browser.
+- **prepNep / Document viewer:** read the case study across three navigable sections, adjust zoom from 70% to 150%, reset zoom, and print the current view. The viewer is generated from portfolio content; no source PDF is present.
+- **Résumé / PDF-style viewer:** navigate résumé sections, adjust zoom, copy text, or use the browser print dialog to save the rendered résumé as a PDF.
+- **Systems Lab:** browse and search the skills manifest, inspect categorized technologies, and view/copy live browser runtime details such as platform, viewport, display scale, and connectivity.
+- **Mail:** compose and send through the contact API, use message templates, resume or delete the locally saved draft, and review successful sends from the current session. The Inbox is an explanatory empty state; it does not connect to Swastik's private mailbox.
 
 ## Stack
 

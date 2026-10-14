@@ -1,5 +1,6 @@
 import React, { useRef, useState, useEffect } from 'react'
 import { Minus, X, Maximize2, Minimize2 } from 'lucide-react'
+import { ShortcutGlyph } from './DesktopIcons'
 
 export default function WindowFrame({
   title,
@@ -51,7 +52,7 @@ export default function WindowFrame({
 
     // Keep window within visible screen bounds
     const newX = Math.max(8, Math.min(window.innerWidth - 140, e.clientX - dragOffsetRef.current.x))
-    const newY = Math.max(36, Math.min(window.innerHeight - 130, e.clientY - dragOffsetRef.current.y))
+    const newY = Math.max(8, Math.min(window.innerHeight - 110, e.clientY - dragOffsetRef.current.y))
 
     onUpdatePosition?.({ x: newX, y: newY })
   }
@@ -71,31 +72,31 @@ export default function WindowFrame({
   const windowStyle = isMobile
     ? {
         position: 'fixed',
-        top: 34,
+        top: 8,
         left: 4,
         right: 4,
-        bottom: 68,
+        bottom: 60,
         zIndex,
-        maxHeight: 'calc(100vh - 104px)'
+        maxHeight: 'calc(100vh - 68px)'
       }
     : isMaximized
     ? {
         position: 'fixed',
-        top: 34,
+        top: 10,
         left: 12,
         right: 12,
-        bottom: 76,
+        bottom: 66,
         zIndex,
-        maxHeight: 'calc(100vh - 114px)'
+        maxHeight: 'calc(100vh - 76px)'
       }
     : {
         position: 'fixed',
         left: position.x,
         top: position.y,
         width: Math.min(size.w, window.innerWidth - 24),
-        height: Math.min(size.h, window.innerHeight - 140),
+        height: Math.min(size.h, window.innerHeight - 90),
         maxWidth: 'calc(100vw - 24px)',
-        maxHeight: 'calc(100vh - 140px)',
+        maxHeight: 'calc(100vh - 90px)',
         zIndex
       }
 
@@ -104,8 +105,8 @@ export default function WindowFrame({
       ref={windowRef}
       style={windowStyle}
       onMouseDown={onFocus}
-      className={`pointer-events-auto rounded-xl sm:rounded-2xl border border-white/15 bg-[#1c1c28]/95 backdrop-blur-2xl shadow-[0_25px_60px_rgba(0,0,0,0.6)] flex flex-col overflow-hidden select-auto animate-in fade-in zoom-in-95 duration-150 ${
-        isDragging ? 'opacity-95 ring-1 ring-[#7e9cd8]/50 shadow-2xl' : ''
+      className={`pointer-events-auto rounded-lg border border-white/15 bg-[#20242d]/95 shadow-[0_24px_64px_rgba(0,0,0,0.48)] backdrop-blur-2xl flex flex-col overflow-hidden select-auto animate-in fade-in zoom-in-95 duration-150 ${
+        isDragging ? 'opacity-95 ring-1 ring-[#39a9f8]/50 shadow-2xl' : ''
       }`}
     >
       {/* Title Bar (Draggable handle on desktop) */}
@@ -114,29 +115,16 @@ export default function WindowFrame({
         onPointerMove={handlePointerMove}
         onPointerUp={handlePointerUp}
         onDoubleClick={!isMobile ? onToggleMaximize : undefined}
-        className={`h-10 px-2.5 sm:px-3 bg-[#242436]/95 border-b border-white/10 flex items-center justify-between select-none shrink-0 z-20 ${
+        className={`h-10 bg-[#20242d] border-b border-white/[0.08] flex items-center justify-between select-none shrink-0 z-20 ${
           isMobile ? 'cursor-default' : 'cursor-grab active:cursor-grabbing'
         }`}
       >
-        {/* macOS Traffic Light Buttons */}
-        <div className="flex items-center gap-1.5 sm:gap-2 group/lights" onPointerDown={(e) => e.stopPropagation()}>
-          {/* Close button (Red) */}
-          <button
-            type="button"
-            onClick={(e) => {
-              e.stopPropagation()
-              onClose?.()
-            }}
-            onPointerDown={(e) => e.stopPropagation()}
-            className="w-6 h-6 flex items-center justify-center p-1 rounded-full hover:bg-white/10 transition-colors cursor-pointer"
-            title="Close (Exit)"
-          >
-            <div className="w-3.5 h-3.5 rounded-full bg-[#e46876] hover:bg-[#c34043] flex items-center justify-center shadow-sm">
-              <X className="w-2.5 h-2.5 text-black/70 stroke-[3]" />
-            </div>
-          </button>
+        <div className="flex min-w-0 flex-1 items-center gap-2.5 pl-3 text-xs font-medium text-white/85">
+          {icon && <span className="flex h-6 w-6 shrink-0 items-center justify-center"><ShortcutGlyph type={icon} className="h-5 w-5" /></span>}
+          <span className="truncate">{title}</span>
+        </div>
 
-          {/* Minimize button (Yellow) */}
+        <div className="flex h-full shrink-0 items-stretch" onPointerDown={(e) => e.stopPropagation()}>
           <button
             type="button"
             onClick={(e) => {
@@ -144,15 +132,12 @@ export default function WindowFrame({
               onMinimize?.()
             }}
             onPointerDown={(e) => e.stopPropagation()}
-            className="w-6 h-6 flex items-center justify-center p-1 rounded-full hover:bg-white/10 transition-colors cursor-pointer"
-            title="Minimize to Dock"
+            aria-label={`Minimize ${title}`}
+            className="flex w-10 items-center justify-center text-white/65 transition-colors hover:bg-white/10 hover:text-white"
+            title="Minimize"
           >
-            <div className="w-3.5 h-3.5 rounded-full bg-[#dca561] hover:bg-[#c0853e] flex items-center justify-center shadow-sm">
-              <Minus className="w-2.5 h-2.5 text-black/70 stroke-[3]" />
-            </div>
+            <Minus className="h-3.5 w-3.5" />
           </button>
-
-          {/* Maximize / Restore button (Green) */}
           <button
             type="button"
             onClick={(e) => {
@@ -160,27 +145,12 @@ export default function WindowFrame({
               onToggleMaximize?.()
             }}
             onPointerDown={(e) => e.stopPropagation()}
-            className="w-6 h-6 flex items-center justify-center p-1 rounded-full hover:bg-white/10 transition-colors cursor-pointer hidden sm:flex"
-            title="Toggle Fullscreen"
+            aria-label={`${isMaximized ? 'Restore' : 'Maximize'} ${title}`}
+            className="hidden w-10 items-center justify-center text-white/65 transition-colors hover:bg-white/10 hover:text-white sm:flex"
+            title={isMaximized ? 'Restore down' : 'Maximize'}
           >
-            <div className="w-3.5 h-3.5 rounded-full bg-[#76946a] hover:bg-[#5c7a52] flex items-center justify-center shadow-sm">
-              {isMaximized ? (
-                <Minimize2 className="w-2.5 h-2.5 text-black/70 stroke-[3]" />
-              ) : (
-                <Maximize2 className="w-2.5 h-2.5 text-black/70 stroke-[3]" />
-              )}
-            </div>
+            {isMaximized ? <Minimize2 className="h-3.5 w-3.5" /> : <Maximize2 className="h-3.5 w-3.5" />}
           </button>
-        </div>
-
-        {/* Centered Window Title */}
-        <div className="flex items-center gap-1.5 sm:gap-2 text-xs font-semibold text-[#dcd7ba] truncate max-w-[55%] sm:max-w-[65%]">
-          {icon && <span className="text-xs sm:text-sm">{icon}</span>}
-          <span className="truncate">{title}</span>
-        </div>
-
-        {/* Right side close pill */}
-        <div className="flex items-center gap-1.5">
           <button
             type="button"
             onClick={(e) => {
@@ -188,10 +158,11 @@ export default function WindowFrame({
               onClose?.()
             }}
             onPointerDown={(e) => e.stopPropagation()}
-            className="px-2 py-0.5 rounded-md bg-white/5 hover:bg-[#e46876]/20 hover:text-[#e46876] text-[11px] font-mono text-white/50 transition-colors cursor-pointer"
-            title="Close window"
+            aria-label={`Close ${title}`}
+            className="flex w-11 items-center justify-center text-white/70 transition-colors hover:bg-[#c42b1c] hover:text-white sm:w-12"
+            title="Close"
           >
-            esc
+            <X className="h-4 w-4" />
           </button>
         </div>
       </div>

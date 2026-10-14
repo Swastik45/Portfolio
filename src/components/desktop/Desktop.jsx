@@ -1,15 +1,14 @@
 import React, { useState, useEffect, useRef } from 'react'
 import WallpaperBackground from './Wallpapers'
-import TopMenuBar from './TopMenuBar'
 import Dock from './Dock'
 import Launchpad from './Launchpad'
 import ControlCenter from './ControlCenter'
 import DesktopIcons from './DesktopIcons'
+import DesktopWorkspace from './DesktopWorkspace'
 import WindowFrame from './WindowFrame'
 import Spotlight from './Spotlight'
 import MissionControl from './MissionControl'
 import { soundFX } from './soundEffects'
-import { StickyNote, X, Check } from 'lucide-react'
 
 // Apps
 import AboutApp from './apps/AboutApp'
@@ -33,16 +32,16 @@ const DEFAULT_APPS = {
   about: {
     id: 'about',
     title: 'About Swastik Paudel',
-    icon: '👤',
-    isOpen: true,
+    icon: 'text',
+    isOpen: false,
     isMinimized: false,
     isMaximized: false,
     size: { w: 720, h: 540 }
   },
   projects: {
     id: 'projects',
-    title: 'Projects — Finder',
-    icon: '📁',
+    title: 'Projects — File Explorer',
+    icon: 'folder',
     isOpen: false,
     isMinimized: false,
     isMaximized: false,
@@ -51,7 +50,7 @@ const DEFAULT_APPS = {
   terminal: {
     id: 'terminal',
     title: 'Terminal — bash',
-    icon: '💻',
+    icon: 'terminal',
     isOpen: false,
     isMinimized: false,
     isMaximized: false,
@@ -60,7 +59,7 @@ const DEFAULT_APPS = {
   ask: {
     id: 'ask',
     title: 'Ask Swastik — AI Assistant',
-    icon: '問',
+    icon: 'assistant',
     isOpen: false,
     isMinimized: false,
     isMaximized: false,
@@ -69,7 +68,7 @@ const DEFAULT_APPS = {
   experience: {
     id: 'experience',
     title: 'prepNep — Engineering Case Study',
-    icon: '💼',
+    icon: 'case',
     isOpen: false,
     isMinimized: false,
     isMaximized: false,
@@ -77,8 +76,8 @@ const DEFAULT_APPS = {
   },
   skills: {
     id: 'skills',
-    title: 'Skills & Architecture — System Profiler',
-    icon: '⚡',
+    title: 'Systems Lab — System Information',
+    icon: 'system',
     isOpen: false,
     isMinimized: false,
     isMaximized: false,
@@ -87,7 +86,7 @@ const DEFAULT_APPS = {
   resume: {
     id: 'resume',
     title: 'Résumé — Swastik Paudel',
-    icon: '📄',
+    icon: 'pdf',
     isOpen: false,
     isMinimized: false,
     isMaximized: false,
@@ -96,7 +95,7 @@ const DEFAULT_APPS = {
   mail: {
     id: 'mail',
     title: 'Mail — New Message',
-    icon: '✉️',
+    icon: 'mail',
     isOpen: false,
     isMinimized: false,
     isMaximized: false,
@@ -105,7 +104,7 @@ const DEFAULT_APPS = {
   music: {
     id: 'music',
     title: 'Music Player — Chillhop',
-    icon: '🎵',
+    icon: 'music',
     isOpen: false,
     isMinimized: false,
     isMaximized: false,
@@ -121,22 +120,22 @@ export default function Desktop() {
       initial[key] = {
         ...app,
         position: getCenteredCoords(app.size.w, app.size.h),
-        zIndex: key === 'about' ? 10 : 5
+        zIndex: 5
       }
     })
     return initial
   })
 
-  const [activeWindowId, setActiveWindowId] = useState('about')
+  const [activeWindowId, setActiveWindowId] = useState(null)
   const highestZRef = useRef(20)
 
   // Wallpaper persistence
   const [wallpaper, setWallpaper] = useState(() => {
     try {
-      return localStorage.getItem('swastik_wallpaper') || 'samurai'
+      return localStorage.getItem('swastik_wallpaper') || 'kathmandu'
     } catch (e) {
       console.debug('localStorage error:', e)
-      return 'samurai'
+      return 'kathmandu'
     }
   })
 
@@ -147,26 +146,7 @@ export default function Desktop() {
   const [isControlCenterOpen, setIsControlCenterOpen] = useState(false)
   const [soundEnabled, setSoundEnabled] = useState(true)
   const [spotlightProjectQuery, setSpotlightProjectQuery] = useState('')
-
-  // Desktop Sticky Note State
-  const [showStickyNote, setShowStickyNote] = useState(true)
-  const [noteContent, setNoteContent] = useState(() => {
-    try {
-      return localStorage.getItem('swastik_desktop_note') || '💡 Quick Memo:\n- Lead Engineer @ prepNep (prepnep.com)\n- Building high-concurrency systems & Rust\n- Contact: psamarpaudel@gmail.com'
-    } catch {
-      return ''
-    }
-  })
-
-  // Save sticky note
-  const handleNoteChange = (text) => {
-    setNoteContent(text)
-    try {
-      localStorage.setItem('swastik_desktop_note', text)
-    } catch (e) {
-      console.debug('localStorage error:', e)
-    }
-  }
+  const [projectsSearchResetKey, setProjectsSearchResetKey] = useState(0)
 
   // Toggle sound
   const handleToggleSound = () => {
@@ -279,6 +259,7 @@ export default function Desktop() {
     setIsSpotlightOpen(false)
     if (projectQuery) {
       setSpotlightProjectQuery(projectQuery)
+      setProjectsSearchResetKey((key) => key + 1)
       focusApp(appId)
     } else {
       openApp(appId)
@@ -290,7 +271,7 @@ export default function Desktop() {
     soundFX.play('close')
     setWindows((prev) => ({
       ...prev,
-      [appId]: { ...prev[appId], isOpen: false }
+      [appId]: { ...prev[appId], isOpen: false, isMinimized: false }
     }))
     setActiveWindowId((current) => (current === appId ? null : current))
   }, [])
@@ -325,19 +306,12 @@ export default function Desktop() {
     }))
   }
 
-  // Close active window shortcut
-  const closeActiveWindow = () => {
-    if (activeWindowId) {
-      closeApp(activeWindowId)
-    }
-  }
-
   const activeWindowIdRef = useRef(activeWindowId)
   useEffect(() => {
     activeWindowIdRef.current = activeWindowId
   }, [activeWindowId])
 
-  // Global shortcuts for Spotlight, Mission Control, and overlay dismissal.
+  // Global shortcuts for search, Task View, and overlay dismissal.
   useEffect(() => {
     const handleKeyDown = (e) => {
       if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
@@ -346,12 +320,14 @@ export default function Desktop() {
         setIsSpotlightOpen((prev) => !prev)
         setIsLaunchpadOpen(false)
         setIsMissionControlOpen(false)
+        setIsControlCenterOpen(false)
       } else if (e.key === 'F3' || ((e.metaKey || e.ctrlKey) && e.key === 'ArrowUp')) {
         e.preventDefault()
         soundFX.play('click')
         setIsMissionControlOpen((prev) => !prev)
         setIsSpotlightOpen(false)
         setIsLaunchpadOpen(false)
+        setIsControlCenterOpen(false)
       } else if (e.key === 'Escape') {
         if (isSpotlightOpen) setIsSpotlightOpen(false)
         else if (isMissionControlOpen) setIsMissionControlOpen(false)
@@ -365,20 +341,21 @@ export default function Desktop() {
 
   // Calculate open apps map for Dock dots
   const openAppsMap = Object.keys(windows).reduce((acc, k) => {
-    acc[k] = windows[k].isOpen && !windows[k].isMinimized
+    acc[k] = {
+      isOpen: windows[k].isOpen,
+      isMinimized: windows[k].isMinimized
+    }
     return acc
   }, {})
-
-  // Active App Name display in top menubar
-  const activeAppObj = activeWindowId ? windows[activeWindowId] : null
-  const activeAppName = activeAppObj ? activeAppObj.title.split('—')[0].trim() : 'Swastik Paudel'
 
   const minimizeAll = () => {
     soundFX.play('close')
     setWindows((prev) => {
       const updated = { ...prev }
       Object.keys(updated).forEach((k) => {
-        updated[k] = { ...updated[k], isMinimized: true }
+        if (updated[k].isOpen) {
+          updated[k] = { ...updated[k], isMinimized: true }
+        }
       })
       return updated
     })
@@ -397,68 +374,11 @@ export default function Desktop() {
       {/* 1. Wallpaper Background Canvas */}
       <WallpaperBackground wallpaperId={wallpaper} />
 
-      {/* 2. Top System Menu Bar */}
-      <TopMenuBar
-        activeAppName={activeAppName}
-        onToggleLaunchpad={() => {
-          soundFX.play('click')
-          setIsLaunchpadOpen((prev) => !prev)
-        }}
-        onToggleControlCenter={() => {
-          soundFX.play('click')
-          setIsControlCenterOpen((prev) => !prev)
-        }}
-        onToggleSpotlight={() => {
-          soundFX.play('click')
-          setIsSpotlightOpen((prev) => !prev)
-          setIsLaunchpadOpen(false)
-          setIsMissionControlOpen(false)
-        }}
-        onToggleMissionControl={() => {
-          soundFX.play('click')
-          setIsMissionControlOpen((prev) => !prev)
-          setIsSpotlightOpen(false)
-          setIsLaunchpadOpen(false)
-        }}
-        isControlCenterOpen={isControlCenterOpen}
-        onOpenApp={openApp}
-        onCloseActiveWindow={closeActiveWindow}
-        onMinimizeAll={minimizeAll}
-      />
-
-      {/* 3. Streamlined Desktop Shortcuts */}
+      {/* 2. Personal desktop home */}
+      <DesktopWorkspace onOpenApp={openApp} />
       <DesktopIcons onOpenApp={openApp} />
 
-      {/* 4. Desktop Quick Sticky Note (Persistent Memo) */}
-      {showStickyNote && (
-        <div 
-          className="absolute bottom-20 right-4 z-10 hidden sm:block w-64 p-3.5 rounded-2xl bg-[#fff8db]/90 text-[#3d3725] border border-amber-200/60 shadow-xl backdrop-blur-md pointer-events-auto transition-transform hover:scale-[1.02]"
-          onClick={(e) => e.stopPropagation()}
-        >
-          <div className="flex items-center justify-between pb-1.5 border-b border-amber-900/10 mb-2">
-            <div className="flex items-center gap-1.5 text-xs font-mono font-bold text-amber-950">
-              <StickyNote className="w-3.5 h-3.5 text-amber-700" />
-              <span>Desktop Note</span>
-            </div>
-            <button
-              type="button"
-              onClick={() => setShowStickyNote(false)}
-              className="p-0.5 rounded hover:bg-black/10 text-amber-900/60 hover:text-amber-950 cursor-pointer"
-              title="Hide note"
-            >
-              <X className="w-3 h-3" />
-            </button>
-          </div>
-          <textarea
-            value={noteContent}
-            onChange={(e) => handleNoteChange(e.target.value)}
-            rows={4}
-            className="w-full bg-transparent text-xs font-mono text-[#3d3725] placeholder-amber-900/40 resize-none focus:outline-none leading-relaxed"
-          />
-        </div>
-      )}
-
-      {/* 5. Windows Manager Layer */}
+      {/* 3. Windows Manager Layer */}
       <div className="absolute inset-0 pointer-events-none">
         {/* About App */}
         <WindowFrame
@@ -482,8 +402,10 @@ export default function Desktop() {
           onUpdatePosition={(pos) => updatePosition('projects', pos)}
         >
           <ProjectsApp
+            key={projectsSearchResetKey}
             onOpenApp={openApp}
-            initialSearch={spotlightProjectQuery}
+            search={spotlightProjectQuery}
+            onSearchChange={setSpotlightProjectQuery}
           />
         </WindowFrame>
 
@@ -577,7 +499,7 @@ export default function Desktop() {
         </WindowFrame>
       </div>
 
-      {/* 6. Control Center Dropdown Drawer */}
+      {/* 5. Quick Settings Drawer */}
       <ControlCenter
         isOpen={isControlCenterOpen}
         onClose={() => setIsControlCenterOpen(false)}
@@ -588,27 +510,64 @@ export default function Desktop() {
           setIsMissionControlOpen(true)
           setIsSpotlightOpen(false)
           setIsLaunchpadOpen(false)
+          setIsControlCenterOpen(false)
         }}
         soundEnabled={soundEnabled}
         onToggleSound={handleToggleSound}
       />
 
-      {/* 7. macOS Bottom Floating Dock */}
+      {/* 6. Windows-style taskbar */}
       <Dock
         openApps={openAppsMap}
+        activeWindowId={activeWindowId}
         onOpenApp={openApp}
         onToggleLaunchpad={() => {
           soundFX.play('click')
           setIsLaunchpadOpen((prev) => !prev)
+          setIsSpotlightOpen(false)
+          setIsMissionControlOpen(false)
+          setIsControlCenterOpen(false)
         }}
         isLaunchpadOpen={isLaunchpadOpen}
+        onToggleSpotlight={() => {
+          soundFX.play('click')
+          setIsSpotlightOpen((prev) => !prev)
+          setIsLaunchpadOpen(false)
+          setIsMissionControlOpen(false)
+          setIsControlCenterOpen(false)
+        }}
+        onToggleMissionControl={() => {
+          soundFX.play('click')
+          setIsMissionControlOpen((prev) => !prev)
+          setIsSpotlightOpen(false)
+          setIsLaunchpadOpen(false)
+          setIsControlCenterOpen(false)
+        }}
+        onToggleControlCenter={() => {
+          soundFX.play('click')
+          setIsControlCenterOpen((prev) => !prev)
+          setIsLaunchpadOpen(false)
+          setIsSpotlightOpen(false)
+          setIsMissionControlOpen(false)
+        }}
+        onShowDesktop={minimizeAll}
+        isControlCenterOpen={isControlCenterOpen}
       />
 
-      {/* 8. Fullscreen Launchpad Overlay */}
+      {/* 7. Start Menu */}
       <Launchpad
+        key={isLaunchpadOpen ? 'open' : 'closed'}
         isOpen={isLaunchpadOpen}
         onClose={() => setIsLaunchpadOpen(false)}
         onOpenApp={openApp}
+        onFocusApp={focusApp}
+        onToggleMissionControl={() => {
+          setIsMissionControlOpen(true)
+          setIsSpotlightOpen(false)
+          setIsLaunchpadOpen(false)
+          setIsControlCenterOpen(false)
+        }}
+        windows={windows}
       />
 
       {isSpotlightOpen && (

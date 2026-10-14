@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import { 
   Folder, 
+  BriefcaseBusiness,
   ExternalLink, 
   Github, 
   Search, 
@@ -13,7 +14,13 @@ import {
   Check,
   Tag,
   Monitor,
-  Smartphone
+  Smartphone,
+  Cpu,
+  HardDrive,
+  Globe2,
+  ChevronRight,
+  FolderOpen,
+  RefreshCw
 } from 'lucide-react'
 import { soundFX } from '../soundEffects'
 import { PROJECTS_DATA } from '../portfolioData'
@@ -21,16 +28,41 @@ import { PROJECTS_DATA } from '../portfolioData'
 // Extract unique technology tags
 const ALL_TAGS = Array.from(new Set(PROJECTS_DATA.flatMap((p) => p.tech)))
 
-export default function ProjectsApp({ onOpenApp, initialSearch = '' }) {
-  const [selectedCategory, setSelectedCategory] = useState('All')
+export default function ProjectsApp({ onOpenApp, search = '', onSearchChange }) {
+  const [folderHistory, setFolderHistory] = useState({ entries: ['All'], index: 0 })
+  const [selectedProjectId, setSelectedProjectId] = useState(null)
   const [selectedTag, setSelectedTag] = useState(null)
-  const [search, setSearch] = useState(initialSearch)
   const [viewMode, setViewMode] = useState('grid') // 'grid' | 'list'
   const [inspectProject, setInspectProject] = useState(null)
   const [previewDevice, setPreviewDevice] = useState('desktop') // 'desktop' | 'mobile'
   const [copiedUrl, setCopiedUrl] = useState(false)
 
-  const categories = ['All', 'Production', 'Web', 'Systems']
+  const selectedCategory = folderHistory.entries[folderHistory.index]
+  const selectedProject = PROJECTS_DATA.find((project) => project.id === selectedProjectId) || null
+
+  const navigateFolder = (category) => {
+    setFolderHistory((history) => {
+      if (history.entries[history.index] === category) return history
+      const entries = history.entries.slice(0, history.index + 1)
+      entries.push(category)
+      return { entries, index: entries.length - 1 }
+    })
+    setSelectedProjectId(null)
+    setSelectedTag(null)
+  }
+
+  const moveInHistory = (direction) => {
+    setFolderHistory((history) => ({
+      ...history,
+      index: Math.max(0, Math.min(history.entries.length - 1, history.index + direction))
+    }))
+    setSelectedProjectId(null)
+  }
+
+  const openProject = (project) => {
+    soundFX.play('open')
+    setInspectProject(project)
+  }
 
   const handleCopyUrl = (url) => {
     navigator.clipboard.writeText(url)
@@ -51,44 +83,68 @@ export default function ProjectsApp({ onOpenApp, initialSearch = '' }) {
   })
 
   return (
-    <div className="flex flex-col h-full bg-[#181824] text-[#dcd7ba]">
-      {/* Top Toolbar */}
-      <div className="p-3 bg-[#20202e] border-b border-white/10 flex flex-wrap items-center justify-between gap-3 shrink-0">
-        {/* Category Tabs */}
-        <div className="flex items-center gap-1 bg-white/5 p-1 rounded-xl border border-white/10">
-          {categories.map((cat) => (
-            <button
-              key={cat}
-              type="button"
-              onClick={() => {
-                soundFX.play('click')
-                setSelectedCategory(cat)
-              }}
-              className={`px-3 py-1 rounded-lg text-xs font-medium transition-colors cursor-pointer ${
-                selectedCategory === cat
-                  ? 'bg-[#7e9cd8] text-[#1f1f28] shadow font-bold'
-                  : 'text-white/70 hover:text-white'
-              }`}
-            >
-              {cat}
-            </button>
-          ))}
+    <div className="flex h-full flex-col bg-[#111820] text-[#e8edf3]">
+      <div className="flex h-11 shrink-0 items-center gap-3 border-b border-[#303b48] bg-[#1a232d] px-3 text-[11px]">
+        <div className="flex items-center gap-1.5 text-[#a9b6c5]">
+          <button type="button" aria-label="Back" onClick={() => moveInHistory(-1)} disabled={folderHistory.index === 0} className="rounded p-1.5 hover:bg-[#2a3745] disabled:opacity-35">‹</button>
+          <button type="button" aria-label="Forward" onClick={() => moveInHistory(1)} disabled={folderHistory.index >= folderHistory.entries.length - 1} className="rounded p-1.5 hover:bg-[#2a3745] disabled:opacity-35">›</button>
         </div>
+        <div className="flex min-w-0 flex-1 items-center gap-1 rounded-md border border-[#394653] bg-[#141c24] px-2 py-1.5 text-[#a9b6c5]">
+          <HardDrive className="h-3.5 w-3.5 shrink-0 text-[#58a8ff]" />
+          <button type="button" onClick={() => navigateFolder('All')} className="truncate hover:text-[#2878d0]">This PC</button>
+          <ChevronRight className="h-3 w-3 shrink-0 text-[#647487]" />
+          <span className="truncate font-medium text-[#e8edf3]">Projects</span>
+          {selectedCategory !== 'All' && (
+            <>
+              <ChevronRight className="h-3 w-3 shrink-0 text-[#647487]" />
+              <span className="truncate font-medium text-[#e8edf3]">{selectedCategory}</span>
+            </>
+          )}
+        </div>
+        <button type="button" onClick={() => { onSearchChange(''); setSelectedTag(null); setSelectedProjectId(null) }} title="Clear search and filters" aria-label="Clear search and filters" className="rounded p-1.5 text-[#91a0b1] hover:bg-[#2a3745]"><RefreshCw className="h-3.5 w-3.5" /></button>
+        <span className="hidden text-[10px] text-[#91a0b1] sm:block">{filteredProjects.length} items</span>
+      </div>
 
+      <div className="flex min-h-0 flex-1">
+        <aside className="hidden w-44 shrink-0 border-r border-[#303b48] bg-[#151e27] p-2 md:block" aria-label="Project folders">
+          <p className="px-2 pb-2 pt-1 text-[9px] font-semibold uppercase tracking-[0.14em] text-[#7b8795]">Quick access</p>
+          <div className="space-y-0.5 text-[11px]">
+            {[
+              { name: 'All', label: 'Projects', Icon: Folder },
+              { name: 'Production', label: 'Production', Icon: BriefcaseBusiness },
+              { name: 'Web', label: 'Web', Icon: Globe2 },
+              { name: 'Systems', label: 'Systems', Icon: Cpu },
+            ].map(({ name, label, Icon }) => (
+              <button key={label} type="button" onClick={() => navigateFolder(name)} aria-current={selectedCategory === name ? 'page' : undefined} className={`flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-left ${selectedCategory === name ? 'bg-[#17324d] font-medium text-[#8bc4ff]' : 'text-[#b6c2ce] hover:bg-[#222e3a]'}`}>
+                {React.createElement(Icon, { className: 'h-3.5 w-3.5' })} {label}
+              </button>
+            ))}
+          </div>
+          <div className="mx-2 my-3 border-t border-[#303b48]" />
+          <p className="px-2 pb-2 text-[9px] font-semibold uppercase tracking-[0.14em] text-[#7b8795]">Storage</p>
+          <div className="flex items-center gap-2 px-2 py-1.5 text-[11px] text-[#b6c2ce]"><HardDrive className="h-3.5 w-3.5" /> Local projects <span className="ml-auto text-[9px]">{PROJECTS_DATA.length}</span></div>
+        </aside>
+        <div className="flex min-w-0 flex-1 flex-col">
+      {/* Top Toolbar */}
+      <div className="flex shrink-0 flex-wrap items-center justify-end gap-3 border-b border-[#303b48] bg-[#1a232d] p-3">
         {/* Search & View Toggle */}
         <div className="flex items-center gap-2">
           <div className="relative">
-            <Search className="w-3.5 h-3.5 text-white/40 absolute left-3 top-1/2 -translate-y-1/2" />
+            <Search className="absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-[#7b8795]" />
             <input
               type="text"
               value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              placeholder="Search stack or title..."
-              className="pl-8 pr-3 py-1.5 rounded-xl bg-white/5 border border-white/10 text-white placeholder-white/40 text-xs w-44 sm:w-56 focus:outline-none focus:ring-1 focus:ring-[#7e9cd8]"
+            onChange={(e) => {
+              onSearchChange(e.target.value)
+              setSelectedProjectId(null)
+            }}
+              placeholder="Search projects..."
+              aria-label="Search projects"
+              className="w-40 rounded-lg border border-[#394653] bg-[#111820] py-1.5 pl-8 pr-3 text-xs text-[#e8edf3] placeholder-[#7b8795] focus:outline-none focus:ring-1 focus:ring-[#2878d0] sm:w-56"
             />
           </div>
 
-          <div className="flex items-center bg-white/5 rounded-xl border border-white/10 p-0.5">
+          <div className="flex items-center rounded-lg border border-[#394653] bg-[#141c24] p-0.5">
             <button
               type="button"
               onClick={() => {
@@ -96,7 +152,7 @@ export default function ProjectsApp({ onOpenApp, initialSearch = '' }) {
                 setViewMode('grid')
               }}
               className={`p-1.5 rounded-lg transition-colors cursor-pointer ${
-                viewMode === 'grid' ? 'bg-white/20 text-white' : 'text-white/50 hover:text-white'
+                viewMode === 'grid' ? 'bg-[#263442] text-[#8bc4ff] shadow-sm' : 'text-[#91a0b1] hover:text-[#e8edf3]'
               }`}
               title="Grid View"
             >
@@ -109,26 +165,29 @@ export default function ProjectsApp({ onOpenApp, initialSearch = '' }) {
                 setViewMode('list')
               }}
               className={`p-1.5 rounded-lg transition-colors cursor-pointer ${
-                viewMode === 'list' ? 'bg-white/20 text-white' : 'text-white/50 hover:text-white'
+                viewMode === 'list' ? 'bg-[#263442] text-[#8bc4ff] shadow-sm' : 'text-[#91a0b1] hover:text-[#e8edf3]'
               }`}
               title="List View"
             >
               <List className="w-3.5 h-3.5" />
             </button>
           </div>
+          <button type="button" disabled={!selectedProject} onClick={() => selectedProject && openProject(selectedProject)} className="inline-flex items-center gap-1.5 rounded-lg bg-[#2878d0] px-3 py-1.5 text-xs font-medium text-white hover:bg-[#1f67b8] disabled:cursor-not-allowed disabled:opacity-45">
+            <FolderOpen className="h-3.5 w-3.5" /> Open
+          </button>
         </div>
       </div>
 
       {/* Interactive Tech Tag Filter Bar */}
-      <div className="px-3.5 py-2 bg-white/[0.02] border-b border-white/5 flex items-center gap-1.5 overflow-x-auto no-scrollbar shrink-0">
-        <span className="text-[10px] font-mono text-white/40 uppercase tracking-wider shrink-0 flex items-center gap-1">
-          <Tag className="w-3 h-3 text-[#7e9cd8]" /> Filter Stack:
+      <div className="flex shrink-0 items-center gap-1.5 overflow-x-auto border-b border-[#303b48] bg-[#151e27] px-3.5 py-2 no-scrollbar">
+        <span className="flex shrink-0 items-center gap-1 font-mono text-[10px] uppercase tracking-wider text-[#91a0b1]">
+          <Tag className="h-3 w-3 text-[#2878d0]" /> Filter Stack:
         </span>
         {selectedTag && (
           <button
             type="button"
             onClick={() => setSelectedTag(null)}
-            className="px-2 py-0.5 rounded-full bg-[#e46876]/20 text-[#e46876] border border-[#e46876]/30 text-[10px] font-mono shrink-0 cursor-pointer flex items-center gap-1"
+            className="flex shrink-0 cursor-pointer items-center gap-1 rounded-full border border-[#693b40] bg-[#3a2227] px-2 py-0.5 font-mono text-[10px] text-[#ff9fa5]"
           >
             Clear ({selectedTag}) &times;
           </button>
@@ -143,8 +202,8 @@ export default function ProjectsApp({ onOpenApp, initialSearch = '' }) {
             }}
             className={`px-2.5 py-0.5 rounded-full text-[10px] font-mono transition-colors shrink-0 whitespace-nowrap cursor-pointer ${
               selectedTag === t
-                ? 'bg-[#7e9cd8] text-[#1f1f28] font-bold shadow'
-                : 'bg-white/5 hover:bg-white/10 text-white/70 hover:text-white border border-white/5'
+                ? 'bg-[#17324d] font-bold text-[#8bc4ff] shadow-sm'
+                  : 'border border-[#394653] bg-[#1a232d] text-[#b6c2ce] hover:bg-[#263442]'
             }`}
           >
             {t}
@@ -153,20 +212,33 @@ export default function ProjectsApp({ onOpenApp, initialSearch = '' }) {
       </div>
 
       {/* Content Area */}
-      <div className="flex-1 p-4 overflow-y-auto">
+      <div className="min-h-0 flex-1 overflow-y-auto bg-[#111820] p-4">
         {viewMode === 'grid' ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {filteredProjects.map((p) => (
               <div
                 key={p.id}
                 onClick={() => {
-                  soundFX.play('open')
-                  setInspectProject(p)
+                  setSelectedProjectId(p.id)
                 }}
-                className="group rounded-2xl border border-white/10 bg-[#20202e]/60 hover:bg-[#20202e] hover:border-white/25 transition-all duration-200 overflow-hidden flex flex-col cursor-pointer shadow-lg hover:shadow-2xl"
+                onDoubleClick={() => openProject(p)}
+                onKeyDown={(event) => {
+                  if (event.target !== event.currentTarget) return
+                  if (event.key === 'Enter') openProject(p)
+                  if (event.key === ' ') {
+                    event.preventDefault()
+                    setSelectedProjectId(p.id)
+                  }
+                }}
+                role="button"
+                tabIndex={0}
+                aria-pressed={selectedProjectId === p.id}
+                className={`group flex cursor-pointer flex-col overflow-hidden rounded-xl border bg-[#1a232d] transition-all duration-150 hover:shadow-md ${
+                  selectedProjectId === p.id ? 'border-[#4da3ff] ring-1 ring-[#4da3ff]' : 'border-[#303b48] hover:border-[#526477]'
+                }`}
               >
                 {/* Screenshot or Canvas Frame */}
-                <div className="relative h-40 bg-[#121218] overflow-hidden border-b border-white/10 flex items-center justify-center">
+                <div className="relative flex h-40 items-center justify-center overflow-hidden border-b border-[#303b48] bg-[#141c24]">
                   {p.previewImg ? (
                     <img
                       src={p.previewImg}
@@ -175,15 +247,15 @@ export default function ProjectsApp({ onOpenApp, initialSearch = '' }) {
                     />
                   ) : (
                     <div className="flex flex-col items-center justify-center text-center p-4">
-                      <div className="w-12 h-12 rounded-xl bg-[#e46876]/20 border border-[#e46876]/40 flex items-center justify-center text-[#e46876] font-mono font-bold text-lg mb-2">
+                      <div className="mb-2 flex h-12 w-12 items-center justify-center rounded-xl border border-[#63383d] bg-[#321f24] font-mono text-lg font-bold text-[#ff858c]">
                         🦀
                       </div>
-                      <span className="text-xs font-mono text-white/70">Rust &amp; Bevy Engine</span>
+                      <span className="font-mono text-xs text-[#a4b1bf]">Rust &amp; Bevy Engine</span>
                     </div>
                   )}
 
                   {/* Badge */}
-                  <span className="absolute top-2.5 left-2.5 px-2 py-0.5 rounded-full bg-black/60 backdrop-blur-md text-[10px] font-mono text-white/90 border border-white/15">
+                  <span className="absolute left-2.5 top-2.5 rounded-full border border-[#465566] bg-[#111820]/90 px-2 py-0.5 font-mono text-[10px] text-[#dbe5ef] shadow-sm backdrop-blur-md">
                     {p.badge}
                   </span>
                 </div>
@@ -192,12 +264,12 @@ export default function ProjectsApp({ onOpenApp, initialSearch = '' }) {
                 <div className="p-3.5 flex-1 flex flex-col justify-between space-y-3">
                   <div>
                     <div className="flex items-center justify-between">
-                      <h3 className="font-bold text-white text-sm group-hover:text-[#7e9cd8] transition-colors">
+                      <h3 className="text-sm font-bold text-[#e8edf3] transition-colors group-hover:text-[#72b7ff]">
                         {p.title}
                       </h3>
-                      <ArrowUpRight className="w-3.5 h-3.5 text-white/40 group-hover:text-white transition-colors" />
+                      <ArrowUpRight className="h-3.5 w-3.5 text-[#8b96a4] transition-colors group-hover:text-[#2878d0]" />
                     </div>
-                    <p className="text-[11px] text-[#938aa9] mt-1 line-clamp-2 leading-relaxed">
+                    <p className="mt-1 line-clamp-2 text-[11px] leading-relaxed text-[#a4b1bf]">
                       {p.headline}
                     </p>
                   </div>
@@ -207,13 +279,13 @@ export default function ProjectsApp({ onOpenApp, initialSearch = '' }) {
                     {p.tech.slice(0, 3).map((t, idx) => (
                       <span
                         key={idx}
-                        className="px-2 py-0.5 rounded-md bg-white/5 border border-white/10 text-[10px] font-mono text-white/70"
+                        className="rounded-md border border-[#394653] bg-[#202b35] px-2 py-0.5 font-mono text-[10px] text-[#b7c4d1]"
                       >
                         {t}
                       </span>
                     ))}
                     {p.tech.length > 3 && (
-                      <span className="px-1.5 py-0.5 rounded-md bg-white/5 text-[10px] font-mono text-white/50">
+                      <span className="rounded-md bg-[#202b35] px-1.5 py-0.5 font-mono text-[10px] text-[#91a0b1]">
                         +{p.tech.length - 3}
                       </span>
                     )}
@@ -224,18 +296,32 @@ export default function ProjectsApp({ onOpenApp, initialSearch = '' }) {
           </div>
         ) : (
           /* List View */
-          <div className="rounded-xl border border-white/10 bg-[#20202e]/40 overflow-hidden divide-y divide-white/5">
+          <div className="overflow-hidden rounded-xl border border-[#303b48] bg-[#1a232d] divide-y divide-[#303b48]">
             {filteredProjects.map((p) => (
               <div
                 key={p.id}
                 onClick={() => {
-                  soundFX.play('open')
-                  setInspectProject(p)
+                  setSelectedProjectId(p.id)
                 }}
-                className="p-3 hover:bg-white/5 transition-colors flex items-center justify-between gap-4 cursor-pointer"
+                onDoubleClick={() => openProject(p)}
+                onKeyDown={(event) => {
+                  if (event.target !== event.currentTarget) return
+                  if (event.key === 'Enter') openProject(p)
+                  if (event.key === ' ') {
+                    event.preventDefault()
+                    setSelectedProjectId(p.id)
+                  }
+                }}
+                role="group"
+                aria-label={`Select ${p.title}`}
+                tabIndex={0}
+                aria-current={selectedProjectId === p.id ? 'true' : undefined}
+                className={`flex cursor-pointer items-center justify-between gap-4 p-3 transition-colors ${
+                  selectedProjectId === p.id ? 'bg-[#1b3146]' : 'hover:bg-[#222e3a]'
+                }`}
               >
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-lg bg-black/40 border border-white/10 overflow-hidden shrink-0 flex items-center justify-center">
+                  <div className="flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-lg border border-[#394653] bg-[#141c24]">
                     {p.previewImg ? (
                       <img src={p.previewImg} alt={p.title} className="w-full h-full object-cover" />
                     ) : (
@@ -244,12 +330,12 @@ export default function ProjectsApp({ onOpenApp, initialSearch = '' }) {
                   </div>
                   <div>
                     <div className="flex items-center gap-2">
-                      <span className="font-bold text-white text-xs sm:text-sm">{p.title}</span>
-                      <span className="text-[10px] font-mono px-1.5 py-0.2 rounded bg-white/10 text-white/70">
+                      <span className="text-xs font-bold text-[#e8edf3] sm:text-sm">{p.title}</span>
+                      <span className="rounded bg-[#263442] px-1.5 py-0.2 font-mono text-[10px] text-[#b7c4d1]">
                         {p.badge}
                       </span>
                     </div>
-                    <p className="text-[11px] text-[#938aa9] line-clamp-1">
+                    <p className="line-clamp-1 text-[11px] text-[#a4b1bf]">
                       {p.headline}
                     </p>
                   </div>
@@ -262,7 +348,7 @@ export default function ProjectsApp({ onOpenApp, initialSearch = '' }) {
                       target="_blank"
                       rel="noopener noreferrer"
                       onClick={(e) => e.stopPropagation()}
-                      className="p-1.5 rounded-lg bg-white/5 hover:bg-white/15 text-white/80 hover:text-white transition-colors cursor-pointer"
+                      className="cursor-pointer rounded-lg p-1.5 text-[#91a0b1] transition-colors hover:bg-[#17324d] hover:text-[#8bc4ff]"
                       title="Open Live Website"
                     >
                       <ExternalLink className="w-3.5 h-3.5" />
@@ -274,7 +360,7 @@ export default function ProjectsApp({ onOpenApp, initialSearch = '' }) {
                       target="_blank"
                       rel="noopener noreferrer"
                       onClick={(e) => e.stopPropagation()}
-                      className="p-1.5 rounded-lg bg-white/5 hover:bg-white/15 text-white/80 hover:text-white transition-colors cursor-pointer"
+                      className="cursor-pointer rounded-lg p-1.5 text-[#91a0b1] transition-colors hover:bg-[#17324d] hover:text-[#8bc4ff]"
                       title="View GitHub Repository"
                     >
                       <Github className="w-3.5 h-3.5" />
@@ -285,6 +371,19 @@ export default function ProjectsApp({ onOpenApp, initialSearch = '' }) {
             ))}
           </div>
         )}
+        {filteredProjects.length === 0 && (
+          <div className="rounded-xl border border-dashed border-[#465566] bg-[#1a232d] p-10 text-center">
+            <Search className="mx-auto h-6 w-6 text-[#718092]" />
+            <p className="mt-3 text-sm font-medium text-[#dbe5ef]">No projects found</p>
+            <p className="mt-1 text-xs text-[#91a0b1]">Try a different name, technology, or folder.</p>
+          </div>
+        )}
+      </div>
+      <div className="flex min-h-8 shrink-0 items-center justify-between border-t border-[#303b48] bg-[#1a232d] px-3 py-1 text-[9px] text-[#91a0b1]">
+        <span>{filteredProjects.length} items{selectedProject ? ` · ${selectedProject.title} selected` : ''}</span>
+        <span>Double-click an item to inspect · {viewMode === 'grid' ? 'Icon view' : 'Details view'}</span>
+      </div>
+        </div>
       </div>
 
       {/* Project Inspection Modal */}
@@ -294,13 +393,13 @@ export default function ProjectsApp({ onOpenApp, initialSearch = '' }) {
           onClick={() => setInspectProject(null)}
         >
           <div 
-            className="w-full max-w-xl rounded-2xl bg-[#20202e] border border-white/15 shadow-2xl p-5 space-y-4 max-h-[90vh] overflow-y-auto"
+            className="w-full max-w-xl space-y-4 overflow-y-auto rounded-2xl border border-[#354250] bg-[#1a232d] p-5 shadow-2xl max-h-[90vh]"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Modal Header */}
             <div className="flex items-center justify-between pb-3 border-b border-white/10">
               <div className="flex items-center gap-2">
-                <span className="px-2 py-0.5 rounded-md bg-[#7e9cd8]/20 border border-[#7e9cd8]/30 text-[#7e9cd8] text-xs font-mono">
+                <span className="rounded-md border border-[#294d6e] bg-[#17324d] px-2 py-0.5 font-mono text-xs text-[#8bc4ff]">
                   {inspectProject.badge}
                 </span>
                 <h3 className="text-base font-bold text-white">{inspectProject.title}</h3>
@@ -308,7 +407,7 @@ export default function ProjectsApp({ onOpenApp, initialSearch = '' }) {
               <button
                 type="button"
                 onClick={() => setInspectProject(null)}
-                className="p-1.5 rounded-lg hover:bg-white/10 text-white/60 hover:text-white cursor-pointer"
+                className="cursor-pointer rounded-lg p-1.5 text-white/60 hover:bg-white/10 hover:text-white"
                 title="Close dialog"
               >
                 <X className="w-4 h-4" />
@@ -319,13 +418,13 @@ export default function ProjectsApp({ onOpenApp, initialSearch = '' }) {
             {inspectProject.previewImg && (
               <div className="space-y-2">
                 <div className="flex items-center justify-between text-xs">
-                  <span className="text-[10px] font-mono text-white/40 uppercase">Live Viewport Preview</span>
-                  <div className="flex items-center gap-1 bg-white/5 p-0.5 rounded-lg border border-white/10">
+                  <span className="font-mono text-[10px] uppercase text-[#91a0b1]">Project preview</span>
+                  <div className="flex items-center gap-1 rounded-lg border border-[#394653] bg-[#141c24] p-0.5">
                     <button
                       type="button"
                       onClick={() => setPreviewDevice('desktop')}
                       className={`p-1 rounded text-[11px] cursor-pointer flex items-center gap-1 ${
-                        previewDevice === 'desktop' ? 'bg-[#7e9cd8] text-[#1f1f28] font-bold' : 'text-white/60'
+                        previewDevice === 'desktop' ? 'bg-[#263442] font-bold text-[#8bc4ff]' : 'text-[#a9b6c5]'
                       }`}
                     >
                       <Monitor className="w-3 h-3" /> Desktop
@@ -334,7 +433,7 @@ export default function ProjectsApp({ onOpenApp, initialSearch = '' }) {
                       type="button"
                       onClick={() => setPreviewDevice('mobile')}
                       className={`p-1 rounded text-[11px] cursor-pointer flex items-center gap-1 ${
-                        previewDevice === 'mobile' ? 'bg-[#7e9cd8] text-[#1f1f28] font-bold' : 'text-white/60'
+                        previewDevice === 'mobile' ? 'bg-[#263442] font-bold text-[#8bc4ff]' : 'text-[#a9b6c5]'
                       }`}
                     >
                       <Smartphone className="w-3 h-3" /> Mobile
@@ -361,7 +460,7 @@ export default function ProjectsApp({ onOpenApp, initialSearch = '' }) {
 
             {/* Key Engineering Deliverables */}
             <div className="space-y-1.5 bg-white/5 p-3 rounded-xl border border-white/10">
-              <span className="text-[10px] font-mono uppercase tracking-wider text-[#938aa9] block">
+              <span className="block font-mono text-[10px] uppercase tracking-wider text-[#91a0b1]">
                 Highlights &amp; Architecture:
               </span>
               {inspectProject.metrics.map((m, idx) => (
@@ -374,14 +473,14 @@ export default function ProjectsApp({ onOpenApp, initialSearch = '' }) {
 
             {/* Tech Stack */}
             <div className="space-y-1.5">
-              <span className="text-[10px] font-mono uppercase tracking-wider text-[#938aa9] block">
+              <span className="block font-mono text-[10px] uppercase tracking-wider text-[#91a0b1]">
                 Technologies:
               </span>
               <div className="flex flex-wrap gap-1.5">
                 {inspectProject.tech.map((t, idx) => (
                   <span
                     key={idx}
-                    className="px-2.5 py-1 rounded-lg bg-white/5 border border-white/10 text-xs font-mono text-[#7e9cd8]"
+                    className="rounded-lg border border-[#394653] bg-[#202b35] px-2.5 py-1 font-mono text-xs text-[#8bc4ff]"
                   >
                     {t}
                   </span>
@@ -398,7 +497,7 @@ export default function ProjectsApp({ onOpenApp, initialSearch = '' }) {
                       href={inspectProject.liveUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-[#7e9cd8] hover:bg-[#6c8ac6] text-[#1f1f28] font-bold text-xs transition-colors shadow cursor-pointer"
+                      className="inline-flex cursor-pointer items-center gap-1.5 rounded-xl bg-[#2878d0] px-3.5 py-2 text-xs font-bold text-white shadow transition-colors hover:bg-[#1f67b8]"
                     >
                       Open Live Site
                       <ExternalLink className="w-3.5 h-3.5" />

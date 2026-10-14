@@ -1,216 +1,235 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
+import { Battery, PanelsTopLeft, Search, SlidersHorizontal, Wifi } from 'lucide-react'
+import { ShortcutGlyph } from './DesktopIcons'
 
 const DOCK_ITEMS = [
-  {
-    id: 'launchpad',
-    label: 'Launchpad',
-    isLauncher: true,
-    bg: 'linear-gradient(180deg, #5A5A70 0%, #2C2C3A 100%)',
-    renderIcon: () => (
-      <div className="grid grid-cols-3 gap-0.5 p-1 w-full h-full items-center justify-center">
-        {['#E46876', '#7E9CD8', '#76946A', '#DCA561', '#957FB8', '#D27E99', '#7AA89F', '#FFA066', '#E6C384'].map((c, i) => (
-          <div key={i} className="w-1.5 h-1.5 rounded-sm" style={{ backgroundColor: c }} />
-        ))}
-      </div>
-    )
-  },
   {
     id: 'ask',
     label: 'Ask Swastik',
     appId: 'ask',
     bg: 'linear-gradient(180deg, #DC5A55 0%, #A9333B 100%)',
     badge: 'AI',
-    renderIcon: () => (
-      <div className="flex items-center justify-center w-full h-full text-white font-bold text-lg select-none">
-        問
-      </div>
-    )
+    renderIcon: () => <ShortcutGlyph type="assistant" className="h-6 w-6" />
   },
   {
     id: 'projects',
     label: 'Projects',
     appId: 'projects',
     bg: 'linear-gradient(180deg, #8FD0EA 0%, #4A86C8 100%)',
-    renderIcon: () => (
-      <svg viewBox="0 0 40 40" className="w-6 h-6" fill="none">
-        <path d="M6 14a3 3 0 0 1 3-3h6l3 3h16a3 3 0 0 1 3 3v13a3 3 0 0 1-3 3H9a3 3 0 0 1-3-3V14z" fill="#F7FBFF" />
-        <path d="M6 19h28" stroke="#4A86C8" strokeWidth="1.5" opacity="0.4" />
-      </svg>
-    )
+    renderIcon: () => <ShortcutGlyph type="folder" className="h-6 w-6" />
   },
   {
     id: 'terminal',
     label: 'Terminal',
     appId: 'terminal',
     bg: 'linear-gradient(180deg, #3C3C48 0%, #131318 100%)',
-    renderIcon: () => (
-      <div className="flex items-center justify-center w-full h-full font-mono font-bold text-white text-xs">
-        <span className="text-[#76946a] mr-0.5">&gt;</span>_
-      </div>
-    )
+    renderIcon: () => <ShortcutGlyph type="terminal" className="h-6 w-6" />
   },
   {
     id: 'experience',
     label: 'prepNep',
     appId: 'experience',
     bg: 'linear-gradient(180deg, #7E9CD8 0%, #2D4F67 100%)',
-    renderIcon: () => (
-      <div className="flex items-center justify-center w-full h-full font-black text-white text-sm">
-        pN
-      </div>
-    )
+    renderIcon: () => <ShortcutGlyph type="case" className="h-6 w-6" />
+  },
+  {
+    id: 'about',
+    label: 'About Swastik',
+    appId: 'about',
+    bg: 'linear-gradient(180deg, #FFA066 0%, #D35400 100%)',
+    renderIcon: () => <ShortcutGlyph type="text" className="h-6 w-6" />
   },
   {
     id: 'skills',
-    label: 'Skills',
+    label: 'Systems Lab',
     appId: 'skills',
     bg: 'linear-gradient(180deg, #957FB8 0%, #4E3E6B 100%)',
-    renderIcon: () => (
-      <svg viewBox="0 0 24 24" className="w-5 h-5 text-white" fill="none" stroke="currentColor" strokeWidth="2">
-        <rect x="4" y="4" width="16" height="16" rx="2" />
-        <rect x="9" y="9" width="6" height="6" />
-        <line x1="9" y1="1" x2="9" y2="4" />
-        <line x1="15" y1="1" x2="15" y2="4" />
-        <line x1="9" y1="20" x2="9" y2="23" />
-        <line x1="15" y1="20" x2="15" y2="23" />
-        <line x1="20" y1="9" x2="23" y2="9" />
-        <line x1="20" y1="15" x2="23" y2="15" />
-        <line x1="1" y1="9" x2="4" y2="9" />
-        <line x1="1" y1="15" x2="4" y2="15" />
-      </svg>
-    )
+    renderIcon: () => <ShortcutGlyph type="system" className="h-6 w-6" />
   },
   {
     id: 'music',
     label: 'Music Player',
     appId: 'music',
-    bg: 'linear-gradient(180deg, #2BE57A 0%, #129A48 100%)',
-    renderIcon: () => (
-      <div className="flex items-end justify-center gap-0.5 w-full h-full pb-2">
-        <div className="w-1 h-3 bg-[#0B1F12] rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
-        <div className="w-1 h-5 bg-[#0B1F12] rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
-        <div className="w-1 h-4 bg-[#0B1F12] rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
-        <div className="w-1 h-2 bg-[#0B1F12] rounded-full animate-bounce" style={{ animationDelay: '450ms' }} />
-      </div>
-    )
-  },
-  {
-    id: 'divider',
-    isDivider: true
+    bg: 'linear-gradient(180deg, #3B9FE8 0%, #1669AE 100%)',
+    renderIcon: () => <ShortcutGlyph type="music" className="h-6 w-6" />
   },
   {
     id: 'resume',
     label: 'Résumé',
     appId: 'resume',
     bg: 'linear-gradient(180deg, #FCF8EC 0%, #D9D2BA 100%)',
-    renderIcon: () => (
-      <svg viewBox="0 0 24 24" className="w-5 h-5 text-[#2A2A37]" fill="none" stroke="currentColor" strokeWidth="2.2">
-        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
-        <polyline points="14 2 14 8 20 8" />
-        <line x1="16" y1="13" x2="8" y2="13" />
-        <line x1="16" y1="17" x2="8" y2="17" />
-        <line x1="10" y1="9" x2="8" y2="9" />
-      </svg>
-    )
+    renderIcon: () => <ShortcutGlyph type="pdf" className="h-6 w-6" />
   },
   {
     id: 'mail',
     label: 'Mail',
     appId: 'mail',
     bg: 'linear-gradient(180deg, #7DBDF7 0%, #2E6EDD 100%)',
-    renderIcon: () => (
-      <svg viewBox="0 0 24 24" className="w-5 h-5 text-white" fill="none" stroke="currentColor" strokeWidth="2">
-        <rect x="2" y="4" width="20" height="16" rx="2" />
-        <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" />
-      </svg>
-    )
+    renderIcon: () => <ShortcutGlyph type="mail" className="h-6 w-6" />
   }
 ]
 
+const MOBILE_TASKBAR_APP_IDS = new Set(['ask', 'projects', 'terminal'])
+
 export default function Dock({
   openApps = {},
+  activeWindowId,
   onOpenApp,
   onToggleLaunchpad,
-  isLaunchpadOpen
+  isLaunchpadOpen,
+  onToggleSpotlight,
+  onToggleMissionControl,
+  onToggleControlCenter,
+  onShowDesktop,
+  isControlCenterOpen
 }) {
-  const [hoveredIdx, setHoveredIdx] = useState(null)
+  const [clock, setClock] = useState({ time: '', date: '' })
+
+  useEffect(() => {
+    const updateClock = () => {
+      const now = new Date()
+      const timeOptions = { timeZone: 'Asia/Kathmandu', hour: 'numeric', minute: '2-digit', hour12: true }
+      const dateOptions = { timeZone: 'Asia/Kathmandu', month: 'numeric', day: 'numeric', year: 'numeric' }
+
+      try {
+        setClock({
+          time: new Intl.DateTimeFormat('en-US', timeOptions).format(now),
+          date: new Intl.DateTimeFormat('en-US', dateOptions).format(now)
+        })
+      } catch {
+        setClock({ time: now.toLocaleTimeString(), date: now.toLocaleDateString() })
+      }
+    }
+
+    updateClock()
+    const timer = setInterval(updateClock, 15000)
+    return () => clearInterval(timer)
+  }, [])
+
+  const apps = DOCK_ITEMS.filter((item) => item.appId)
 
   return (
-    <div className="fixed bottom-1.5 sm:bottom-2.5 inset-x-0 mx-auto w-fit max-w-[calc(100vw-8px)] z-[85] pointer-events-none select-none px-1 sm:px-2 flex justify-center">
-      <div 
-        className="pointer-events-auto flex items-end rounded-2xl sm:rounded-[22px] px-1.5 sm:px-2.5 pb-1.5 sm:pb-2 gap-1 sm:gap-2 shadow-[0_16px_40px_rgba(0,0,0,0.5),_inset_0_1px_0_rgba(255,255,255,0.15)] transition-all duration-200 overflow-x-auto no-scrollbar max-w-full"
-        style={{
-          background: 'rgba(54, 54, 70, 0.55)',
-          backdropFilter: 'blur(24px)',
-          WebkitBackdropFilter: 'blur(24px)',
-          border: '1px solid rgba(255, 255, 255, 0.16)'
-        }}
-        onMouseLeave={() => setHoveredIdx(null)}
-      >
-        {DOCK_ITEMS.map((item, idx) => {
-          if (item.isDivider) {
+    <div className="fixed inset-x-0 bottom-0 z-[90] h-[54px] border-t border-white/10 bg-[#171923]/90 text-white shadow-[0_-8px_32px_rgba(0,0,0,0.2)] backdrop-blur-2xl sm:h-[58px]">
+      <div className="mx-auto flex h-full w-full items-center gap-1 px-1.5 sm:gap-2 sm:px-3">
+        <button
+          type="button"
+          onClick={onToggleLaunchpad}
+          aria-label={isLaunchpadOpen ? 'Close Start menu' : 'Open Start menu'}
+          aria-haspopup="dialog"
+          aria-expanded={isLaunchpadOpen}
+          title="Start"
+          className={`group flex h-10 w-10 shrink-0 items-center justify-center rounded-lg transition-colors hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-300 ${
+            isLaunchpadOpen ? 'bg-white/10' : ''
+          }`}
+        >
+          <span className="grid grid-cols-2 gap-[2px] transition-transform duration-150 group-hover:scale-110">
+            <span className="h-[9px] w-[9px] bg-[#39a9f8]" />
+            <span className="h-[9px] w-[9px] bg-[#39a9f8]" />
+            <span className="h-[9px] w-[9px] bg-[#39a9f8]" />
+            <span className="h-[9px] w-[9px] bg-[#39a9f8]" />
+          </span>
+        </button>
+
+        <button
+          type="button"
+          onClick={onToggleSpotlight}
+          aria-label="Search apps, projects, and technologies"
+          title="Search"
+          className="flex h-9 w-10 shrink-0 items-center justify-center gap-2 rounded-lg border border-white/10 bg-white/[0.06] text-white/65 transition-colors hover:bg-white/10 hover:text-white sm:w-52 sm:justify-start sm:px-3 lg:w-60"
+        >
+          <Search className="h-4 w-4 shrink-0" />
+          <span className="hidden truncate text-xs sm:inline">Search apps and projects</span>
+        </button>
+
+        <div className="mx-1 h-7 w-px shrink-0 bg-white/10 sm:mx-1.5" />
+
+        <div className="flex min-w-0 flex-1 items-center gap-0.5 overflow-hidden sm:gap-1">
+          {apps.map((item) => {
+            const appState = openApps[item.appId] || {}
+            const isOpen = Boolean(appState.isOpen)
+            const isMinimized = isOpen && Boolean(appState.isMinimized)
+            const isActive = activeWindowId === item.appId && isOpen
+
             return (
-              <span
-                key={item.id}
-                className="w-px h-5 sm:h-8 mb-1 sm:mb-2 bg-white/20 self-center shrink-0 mx-0.5"
-                aria-hidden="true"
-              />
-            )
-          }
-
-          const isHovered = hoveredIdx === idx
-          const isNeighbor = hoveredIdx !== null && Math.abs(hoveredIdx - idx) === 1
-          const isOpen = item.appId ? openApps[item.appId] : (item.isLauncher && isLaunchpadOpen)
-
-          // Magnification scale (desktop only)
-          const scaleClass = isHovered 
-            ? 'scale-110 sm:scale-125 -translate-y-1 sm:-translate-y-2' 
-            : isNeighbor 
-            ? 'scale-105 sm:scale-110 -translate-y-0.5 sm:-translate-y-1' 
-            : 'scale-100'
-
-          return (
-            <div
-              key={item.id}
-              className="relative flex flex-col items-center group shrink-0"
-              onMouseEnter={() => setHoveredIdx(idx)}
-            >
-              {/* Tooltip */}
-              {isHovered && (
-                <div className="absolute -top-9 sm:-top-10 px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-lg bg-[#22222e]/90 text-white text-[10px] sm:text-[11px] font-medium font-sans border border-white/15 backdrop-blur-md whitespace-nowrap shadow-xl pointer-events-none z-50">
-                  {item.label}
-                </div>
-              )}
-
-              {/* Icon Capsule Button */}
               <button
+                key={item.id}
                 type="button"
-                onClick={() => {
-                  if (item.isLauncher) onToggleLaunchpad()
-                  else if (item.appId) onOpenApp(item.appId)
-                }}
-                className={`relative w-8 h-8 sm:w-11 sm:h-11 rounded-xl sm:rounded-[14px] flex items-center justify-center shadow-lg transition-transform duration-150 ease-out active:scale-95 cursor-pointer ${scaleClass}`}
-                style={{ background: item.bg }}
+                onClick={() => onOpenApp(item.appId)}
+                aria-label={`${isOpen ? 'Switch to' : 'Open'} ${item.label}${isMinimized ? ', minimized' : ''}`}
+                aria-pressed={isActive}
+                title={`${item.label}${isOpen ? (isMinimized ? ' (minimized)' : ' (open)') : ''}`}
+                className={`group relative h-10 w-10 shrink-0 items-center justify-center rounded-lg transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-300 sm:flex sm:w-11 ${
+                  MOBILE_TASKBAR_APP_IDS.has(item.appId) ? 'flex' : 'hidden'
+                } ${
+                  isActive ? 'bg-white/[0.13]' : 'hover:bg-white/[0.09]'
+                }`}
               >
-                {item.renderIcon()}
-
-                {/* AI / Custom Badge */}
-                {item.badge && (
-                  <span className="absolute -top-1 -right-1 px-1 py-0.2 rounded-full bg-[#e46876] text-white text-[7px] sm:text-[8px] font-mono font-bold leading-none shadow">
-                    {item.badge}
-                  </span>
+                <span
+                  className="relative flex h-7 w-7 items-center justify-center rounded-[9px] border border-white/10 shadow-md transition-transform group-hover:scale-105"
+                  style={{ background: item.bg }}
+                >
+                  {item.renderIcon()}
+                  {item.badge && (
+                    <span className="absolute -right-1 -top-1 rounded-full bg-[#e46876] px-1 text-[7px] font-bold leading-3 text-white">
+                      {item.badge}
+                    </span>
+                  )}
+                </span>
+                {isOpen && (
+                  <span
+                    className={`absolute bottom-0.5 h-[3px] rounded-full transition-all ${
+                      isActive ? 'w-4 bg-[#55b6ff]' : 'w-1.5 bg-white/45'
+                    }`}
+                  />
                 )}
               </button>
+            )
+          })}
+        </div>
 
-              {/* Active Indicator Dot */}
-              <div className="h-1 flex items-center justify-center mt-0.5 sm:mt-1">
-                {isOpen && (
-                  <div className="w-1.5 h-1.5 rounded-full bg-white/90 shadow-[0_0_6px_white]" />
-                )}
-              </div>
-            </div>
-          )
-        })}
+        <button
+          type="button"
+          onClick={onToggleMissionControl}
+          aria-label="Open Task View"
+          title="Task View · F3"
+          className="hidden h-10 w-10 shrink-0 items-center justify-center rounded-lg text-white/70 transition-colors hover:bg-white/10 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-300 sm:flex"
+        >
+          <PanelsTopLeft className="h-[18px] w-[18px]" />
+        </button>
+
+        <button
+          type="button"
+          onClick={onToggleControlCenter}
+          aria-label="Open quick settings"
+          aria-expanded={isControlCenterOpen}
+          title="Quick settings"
+          className={`flex h-10 shrink-0 items-center gap-1 rounded-lg px-2 text-white/75 transition-colors hover:bg-white/10 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-300 ${
+            isControlCenterOpen ? 'bg-white/10 text-white' : ''
+          }`}
+        >
+          <Wifi className="h-4 w-4" />
+          <Battery className="hidden h-4 w-4 sm:block" />
+          <SlidersHorizontal className="ml-0.5 h-3.5 w-3.5 text-white/50" />
+        </button>
+
+        <button
+          type="button"
+          onClick={onToggleControlCenter}
+          aria-label={`Kathmandu time ${clock.time}, ${clock.date}. Open quick settings`}
+          title="Kathmandu local time"
+          className="hidden h-10 shrink-0 flex-col items-center justify-center rounded-lg px-2 text-[11px] leading-4 text-white/85 transition-colors hover:bg-white/10 sm:flex"
+        >
+          <span>{clock.time || 'UTC+5:45'}</span>
+          <span className="text-[10px] text-white/55">{clock.date}</span>
+        </button>
+
+        <button
+          type="button"
+          onClick={onShowDesktop}
+          aria-label="Show desktop and minimize all windows"
+          title="Show desktop"
+          className="h-full w-1 shrink-0 border-l border-white/20 transition-colors hover:bg-[#39a9f8]/25 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-sky-300"
+        />
       </div>
     </div>
   )

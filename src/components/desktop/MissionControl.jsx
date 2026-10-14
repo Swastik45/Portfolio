@@ -52,7 +52,7 @@ export default function MissionControl({
         <div>
           <div className="mb-2 flex items-center gap-2 text-[10px] font-mono uppercase tracking-[0.24em] text-white/40">
             <Layers3 className="h-3.5 w-3.5 text-[#dca561]" />
-            Workspace overview
+            Task View · Workspace overview
           </div>
           <h2 className="text-2xl font-semibold tracking-tight sm:text-4xl">Everything in its place.</h2>
           <p className="mt-2 max-w-lg text-xs leading-relaxed text-white/45 sm:text-sm">
@@ -199,7 +199,7 @@ export default function MissionControl({
       </main>
 
       <div className="mx-auto mt-10 w-full max-w-6xl pb-5 text-center text-[10px] font-mono text-white/30">
-        F3 or ⌃ ↑ to open · Esc to return to desktop
+        F3 or Ctrl+↑ to open · Esc to return to desktop
       </div>
     </div>
   )

@@ -1,8 +1,12 @@
-import React, { useState } from 'react'
-import { Printer, Download, ExternalLink, Check, Copy, Briefcase, GraduationCap, Code2, Sparkles, MapPin, Mail, Phone, Github } from 'lucide-react'
+import React, { useRef, useState } from 'react'
+import { Printer, ExternalLink, Check, Copy, Briefcase, Code2, Sparkles, MapPin, Mail, Phone, Github, ChevronLeft, ChevronRight, ZoomIn, ZoomOut } from 'lucide-react'
 
 export default function ResumeApp() {
   const [copied, setCopied] = useState(false)
+  const [sectionIndex, setSectionIndex] = useState(0)
+  const [zoom, setZoom] = useState(100)
+  const sheetRef = useRef(null)
+  const sections = ['Profile', 'Experience', 'Projects', 'Skills']
 
   const handlePrint = () => {
     window.print()
@@ -41,42 +45,66 @@ Software Engineer — Madargaach Holdings (prepNep · prepnep.com)
     setTimeout(() => setCopied(false), 2000)
   }
 
+  const goToSection = (nextIndex) => {
+    const boundedIndex = Math.max(0, Math.min(sections.length - 1, nextIndex))
+    setSectionIndex(boundedIndex)
+    sheetRef.current?.querySelector(`[data-resume-section="${boundedIndex}"]`)?.scrollIntoView({
+      behavior: 'smooth',
+      block: 'start'
+    })
+  }
+
   return (
-    <div className="flex flex-col h-full bg-[#181824] text-[#dcd7ba]">
-      {/* Top Document Toolbar */}
-      <div className="p-3 bg-[#20202e] border-b border-white/10 flex items-center justify-between text-xs shrink-0">
+    <div className="flex h-full flex-col bg-[#111820] text-[#e8edf3]">
+      <div className="flex h-10 shrink-0 items-center gap-2 border-b border-[#303b48] bg-[#1a232d] px-3 text-[11px]">
+        <span className="flex h-full items-center gap-2 border-b-2 border-[#4da3ff] px-2 font-medium text-[#e8edf3]">
+          <span className="rounded-sm bg-[#d94a45] px-1 py-0.5 text-[8px] font-bold leading-none text-white">PDF</span>
+          Swastik_Paudel_Resume.pdf
+        </span>
+        <span className="ml-auto hidden text-[9px] text-[#91a0b1] sm:block">Resume document preview</span>
+      </div>
+
+      <div className="flex shrink-0 flex-wrap items-center justify-between gap-2 border-b border-[#303b48] bg-[#151e27] px-3 py-2 text-xs">
         <div className="flex items-center gap-2">
-          <span className="font-mono text-white font-medium">Swastik_Paudel_Resume.pdf</span>
-          <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-[#76946a]/20 text-[#76946a] border border-[#76946a]/30">
-            Active / 2026
-          </span>
+          <button type="button" onClick={() => goToSection(sectionIndex - 1)} disabled={sectionIndex === 0} aria-label="Previous resume section" className="rounded p-1.5 text-[#b6c2ce] hover:bg-[#263442] disabled:opacity-35"><ChevronLeft className="h-3.5 w-3.5" /></button>
+          <span className="min-w-28 text-center text-[10px] text-[#b6c2ce]">{sections[sectionIndex]} · {sectionIndex + 1} of {sections.length}</span>
+          <button type="button" onClick={() => goToSection(sectionIndex + 1)} disabled={sectionIndex === sections.length - 1} aria-label="Next resume section" className="rounded p-1.5 text-[#b6c2ce] hover:bg-[#263442] disabled:opacity-35"><ChevronRight className="h-3.5 w-3.5" /></button>
+          <div className="hidden items-center gap-0.5 border-l border-[#394653] pl-2 lg:flex">
+            {sections.map((section, index) => (
+              <button type="button" key={section} onClick={() => goToSection(index)} aria-current={sectionIndex === index ? 'location' : undefined} className={`rounded px-2 py-1 text-[9px] ${sectionIndex === index ? 'bg-[#17324d] text-[#8bc4ff]' : 'text-[#91a0b1] hover:bg-[#263442]'}`}>{section}</button>
+            ))}
+          </div>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1">
+          <button type="button" onClick={() => setZoom((value) => Math.max(70, value - 10))} disabled={zoom <= 70} title="Zoom out" className="rounded p-1.5 text-[#b6c2ce] hover:bg-[#263442] disabled:opacity-35"><ZoomOut className="h-3.5 w-3.5" /></button>
+          <button type="button" onClick={() => setZoom(100)} title="Reset zoom" className="min-w-10 rounded px-1 py-1.5 text-[10px] text-[#b6c2ce] hover:bg-[#263442]">{zoom}%</button>
+          <button type="button" onClick={() => setZoom((value) => Math.min(150, value + 10))} disabled={zoom >= 150} title="Zoom in" className="rounded p-1.5 text-[#b6c2ce] hover:bg-[#263442] disabled:opacity-35"><ZoomIn className="h-3.5 w-3.5" /></button>
           <button
+            type="button"
             onClick={handleCopyMd}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-white/80 hover:text-white transition-colors cursor-pointer"
+            className="inline-flex items-center gap-1.5 rounded-lg border border-[#394653] bg-[#202b35] px-2.5 py-1.5 text-[#c8d2de] transition-colors hover:bg-[#2a3745]"
           >
             {copied ? <Check className="w-3.5 h-3.5 text-[#76946a]" /> : <Copy className="w-3.5 h-3.5" />}
-            <span className="text-[11px]">{copied ? 'Copied MD' : 'Copy MD'}</span>
+            <span className="hidden text-[10px] sm:inline">{copied ? 'Copied' : 'Copy text'}</span>
           </button>
 
           <button
+            type="button"
             onClick={handlePrint}
-            className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-[#7e9cd8] hover:bg-[#6c8ac6] text-[#1f1f28] font-bold transition-colors shadow cursor-pointer"
+            className="inline-flex items-center gap-1.5 rounded-lg bg-[#2878d0] px-3 py-1.5 font-semibold text-white transition-colors hover:bg-[#1f67b8]"
           >
             <Printer className="w-3.5 h-3.5" />
-            <span className="text-[11px]">Print / PDF</span>
+            <span className="text-[10px]">Print / Save PDF</span>
           </button>
         </div>
       </div>
 
-      {/* Resume Document Sheet */}
-      <div className="flex-1 p-4 sm:p-6 overflow-y-auto">
-        <div className="max-w-2xl mx-auto space-y-6">
+      <div className="min-h-0 flex-1 overflow-auto bg-[#111820] p-3 sm:p-6">
+        <div ref={sheetRef} className="mx-auto max-w-3xl space-y-6 rounded-sm border border-[#354250] bg-[#1a232d] p-5 shadow-[0_8px_30px_rgba(0,0,0,.35)] sm:p-8" style={{ zoom: `${zoom}%` }}>
           
           {/* Header Card */}
-          <div className="p-6 rounded-2xl bg-white/[0.03] border border-white/10 space-y-3">
+          <div data-resume-section="0" className="scroll-mt-3 space-y-3 rounded-xl border border-[#354250] bg-[#202b35] p-6">
             <div className="flex flex-wrap items-baseline justify-between gap-2">
               <div>
                 <h1 className="text-2xl sm:text-3xl font-bold text-white tracking-tight">
@@ -124,7 +152,7 @@ Software Engineer — Madargaach Holdings (prepNep · prepnep.com)
           </div>
 
           {/* Experience Section */}
-          <div className="space-y-3">
+          <div data-resume-section="1" className="scroll-mt-3 space-y-3">
             <h2 className="text-xs font-mono font-bold uppercase tracking-wider text-[#dca561] flex items-center gap-2">
               <Briefcase className="w-4 h-4 text-[#dca561]" />
               Work Experience
@@ -171,7 +199,7 @@ Software Engineer — Madargaach Holdings (prepNep · prepnep.com)
           </div>
 
           {/* Flagship Projects Section */}
-          <div className="space-y-3">
+          <div data-resume-section="2" className="scroll-mt-3 space-y-3">
             <h2 className="text-xs font-mono font-bold uppercase tracking-wider text-[#dca561] flex items-center gap-2">
               <Code2 className="w-4 h-4 text-[#dca561]" />
               Flagship Engineering Projects
@@ -233,7 +261,7 @@ Software Engineer — Madargaach Holdings (prepNep · prepnep.com)
           </div>
 
           {/* Technical Skills Section */}
-          <div className="p-5 rounded-2xl bg-white/[0.03] border border-white/10 space-y-3">
+          <div data-resume-section="3" className="scroll-mt-3 space-y-3 rounded-xl border border-[#354250] bg-[#202b35] p-5">
             <h2 className="text-xs font-mono font-bold uppercase tracking-wider text-[#dca561] flex items-center gap-2">
               <Sparkles className="w-4 h-4 text-[#dca561]" />
               Core Competencies
@@ -242,6 +270,10 @@ Software Engineer — Madargaach Holdings (prepNep · prepnep.com)
               <div>
                 <span className="text-white/60 block font-mono text-[11px] mb-1">Languages:</span>
                 <span className="text-white font-medium">TypeScript, JavaScript (ESNext), Rust, Python, C/C++, SQL</span>
+              </div>
+              <div className="flex h-7 shrink-0 items-center justify-between border-t border-[#303b48] bg-[#1a232d] px-3 text-[9px] text-[#91a0b1]">
+                <span>PDF-style preview · Use Print / Save PDF to export</span>
+                <span>{zoom}% · {sections[sectionIndex]}</span>
               </div>
               <div>
                 <span className="text-white/60 block font-mono text-[11px] mb-1">Frontend:</span>

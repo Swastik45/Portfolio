@@ -1,5 +1,5 @@
-import React, { useState } from 'react'
-import { Code, Server, Cpu, Layers, Search, Check, Copy } from 'lucide-react'
+import React, { useEffect, useState } from 'react'
+import { Code, Server, Cpu, Layers, Search, Check, Copy, Monitor, RefreshCw, Wifi, WifiOff } from 'lucide-react'
 import { soundFX } from '../soundEffects'
 
 const SKILLS_CATEGORIES = [
@@ -50,13 +50,39 @@ const SKILLS_CATEGORIES = [
   }
 ]
 
+function readRuntime() {
+  const viewport = typeof window === 'undefined' ? 'Unavailable' : `${window.innerWidth} × ${window.innerHeight}`
+  const platform = typeof navigator === 'undefined'
+    ? 'Unavailable'
+    : navigator.userAgentData?.platform || navigator.platform || 'Unknown'
+  return {
+    viewport,
+    platform,
+    online: typeof navigator !== 'undefined' ? navigator.onLine : false,
+    pixelRatio: typeof window !== 'undefined' ? window.devicePixelRatio || 1 : 1,
+    refreshedAt: new Date()
+  }
+}
+
 export default function SkillsApp({ onOpenApp }) {
   const [activeTab, setActiveTab] = useState('visual') // 'visual' | 'json'
   const [search, setSearch] = useState('')
   const [selectedCategory, setSelectedCategory] = useState('All')
   const [copiedJson, setCopiedJson] = useState(false)
+  const [runtimeCopyStatus, setRuntimeCopyStatus] = useState('')
+  const [runtime, setRuntime] = useState(() => readRuntime())
 
   const categories = ['All', 'Languages', 'Frontend Architecture', 'Backend & Data', 'Systems & Infrastructure']
+
+  useEffect(() => {
+    const handleConnectionChange = () => setRuntime(readRuntime())
+    window.addEventListener('online', handleConnectionChange)
+    window.addEventListener('offline', handleConnectionChange)
+    return () => {
+      window.removeEventListener('online', handleConnectionChange)
+      window.removeEventListener('offline', handleConnectionChange)
+    }
+  }, [])
 
   const rawJson = JSON.stringify(
     SKILLS_CATEGORIES.reduce((acc, cat) => {
@@ -72,11 +98,36 @@ export default function SkillsApp({ onOpenApp }) {
     2
   )
 
-  const handleCopyJson = () => {
-    navigator.clipboard.writeText(rawJson)
-    setCopiedJson(true)
-    soundFX.play('click')
-    setTimeout(() => setCopiedJson(false), 2000)
+  const handleCopyJson = async () => {
+    try {
+      await navigator.clipboard.writeText(rawJson)
+      setCopiedJson(true)
+      soundFX.play('click')
+      setTimeout(() => setCopiedJson(false), 2000)
+    } catch (error) {
+      console.error('Unable to copy the skills manifest:', error)
+      window.alert('Clipboard access is unavailable. Select and copy the JSON text instead.')
+    }
+  }
+
+  const handleCopyRuntime = async () => {
+    const report = [
+      'Systems Lab runtime report',
+      `Platform: ${runtime.platform}`,
+      `Viewport: ${runtime.viewport}`,
+      `Display scale: ${runtime.pixelRatio.toFixed(2)}x`,
+      `Network: ${runtime.online ? 'Online' : 'Offline'}`,
+      `Captured: ${runtime.refreshedAt.toLocaleString()}`
+    ].join('\n')
+    try {
+      await navigator.clipboard.writeText(report)
+      setRuntimeCopyStatus('Copied')
+      setTimeout(() => setRuntimeCopyStatus(''), 2000)
+    } catch (error) {
+      console.error('Unable to copy the runtime report:', error)
+      setRuntimeCopyStatus('Copy unavailable')
+      setTimeout(() => setRuntimeCopyStatus(''), 3000)
+    }
   }
 
   const filteredCategories = SKILLS_CATEGORIES.map((cat) => {
@@ -98,7 +149,7 @@ export default function SkillsApp({ onOpenApp }) {
       <div className="p-3 bg-[#20202e] border-b border-white/10 flex flex-wrap items-center justify-between gap-3 shrink-0">
         <div className="flex items-center gap-2">
           <Cpu className="w-4 h-4 text-[#957fb8]" />
-          <span className="text-xs font-mono font-medium text-white">System Profiler &bull; Skills &amp; Stack</span>
+          <span className="text-xs font-mono font-medium text-white">Systems Lab &bull; Runtime &amp; Stack</span>
         </div>
 
         <div className="flex items-center gap-2">
@@ -143,6 +194,36 @@ export default function SkillsApp({ onOpenApp }) {
           </div>
         </div>
       </div>
+
+      <section className="shrink-0 border-b border-white/10 bg-[#1c1c29] px-4 py-3" aria-label="Live browser diagnostics">
+        <div className="mb-2 flex items-center justify-between gap-2">
+          <div className="flex items-center gap-2 text-[10px] font-semibold uppercase tracking-wider text-[#b8c5d3]">
+            <Monitor className="h-3.5 w-3.5 text-[#7e9cd8]" /> Live runtime
+          </div>
+          <div className="flex items-center gap-1.5">
+            <span className={`inline-flex items-center gap-1 text-[9px] ${runtime.online ? 'text-[#8fd2a1]' : 'text-[#f2949c]'}`}>
+              {runtime.online ? <Wifi className="h-3 w-3" /> : <WifiOff className="h-3 w-3" />}
+              {runtime.online ? 'Online' : 'Offline'}
+            </span>
+            <button type="button" onClick={() => setRuntime(readRuntime())} title="Refresh runtime details" className="rounded p-1 text-white/55 hover:bg-white/10 hover:text-white"><RefreshCw className="h-3 w-3" /></button>
+            <button type="button" onClick={handleCopyRuntime} title="Copy runtime report" aria-label="Copy runtime report" className="rounded p-1 text-white/55 hover:bg-white/10 hover:text-white">{runtimeCopyStatus === 'Copied' ? <Check className="h-3 w-3 text-[#8fd2a1]" /> : <Copy className="h-3 w-3" />}</button>
+          </div>
+        </div>
+        {runtimeCopyStatus && <p role="status" className={`mb-1 text-[9px] ${runtimeCopyStatus === 'Copied' ? 'text-[#8fd2a1]' : 'text-[#f2949c]'}`}>{runtimeCopyStatus}</p>}
+        <div className="grid grid-cols-2 gap-2 lg:grid-cols-4">
+          {[
+            ['Platform', runtime.platform],
+            ['Viewport', runtime.viewport],
+            ['Display scale', `${runtime.pixelRatio.toFixed(2)}×`],
+            ['Snapshot', runtime.refreshedAt.toLocaleTimeString()]
+          ].map(([label, value]) => (
+            <div key={label} className="min-w-0 rounded-md border border-white/[0.07] bg-white/[0.03] px-2.5 py-1.5">
+              <span className="block text-[8px] uppercase tracking-wider text-white/40">{label}</span>
+              <span className="block truncate font-mono text-[10px] text-white/85" title={value}>{value}</span>
+            </div>
+          ))}
+        </div>
+      </section>
 
       {/* Category Tabs */}
       {activeTab === 'visual' && (

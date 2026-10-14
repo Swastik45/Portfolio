@@ -36,7 +36,7 @@ export default function ControlCenter({
 
   return (
     <div 
-      className="fixed top-8 right-3 z-[100] w-80 rounded-2xl bg-[#22222e]/95 border border-white/15 backdrop-blur-2xl p-4 shadow-[0_20px_50px_rgba(0,0,0,0.6)] text-[#dcd7ba] select-none animate-in fade-in zoom-in-95 duration-150 pointer-events-auto"
+      className="fixed bottom-[62px] right-2 z-[100] max-h-[calc(100dvh-78px)] w-[min(20rem,calc(100vw-16px))] overflow-y-auto overscroll-contain rounded-2xl border border-white/15 bg-[#20242d]/95 p-4 text-[#dcd7ba] shadow-[0_20px_50px_rgba(0,0,0,0.6)] backdrop-blur-2xl pointer-events-auto select-none animate-in fade-in zoom-in-95 duration-150 sm:bottom-[66px] sm:right-3 sm:max-h-[calc(100dvh-82px)]"
       onClick={(e) => e.stopPropagation()}
     >
       {/* Header */}
@@ -69,7 +69,7 @@ export default function ControlCenter({
       <div className="space-y-2 my-3">
         <div className="flex items-center justify-between text-[11px] font-mono text-[#938aa9]">
           <span>Desktop Wallpapers</span>
-          <span className="text-[10px] text-white/50">4 live themes</span>
+          <span className="text-[10px] text-white/50">{WALLPAPERS.length} live themes</span>
         </div>
         <div className="grid grid-cols-2 gap-2">
           {WALLPAPERS.map((wp) => {
@@ -152,7 +152,7 @@ export default function ControlCenter({
             onClose()
           }}
           className="p-2 rounded-lg bg-white/5 hover:bg-white/15 text-white/70 hover:text-white transition-colors cursor-pointer"
-          title="Open Mission Control"
+          title="Open Task View"
         >
           <PanelsTopLeft className="w-4 h-4" />
         </button>
