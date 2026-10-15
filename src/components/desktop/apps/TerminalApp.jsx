@@ -64,6 +64,8 @@ echo "Email    : psamarpaudel@gmail.com"
 echo "Phone    : +977 976-7929476 (WhatsApp)"
 echo "Location : Kathmandu, Nepal (UTC+5:45)"
 echo "GitHub   : https://github.com/Swastik45"
+echo "LinkedIn : https://www.linkedin.com/in/swastik-paudel-591b61274/"
+echo "Twitter  : https://x.com/SwastikPaudel45"
 echo "Status   : Open for software engineering & systems roles"`
 }
 
@@ -468,9 +470,11 @@ Highlights  :
         newItems.push({
           type: 'output',
           text: `Email       : psamarpaudel@gmail.com
-Phone       : +977 976-7929476
+Phone       : +977 976-7929476 (WhatsApp)
 Location    : Kathmandu, Nepal (UTC+5:45)
 GitHub      : https://github.com/Swastik45
+LinkedIn    : https://www.linkedin.com/in/swastik-paudel-591b61274/
+Twitter/X   : https://x.com/SwastikPaudel45
 Status      : Open to engineering roles & contracts`
         })
         break

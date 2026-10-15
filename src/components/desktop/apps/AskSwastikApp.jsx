@@ -1,26 +1,103 @@
 import React, { useState, useRef, useEffect } from 'react'
-import { Send, Sparkles, ArrowRight, User, ExternalLink, Copy, Check, RotateCcw } from 'lucide-react'
+import { 
+  Send, 
+  Sparkles, 
+  ArrowRight, 
+  User, 
+  ExternalLink, 
+  Copy, 
+  Check, 
+  RotateCcw,
+  Github,
+  Mail,
+  MessageSquare,
+  Globe,
+  Share2
+} from 'lucide-react'
 import { soundFX } from '../soundEffects'
 
+// Verified profiles & social channels
+const SOCIAL_LINKS = {
+  github: 'https://github.com/Swastik45',
+  linkedin: 'https://www.linkedin.com/in/swastik-paudel-591b61274/',
+  twitter: 'https://x.com/SwastikPaudel45',
+  whatsapp: 'https://wa.me/9779767929476',
+  email: 'psamarpaudel@gmail.com',
+  portfolio: 'https://swastik-portfolio-eight.vercel.app'
+}
+
+// Interactive Quick Prompt Chips
 const TOPICS = [
-  { label: 'prepNep Architecture', prompt: 'How does prepNep handle concurrent exam state synchronization?' },
-  { label: 'Rust & Systems', prompt: 'Tell me about your Rust and low-level systems experience.' },
-  { label: 'Flagship Projects', prompt: 'What are your top production projects?' },
-  { label: 'Tech Stack', prompt: 'What is your complete engineering stack?' },
-  { label: 'Hiring & Availability', prompt: 'Are you available for remote engineering roles or contract work?' }
+  { label: '🔗 Social Media & Links', prompt: 'What are Swastik\'s official social media profiles and contact links?' },
+  { label: '👤 Name & Age', prompt: 'What is your full name, age, and where are you from?' },
+  { label: '💼 Internship at prepNep', prompt: 'Tell me about Swastik\'s software engineering internship at prepNep.' },
+  { label: '⚡ Flagship Projects', prompt: 'What are your top production projects and live deployments?' },
+  { label: '🛠️ Tech Stack', prompt: 'What is your complete programming languages and technology stack?' },
+  { label: '🦀 Rust & Systems', prompt: 'Tell me about your Rust and low-level systems experience.' },
+  { label: '🎓 Education & Background', prompt: 'What is your educational background and technical foundation?' },
+  { label: '🤝 Hiring & Availability', prompt: 'Are you available for remote software engineering roles, internships, or contract work?' }
 ]
 
 function generateAiResponse(query) {
   const q = query.toLowerCase().trim()
 
-  // 1. prepNep / Exam engine / Concurrency
+  // 1. Social Media & Links Inquiry
   if (
-    q.includes('prepnep') || q.includes('exam') || q.includes('madargaach') ||
-    q.includes('concurrency') || q.includes('sync') || q.includes('latency') ||
-    q.includes('padhum')
+    q.includes('social') || q.includes('media') || q.includes('link') ||
+    q.includes('linkedin') || q.includes('twitter') || q.includes('x.com') ||
+    q.includes('instagram') || q.includes('github') || q.includes('profile') ||
+    q.includes('handle') || q.includes('follow') || q.includes('connect')
   ) {
     return {
-      text: `At **prepNep** (prepnep.com), under Madargaach Holdings, I lead the core engineering architecture powering national online examination sessions for thousands of simultaneous students.\n\n### Architectural Highlights:\n• **Sub-50ms State Sync**: Exam sessions sync incremental question answers over resilient WebSockets with HTTP fallback.\n• **Offline Recovery Buffer**: Students never lose progress if their network drops; an IndexedDB client queue syncs deterministically upon reconnect.\n• **Multi-Tier Caching**: PostgreSQL data is partitioned and hot-cached in Redis clusters to prevent database bottlenecks during sudden traffic spikes.\n• **High Reliability**: Zero-downtime rolling deployments with automated rollback safety.`,
+      text: `Here are all of **Swastik Paudel's** verified social media channels and official links:\n\n• **GitHub**: [github.com/Swastik45](${SOCIAL_LINKS.github}) — Open-source repositories & systems prototypes\n• **LinkedIn**: [linkedin.com/in/swastik-paudel](${SOCIAL_LINKS.linkedin}) — Professional network & career updates\n• **Twitter / X**: [@SwastikPaudel45](${SOCIAL_LINKS.twitter}) — Tech discourse & developer thoughts\n• **WhatsApp**: [+977 976-7929476](${SOCIAL_LINKS.whatsapp}) — Direct instant messaging & calls\n• **Email**: [psamarpaudel@gmail.com](mailto:${SOCIAL_LINKS.email}) — Direct engineering inquiries\n• **Live Portfolio**: [swastik-portfolio-eight.vercel.app](${SOCIAL_LINKS.portfolio})\n\nFeel free to connect or send a message on any of these platforms!`,
+      links: [
+        { label: 'Open GitHub', href: SOCIAL_LINKS.github },
+        { label: 'Open LinkedIn', href: SOCIAL_LINKS.linkedin },
+        { label: 'Open WhatsApp', href: SOCIAL_LINKS.whatsapp },
+        { label: 'Compose Mail', appId: 'mail' }
+      ]
+    }
+  }
+
+  // 2. Name, Age, Birthday, & Origin Inquiry
+  if (
+    q.includes('name') || q.includes('who are you') || q.includes('who is swastik') ||
+    q.includes('identity') || q.includes('age') || q.includes('how old') ||
+    q.includes('born') || q.includes('birthday') || q.includes('birthdate') ||
+    q.includes('dob') || q.includes('years old')
+  ) {
+    return {
+      text: `**Personal & Identity Overview**:\n\n• **Full Name**: Swastik Paudel (स्वास्तिक पौडेल)\n• **Age**: 22 years old (Born in 2004)\n• **Location**: Kathmandu, Nepal (UTC+5:45)\n• **Profession**: Software Engineer & Full-Stack Systems Developer\n• **Experience**: Completed a Software Engineering Internship at **Madargaach Holdings** (prepNep)\n• **Specialization**: High-concurrency web platforms, real-time synchronization, and native systems in Rust\n\nHe is an energetic software engineer passionate about clean code, memory safety, and dependable architectures.`,
+      links: [
+        { label: 'View Résumé', appId: 'resume' },
+        { label: 'Open About Bio', appId: 'about' },
+        { label: 'Browse Projects', appId: 'projects' }
+      ]
+    }
+  }
+
+  // 3. Internship & Experience Inquiry
+  if (
+    q.includes('intern') || q.includes('internship') || q.includes('experience') ||
+    q.includes('career') || q.includes('job') || q.includes('madargaach') || q.includes('work history')
+  ) {
+    return {
+      text: `Swastik worked as a **Software Engineering Intern** at **Madargaach Holdings**, working on their flagship digital examination platform **prepNep** (prepnep.com).\n\n### Key Deliverables & Contributions:\n• **Sub-50ms State Synchronization**: Engineered low-latency test session sync over WebSockets with automatic HTTP fallback.\n• **Offline Recovery Buffer**: Designed client-side offline queuing with IndexedDB, ensuring students never lose exam answers during internet dropouts.\n• **Database & Cache Optimization**: Structured PostgreSQL indexes and partitioned Redis caches to handle concurrent student exam spikes.\n• **High Availability**: Maintained 99.9% uptime during nationwide entrance examination cycles.`,
+      links: [
+        { label: 'Read prepNep Case Study', appId: 'experience' },
+        { label: 'Visit prepnep.com', href: 'https://prepnep.com' },
+        { label: 'Inspect Projects', appId: 'projects' }
+      ]
+    }
+  }
+
+  // 4. prepNep Platform Details
+  if (
+    q.includes('prepnep') || q.includes('exam') || q.includes('concurrency') ||
+    q.includes('sync') || q.includes('latency') || q.includes('padhum')
+  ) {
+    return {
+      text: `At **prepNep** (prepnep.com), under Madargaach Holdings, Swastik contributed to the core engineering architecture powering national online examination sessions for thousands of simultaneous students.\n\n### Architectural Highlights:\n• **Sub-50ms State Sync**: Exam sessions sync incremental question answers over resilient WebSockets with HTTP fallback.\n• **Offline Recovery Buffer**: Students never lose progress if their network drops; an IndexedDB client queue syncs deterministically upon reconnect.\n• **Multi-Tier Caching**: PostgreSQL data is partitioned and hot-cached in Redis clusters to prevent database bottlenecks during sudden traffic spikes.\n• **High Reliability**: Zero-downtime rolling deployments with automated rollback safety.`,
       links: [
         { label: 'Visit prepnep.com', href: 'https://prepnep.com' },
         { label: 'Open prepNep Case Study', appId: 'experience' },
@@ -29,45 +106,57 @@ function generateAiResponse(query) {
     }
   }
 
-  // 2. Projects inquiry
-  if (q.includes('project') || q.includes('portfolio') || q.includes('work') || q.includes('built')) {
-    if (q.includes('share') || q.includes('audit') && q.includes('share')) {
-      return {
-        text: `**ShareAudit** (share-audit.vercel.app) is an equity investment auditing and dividend analytics dashboard.\n\n• Computes forward dividend cashflows and risk allocations for retail and institutional traders.\n• Built with React, Vite, Tailwind CSS, and Chart.js.\n• Real-time stock portfolio rebalancing projections with instant calculations.`,
-        links: [
-          { label: 'Visit ShareAudit', href: 'https://share-audit.vercel.app' },
-          { label: 'Open Projects Finder', appId: 'projects' }
-        ]
-      }
+  // 5. Individual Project Inquiries
+  if (q.includes('share') || q.includes('shareaudit')) {
+    return {
+      text: `**ShareAudit** (share-audit.vercel.app) is an equity investment auditing and dividend analytics dashboard.\n\n• Computes forward dividend cashflows and risk allocations for retail and institutional traders.\n• Built with React, Vite, Tailwind CSS, and Chart.js.\n• Real-time stock portfolio rebalancing projections with instant calculations.`,
+      links: [
+        { label: 'Visit ShareAudit', href: 'https://share-audit.vercel.app' },
+        { label: 'Open Projects Finder', appId: 'projects' }
+      ]
     }
-    if (q.includes('gov') || q.includes('civic') || q.includes('budget')) {
-      return {
-        text: `**GovAudit NP** (gova-audit-np.vercel.app) is an open civic transparency engine auditing municipal government budgets in Nepal.\n\n• Ingests and visualizes public expenditure datasets to detect budget anomalies.\n• Clean, accessible UI built with React and Tailwind CSS with zero tracking.`,
-        links: [
-          { label: 'Visit GovAudit NP', href: 'https://gova-audit-np.vercel.app' },
-          { label: 'Open Projects Finder', appId: 'projects' }
-        ]
-      }
+  }
+  if (q.includes('gov') || q.includes('civic') || q.includes('budget') || q.includes('govaudit')) {
+    return {
+      text: `**GovAudit NP** (gova-audit-np.vercel.app) is an open civic transparency engine auditing municipal government budgets in Nepal.\n\n• Ingests and visualizes public expenditure datasets to detect budget anomalies.\n• Clean, accessible UI built with React and Tailwind CSS with zero tracking.`,
+      links: [
+        { label: 'Visit GovAudit NP', href: 'https://gova-audit-np.vercel.app' },
+        { label: 'Open Projects Finder', appId: 'projects' }
+      ]
     }
-    if (q.includes('carbon')) {
-      return {
-        text: `**CarbonCredit** (carbon-credit1.vercel.app) is an ecological offset tracking system for verifiable carbon reduction initiatives.\n\n• Real-time environmental metrics and project ledger verification.\n• Built with Next.js, React, and modular state management.`,
-        links: [
-          { label: 'Visit CarbonCredit', href: 'https://carbon-credit1.vercel.app' },
-          { label: 'Open Projects Finder', appId: 'projects' }
-        ]
-      }
+  }
+  if (q.includes('carbon') || q.includes('carboncredit')) {
+    return {
+      text: `**CarbonCredit** (carbon-credit1.vercel.app) is an ecological offset tracking system for verifiable carbon reduction initiatives.\n\n• Real-time environmental metrics and project ledger verification.\n• Built with Next.js, React, and modular state management.`,
+      links: [
+        { label: 'Visit CarbonCredit', href: 'https://carbon-credit1.vercel.app' },
+        { label: 'Open Projects Finder', appId: 'projects' }
+      ]
     }
-    if (q.includes('lumino')) {
-      return {
-        text: `**Lumino** (lumino-five.vercel.app) is a high-craft frontend engineering showcase focused on fluid interaction design.\n\n• Scored a perfect 100/100 across Google Lighthouse metrics.\n• Sub-millisecond layout shifts, buttery 60fps transitions, and ergonomic typography.`,
-        links: [
-          { label: 'Visit Lumino', href: 'https://lumino-five.vercel.app' },
-          { label: 'Open Projects Finder', appId: 'projects' }
-        ]
-      }
+  }
+  if (q.includes('lumino')) {
+    return {
+      text: `**Lumino** (lumino-five.vercel.app) is a high-craft frontend engineering showcase focused on fluid interaction design.\n\n• Scored a perfect 100/100 across Google Lighthouse metrics.\n• Sub-millisecond layout shifts, buttery 60fps transitions, and ergonomic typography.`,
+      links: [
+        { label: 'Visit Lumino', href: 'https://lumino-five.vercel.app' },
+        { label: 'Open Projects Finder', appId: 'projects' }
+      ]
     }
+  }
 
+  // 6. Rust & Systems Programming
+  if (q.includes('rust') || q.includes('bevy') || q.includes('ecs') || q.includes('game') || q.includes('c++') || q.includes('low-level')) {
+    return {
+      text: `Swastik is passionate about low-level systems and deterministic architectures in **Rust**.\n\n### Systems Focus:\n• **Zero-Cost Abstractions**: Leveraging Rust's ownership and borrow checker for memory safety without garbage collection pauses.\n• **Bevy Engine & ECS**: Built a deterministic 2D arcade shooter using Entity-Component-System (ECS) architecture locked at 120 FPS.\n• **Systems Networking**: Architecting low-overhead microservices, custom binary protocols, and concurrent workers.`,
+      links: [
+        { label: 'Inspect Projects', appId: 'projects' },
+        { label: 'GitHub Repositories', href: SOCIAL_LINKS.github }
+      ]
+    }
+  }
+
+  // 7. General Projects Overview
+  if (q.includes('project') || q.includes('portfolio') || q.includes('work') || q.includes('built') || q.includes('showcase')) {
     return {
       text: `Swastik has engineered six flagship production & systems applications:\n\n1. **prepNep** — High-concurrency examination and learning platform for thousands of students ([prepnep.com](https://prepnep.com))\n2. **ShareAudit** — Equity investment auditor and dividend analytics platform ([share-audit.vercel.app](https://share-audit.vercel.app))\n3. **GovAudit NP** — Civic public expenditure watchdog ([gova-audit-np.vercel.app](https://gova-audit-np.vercel.app))\n4. **CarbonCredit** — Ecological offset tracking ledger ([carbon-credit1.vercel.app](https://carbon-credit1.vercel.app))\n5. **Lumino** — Fluid frontend application with 100 Lighthouse performance ([lumino-five.vercel.app](https://lumino-five.vercel.app))\n6. **2D Shooting Game** — Deterministic game engine in Rust with Bevy ECS architecture (GitHub)`,
       links: [
@@ -77,25 +166,14 @@ function generateAiResponse(query) {
     }
   }
 
-  // 3. Rust & Systems Programming
-  if (q.includes('rust') || q.includes('bevy') || q.includes('ecs') || q.includes('game') || q.includes('c++') || q.includes('low-level')) {
-    return {
-      text: `Swastik is passionate about low-level systems and deterministic architectures in **Rust**.\n\n### Systems Focus:\n• **Zero-Cost Abstractions**: Leveraging Rust's ownership and borrow checker for memory safety without garbage collection pauses.\n• **Bevy Engine & ECS**: Built a deterministic 2D arcade shooter using Entity-Component-System (ECS) architecture locked at 120 FPS.\n• **Systems Networking**: Architecting low-overhead microservices, custom binary protocols, and concurrent workers.`,
-      links: [
-        { label: 'Inspect Projects', appId: 'projects' },
-        { label: 'GitHub Repositories', href: 'https://github.com/Swastik45' }
-      ]
-    }
-  }
-
-  // 4. Skills & Technical Stack
+  // 8. Skills & Technical Stack
   if (
     q.includes('skill') || q.includes('stack') || q.includes('tech') ||
     q.includes('languages') || q.includes('database') || q.includes('frontend') ||
-    q.includes('backend') || q.includes('react') || q.includes('node') || q.includes('postgres')
+    q.includes('backend') || q.includes('react') || q.includes('node') || q.includes('postgres') || q.includes('docker')
   ) {
     return {
-      text: `Swastik's production engineering stack:\n\n• **Core Languages**: TypeScript, JavaScript (ESNext), Rust, Python, C/C++, SQL\n• **Frontend & UI**: React 19, Next.js, Tailwind CSS, Redux Toolkit, WebSockets\n• **Backend & APIs**: Node.js, Express, PostgreSQL, Redis, RESTful APIs, GraphQL\n• **Systems & DevOps**: Docker, Linux/Unix internals, Git, CI/CD, Vercel, Microservices`,
+      text: `Swastik's complete engineering stack:\n\n• **Core Languages**: TypeScript, JavaScript (ESNext), Rust, Python, C/C++, SQL\n• **Frontend & UI**: React 19, Next.js, Tailwind CSS, Redux Toolkit, WebSockets, Vite\n• **Backend & APIs**: Node.js, Express, PostgreSQL, Redis, RESTful APIs, GraphQL\n• **Systems & DevOps**: Docker, Linux/Unix internals, Git, CI/CD, Vercel, Microservices`,
       links: [
         { label: 'Open Skills Matrix', appId: 'skills' },
         { label: 'View Résumé', appId: 'resume' }
@@ -103,78 +181,132 @@ function generateAiResponse(query) {
     }
   }
 
-  // 5. Contact / Hire / Rates / Availability / Remote
+  // 9. Education & Background
   if (
-    q.includes('hire') || q.includes('contact') || q.includes('email') ||
-    q.includes('phone') || q.includes('whatsapp') || q.includes('reach') ||
-    q.includes('available') || q.includes('remote') || q.includes('job') ||
-    q.includes('rate') || q.includes('salary') || q.includes('contract')
+    q.includes('education') || q.includes('study') || q.includes('studied') ||
+    q.includes('college') || q.includes('university') || q.includes('degree') ||
+    q.includes('school') || q.includes('academic') || q.includes('cs')
   ) {
     return {
-      text: `Swastik is open to **Software Engineering**, **Full-Stack / Backend Systems**, and **Contract Roles** with forward-thinking teams.\n\n### Quick Details:\n• **Location**: Kathmandu, Nepal (UTC+5:45)\n• **Remote Flexibility**: Experienced working across global time zones (US, Europe, APAC)\n• **Email**: psamarpaudel@gmail.com\n• **Phone / WhatsApp**: +977 976-7929476\n• **GitHub**: [github.com/Swastik45](https://github.com/Swastik45)`,
+      text: `**Educational Background**:\n\n• **Focus**: Computer Science, Software Engineering, and Systems Architecture.\n• **Foundations**: Data structures, relational database design, networking protocols, and operating systems.\n• **Specialization**: Self-directed engineering in Rust memory models, concurrency primitives, and modern full-stack web platforms.\n• **Practical Application**: Applied academic concepts directly into production during his Software Engineering Internship at prepNep.`,
+      links: [
+        { label: 'View Résumé', appId: 'resume' },
+        { label: 'Open About Bio', appId: 'about' }
+      ]
+    }
+  }
+
+  // 10. Hiring, Rates & Availability
+  if (
+    q.includes('hire') || q.includes('available') || q.includes('remote') ||
+    q.includes('role') || q.includes('rate') || q.includes('salary') || q.includes('contract')
+  ) {
+    return {
+      text: `Swastik is open to **Software Engineering**, **Full-Stack / Backend Systems**, and **Contract / Internship Roles** with forward-thinking teams.\n\n### Quick Details:\n• **Location**: Kathmandu, Nepal (UTC+5:45)\n• **Remote Flexibility**: Experienced working across global time zones (US, Europe, APAC)\n• **Email**: psamarpaudel@gmail.com\n• **Phone / WhatsApp**: +977 976-7929476\n• **GitHub**: [github.com/Swastik45](${SOCIAL_LINKS.github})\n• **LinkedIn**: [linkedin.com/in/swastik-paudel](${SOCIAL_LINKS.linkedin})`,
       links: [
         { label: 'Compose Mail', appId: 'mail' },
-        { label: 'View Résumé', appId: 'resume' }
+        { label: 'View Résumé', appId: 'resume' },
+        { label: 'Open WhatsApp', href: SOCIAL_LINKS.whatsapp }
       ]
     }
   }
 
-  // 6. Bio / Background / Education / Location
+  // 11. Contact Channels
   if (
-    q.includes('who') || q.includes('about') || q.includes('swastik') ||
-    q.includes('bio') || q.includes('background') || q.includes('nepal') ||
-    q.includes('kathmandu') || q.includes('location')
+    q.includes('contact') || q.includes('email') || q.includes('phone') ||
+    q.includes('whatsapp') || q.includes('reach') || q.includes('message') || q.includes('touch')
   ) {
     return {
-      text: `**Swastik Paudel** is a Software Engineer based in Kathmandu, Nepal.\n\nHe specializes in building scalable web architectures, real-time synchronization engines, and low-latency systems. Currently, he serves as lead software engineer for **prepNep** (Madargaach Holdings), driving the technical platform for thousands of concurrent students.`,
+      text: `You can reach **Swastik Paudel** directly through any of these communication channels:\n\n• **Email**: [psamarpaudel@gmail.com](mailto:${SOCIAL_LINKS.email})\n• **Phone / WhatsApp**: [+977 976-7929476](${SOCIAL_LINKS.whatsapp})\n• **LinkedIn**: [linkedin.com/in/swastik-paudel](${SOCIAL_LINKS.linkedin})\n• **GitHub**: [github.com/Swastik45](${SOCIAL_LINKS.github})\n• **Location**: Kathmandu, Nepal (UTC+5:45)`,
+      links: [
+        { label: 'Open WhatsApp', href: SOCIAL_LINKS.whatsapp },
+        { label: 'Compose Mail', appId: 'mail' },
+        { label: 'Open LinkedIn', href: SOCIAL_LINKS.linkedin }
+      ]
+    }
+  }
+
+  // 12. Location & Timezone
+  if (q.includes('nepal') || q.includes('kathmandu') || q.includes('location') || q.includes('where')) {
+    return {
+      text: `Swastik is based in **Kathmandu, Nepal** (Timezone: UTC+5:45).\n\nHe has experience collaborating asynchronously and in real-time with teams across North America, Europe, and Asia-Pacific.`,
       links: [
         { label: 'Open About Bio', appId: 'about' },
-        { label: 'View Résumé', appId: 'resume' },
-        { label: 'Open Projects', appId: 'projects' }
-      ]
-    }
-  }
-
-  // 7. General Architecture / Engineering Question
-  if (q.includes('optimize') || q.includes('database') || q.includes('redis') || q.includes('microservice') || q.includes('architecture')) {
-    return {
-      text: `When architecting high-throughput applications like prepNep, Swastik focuses on three pragmatic engineering pillars:\n\n1. **Data Sharding & Layered Caching**: Read-heavy paths query Redis with sub-millisecond response times, while write-heavy transactional operations pass through batched PostgreSQL transactions with indexing on frequently queried foreign keys.\n2. **Stateless App Nodes & Ephemeral Sessions**: Keeping app servers stateless enables rapid horizontal scaling behind a reverse proxy without sticky sessions.\n3. **Event-Driven Asynchronous Workers**: Heavy tasks like test score evaluations and notification dispatches run asynchronously on background worker queues so API endpoints return immediately.`,
-      links: [
-        { label: 'Read prepNep Case Study', appId: 'experience' },
-        { label: 'Launch Terminal', appId: 'terminal' }
-      ]
-    }
-  }
-
-  // 8. Casual / Friendly greeting
-  if (q === 'hi' || q === 'hello' || q.includes('hey') || q === 'sup' || q.includes('morning') || q.includes('evening')) {
-    return {
-      text: `Hello! Great to meet you. I can answer any question about Swastik's engineering experience, prepNep architecture, projects, skills in Rust/TypeScript, or connect you directly with him.\n\nWhat would you like to know?`,
-      links: [
-        { label: 'Explore Projects', appId: 'projects' },
-        { label: 'View Skills', appId: 'skills' },
         { label: 'Get in Touch', appId: 'mail' }
       ]
     }
   }
 
-  // 9. Fallback: Intelligent, helpful contextual answer
+  // 13. Music, Hobbies & Interests
+  if (
+    q.includes('music') || q.includes('song') || q.includes('hobby') ||
+    q.includes('hobbies') || q.includes('interest') || q.includes('outside') || q.includes('free time')
+  ) {
+    return {
+      text: `Outside coding, Swastik loves:\n\n• **Classic English Music**: A huge fan of timeless English classics like Queen (*Bohemian Rhapsody*), Coldplay (*Yellow*, *Viva La Vida*), Oasis (*Wonderwall*), Elton John (*Rocket Man*), Eagles (*Hotel California*), and Radiohead (*Creep*). You can listen to these tracks right now in the desktop **Music Player** app!\n• **Systems & Game Dev**: Experimenting with game loops, physics simulations, and graphics in Rust with Bevy.\n• **Exploring Kathmandu**: Coffee, reading, and walking around Nepal's historic valley.`,
+      links: [
+        { label: 'Launch Music Player', appId: 'music' },
+        { label: 'Explore Projects', appId: 'projects' }
+      ]
+    }
+  }
+
+  // 14. Casual / Friendly greeting
+  if (q === 'hi' || q === 'hello' || q.includes('hey') || q === 'sup' || q.includes('morning') || q.includes('evening')) {
+    return {
+      text: `Hello! Great to meet you. I am Swastik's AI portfolio assistant.\n\nI can provide verified information on:\n• **Identity & Age**: Swastik Paudel, 22 years old, Kathmandu\n• **Social Media & Links**: GitHub, LinkedIn, Twitter/X, WhatsApp, Email\n• **Work & Internship**: Engineering intern experience at prepNep\n• **Technical Skills**: Rust, TypeScript, React 19, Next.js, PostgreSQL, Redis\n• **Projects**: prepNep, ShareAudit, GovAudit, CarbonCredit, Lumino, Rust Game\n\nWhat would you like to explore?`,
+      links: [
+        { label: 'Social Media & Links', href: SOCIAL_LINKS.github },
+        { label: 'Explore Projects', appId: 'projects' },
+        { label: 'Get in Touch', appId: 'mail' }
+      ]
+    }
+  }
+
+  // 15. Fallback: Intelligent, helpful contextual answer
   return {
-    text: `Regarding "${query}":\n\nSwastik Paudel is a Software Engineer in Kathmandu, Nepal specializing in high-concurrency web platforms, Rust systems, and real-time state synchronization.\n\nHe leads development on **prepNep** (prepnep.com) and has engineered flagship applications across fintech (ShareAudit), civic tech (GovAudit NP), and game systems in Rust.\n\nYou can explore his projects, inspect his skills matrix, or message him directly!`,
+    text: `Regarding "${query}":\n\n**Swastik Paudel** (22, Kathmandu, Nepal) is a Software Engineer specializing in scalable web systems, Rust, and real-time state synchronization.\n\nHe completed a Software Engineering Internship on **prepNep** (prepnep.com) and has engineered flagship applications across fintech (ShareAudit), civic data (GovAudit NP), and game physics in Rust.\n\n• **Official Links**: GitHub ([github.com/Swastik45](${SOCIAL_LINKS.github})), LinkedIn ([linkedin.com/in/swastik-paudel](${SOCIAL_LINKS.linkedin})), Twitter/X ([@SwastikPaudel45](${SOCIAL_LINKS.twitter}))\n• **Direct Contact**: Email ([psamarpaudel@gmail.com](mailto:${SOCIAL_LINKS.email})) & WhatsApp ([+977 976-7929476](${SOCIAL_LINKS.whatsapp}))`,
     links: [
+      { label: 'Open GitHub', href: SOCIAL_LINKS.github },
+      { label: 'Open LinkedIn', href: SOCIAL_LINKS.linkedin },
       { label: 'Browse Projects', appId: 'projects' },
-      { label: 'Inspect Skills', appId: 'skills' },
       { label: 'Contact Swastik', appId: 'mail' }
     ]
   }
+}
+
+// Helper to render bold markdown (**bold**) cleanly in UI
+function renderFormattedMessage(text) {
+  const lines = text.split('\n')
+  return lines.map((line, lIdx) => {
+    const parts = line.split(/(\*\*[^*]+\*\*)/g)
+    return (
+      <React.Fragment key={lIdx}>
+        {parts.map((part, pIdx) => {
+          if (part.startsWith('**') && part.endsWith('**')) {
+            return (
+              <strong key={pIdx} className="font-bold text-white">
+                {part.slice(2, -2)}
+              </strong>
+            )
+          }
+          return part
+        })}
+        {lIdx < lines.length - 1 && <br />}
+      </React.Fragment>
+    )
+  })
 }
 
 export default function AskSwastikApp({ onOpenApp }) {
   const [messages, setMessages] = useState([
     {
       role: 'assistant',
-      text: "Hello! I am Swastik's portfolio assistant. Ask me anything about his projects, prepNep architecture, Rust systems experience, tech stack, or hiring availability.",
-      links: []
+      text: "Hello! I am Swastik's portfolio knowledge assistant. Ask me anything about his name, age, social media links, internship at prepNep, projects, skills in Rust/TypeScript, or contact channels.",
+      links: [
+        { label: 'Social Media & Links', href: SOCIAL_LINKS.github },
+        { label: 'Explore Projects', appId: 'projects' }
+      ]
     }
   ])
   const [input, setInput] = useState('')
@@ -198,7 +330,7 @@ export default function AskSwastikApp({ onOpenApp }) {
     setMessages([
       {
         role: 'assistant',
-        text: "Conversation refreshed. Ask me anything about Swastik's engineering projects, architecture, or contact channels!",
+        text: "Conversation refreshed. Ask me anything about Swastik's name, age, social media profiles, prepNep internship, projects, or contact channels!",
         links: []
       }
     ])
@@ -225,7 +357,7 @@ export default function AskSwastikApp({ onOpenApp }) {
       ])
       setIsTyping(false)
       soundFX.play('open')
-    }, 300)
+    }, 280)
   }
 
   return (
@@ -244,7 +376,7 @@ export default function AskSwastikApp({ onOpenApp }) {
               </span>
             </h2>
             <p className="text-[10px] text-[#938aa9]">
-              Instant technical answers about architecture, stack, and production systems
+              Instant verified answers about Swastik's identity, age, social links, internship, &amp; projects
             </p>
           </div>
         </div>
@@ -262,7 +394,7 @@ export default function AskSwastikApp({ onOpenApp }) {
       {/* Suggested Prompt Chips */}
       <div className="p-2.5 border-b border-white/5 bg-white/[0.02] flex items-center gap-2 overflow-x-auto no-scrollbar shrink-0">
         <span className="text-[10px] font-mono text-white/40 uppercase tracking-wider shrink-0 flex items-center gap-1">
-          <Sparkles className="w-3 h-3 text-[#dca561]" /> Prompts:
+          <Sparkles className="w-3 h-3 text-[#dca561]" /> Topics:
         </span>
         {TOPICS.map((item, idx) => (
           <button
@@ -314,23 +446,33 @@ export default function AskSwastikApp({ onOpenApp }) {
                 </button>
               )}
 
-              <div className="whitespace-pre-line pr-4">{msg.text}</div>
+              <div className="pr-4">
+                {renderFormattedMessage(msg.text)}
+              </div>
 
-              {/* Functional Desktop Action Links */}
+              {/* Functional Desktop Action & Social Links */}
               {msg.links && msg.links.length > 0 && (
                 <div className="mt-3 pt-2.5 border-t border-white/10 flex flex-wrap gap-2">
                   {msg.links.map((link, lIdx) => {
                     if (link.href) {
+                      const isGh = link.href.includes('github')
+                      const isLi = link.href.includes('linkedin')
+                      const isWa = link.href.includes('wa.me')
+
                       return (
                         <a
                           key={lIdx}
                           href={link.href}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-white/10 hover:bg-white/20 text-white font-medium text-[11px] transition-colors cursor-pointer"
+                          className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-white/10 hover:bg-white/20 text-white font-medium text-[11px] transition-colors cursor-pointer"
                         >
-                          {link.label}
-                          <ExternalLink className="w-3 h-3 text-white/60" />
+                          {isGh && <Github className="w-3 h-3 text-[#7e9cd8]" />}
+                          {isLi && <Share2 className="w-3 h-3 text-[#38bdf8]" />}
+                          {isWa && <MessageSquare className="w-3 h-3 text-emerald-400" />}
+                          {!isGh && !isLi && !isWa && <Globe className="w-3 h-3 text-amber-400" />}
+                          <span>{link.label}</span>
+                          <ExternalLink className="w-2.5 h-2.5 text-white/50" />
                         </a>
                       )
                     }
@@ -342,9 +484,10 @@ export default function AskSwastikApp({ onOpenApp }) {
                           soundFX.play('click')
                           onOpenApp(link.appId)
                         }}
-                        className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-[#7e9cd8]/20 hover:bg-[#7e9cd8]/35 text-[#7e9cd8] font-medium text-[11px] border border-[#7e9cd8]/30 transition-colors cursor-pointer"
+                        className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-[#7e9cd8]/20 hover:bg-[#7e9cd8]/35 text-[#7e9cd8] font-medium text-[11px] border border-[#7e9cd8]/30 transition-colors cursor-pointer"
                       >
-                        {link.label}
+                        {link.appId === 'mail' && <Mail className="w-3 h-3" />}
+                        <span>{link.label}</span>
                         <ArrowRight className="w-3 h-3" />
                       </button>
                     )
@@ -360,40 +503,43 @@ export default function AskSwastikApp({ onOpenApp }) {
             <div className="w-7 h-7 rounded-lg bg-[#dc5a55] text-white font-bold flex items-center justify-center text-xs">
               問
             </div>
-            <div className="p-3 rounded-xl bg-white/5 border border-white/10 flex items-center gap-1.5">
-              <span className="w-1.5 h-1.5 rounded-full bg-[#dc5a55] animate-bounce" />
-              <span className="w-1.5 h-1.5 rounded-full bg-[#dc5a55] animate-bounce [animation-delay:150ms]" />
-              <span className="w-1.5 h-1.5 rounded-full bg-[#dc5a55] animate-bounce [animation-delay:300ms]" />
+            <div className="flex gap-1.5 p-3 rounded-2xl bg-white/5 border border-white/10">
+              <span className="w-1.5 h-1.5 rounded-full bg-[#7e9cd8] animate-bounce" style={{ animationDelay: '0ms' }} />
+              <span className="w-1.5 h-1.5 rounded-full bg-[#7e9cd8] animate-bounce" style={{ animationDelay: '150ms' }} />
+              <span className="w-1.5 h-1.5 rounded-full bg-[#7e9cd8] animate-bounce" style={{ animationDelay: '300ms' }} />
             </div>
           </div>
         )}
+
         <div ref={chatEndRef} />
       </div>
 
-      {/* Input Field */}
-      <form
-        onSubmit={(e) => {
-          e.preventDefault()
-          handleAsk(input)
-        }}
-        className="p-3 bg-[#20202e] border-t border-white/10 flex items-center gap-2 shrink-0"
-      >
-        <input
-          type="text"
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          placeholder="Ask anything about prepNep, tech stack, Rust, projects..."
-          className="flex-1 px-3.5 py-2 rounded-xl bg-white/5 border border-white/15 text-white placeholder-white/40 text-xs sm:text-sm focus:outline-none focus:ring-1 focus:ring-[#7e9cd8]"
-        />
-        <button
-          type="submit"
-          disabled={!input.trim()}
-          className="p-2.5 rounded-xl bg-[#dc5a55] hover:bg-[#c34043] disabled:opacity-40 text-white transition-colors cursor-pointer"
-          title="Send message"
+      {/* Input Bar */}
+      <div className="p-3 bg-[#20202e] border-t border-white/10 shrink-0">
+        <form
+          onSubmit={(e) => {
+            e.preventDefault()
+            handleAsk(input)
+          }}
+          className="flex items-center gap-2"
         >
-          <Send className="w-4 h-4" />
-        </button>
-      </form>
+          <input
+            type="text"
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            placeholder="Ask about Swastik's name, age, social links, internship, projects..."
+            className="flex-1 bg-white/5 border border-white/10 focus:border-[#7e9cd8] text-white placeholder-white/40 text-xs px-3.5 py-2.5 rounded-xl outline-none transition-colors"
+          />
+          <button
+            type="submit"
+            disabled={!input.trim()}
+            className="px-4 py-2.5 rounded-xl bg-[#7e9cd8] hover:bg-[#8eaee0] disabled:opacity-40 text-[#1f1f28] font-bold text-xs flex items-center gap-1.5 transition-colors cursor-pointer"
+          >
+            <span>Ask</span>
+            <Send className="w-3 h-3" />
+          </button>
+        </form>
+      </div>
     </div>
   )
 }

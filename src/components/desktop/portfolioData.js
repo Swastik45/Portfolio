@@ -5,7 +5,7 @@ export const PROJECTS_DATA = [
     category: 'Production',
     badge: 'Flagship Platform',
     headline: 'High-concurrency exam preparation & testing platform for thousands of students',
-    description: 'Lead engineering at Madargaach Holdings. Architected reliable real-time test runtimes, low-latency scoring pipelines, and high-availability state synchronization under high concurrent traffic.',
+    description: 'Engineered at Madargaach Holdings. Architected reliable real-time test runtimes, low-latency scoring pipelines, and high-availability state synchronization under high concurrent traffic.',
     tech: ['Next.js', 'React', 'TypeScript', 'PostgreSQL', 'Redis', 'Docker'],
     previewImg: './project-previews/prepnep.png',
     liveUrl: 'https://prepnep.com',

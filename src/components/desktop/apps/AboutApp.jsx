@@ -4,16 +4,23 @@ import { Download, FileText, Printer, Save, FilePlus2 } from 'lucide-react'
 const STORAGE_KEY = 'swastik_notepad_document'
 const DEFAULT_DOCUMENT = `# About Swastik Paudel
 
-Software Engineer
-Kathmandu, Nepal · UTC+5:45
+Software Engineer & Full-Stack Systems Developer
+Kathmandu, Nepal · UTC+5:45 · Age: 22
 
 I build dependable web platforms, real-time systems, and software that stays useful under pressure. My work spans product engineering and lower-level systems experiments.
 
-Currently, I lead engineering on prepNep at Madargaach Holdings, working on the platform's exam experience, state synchronization, and infrastructure.
+I worked as a software engineering intern on prepNep at Madargaach Holdings, developing the platform's exam experience, real-time state synchronization, and infrastructure.
 
 Outside production web systems, I explore Rust, Bevy, and entity-component-system architecture.
 
-Quick links
+Verified Links & Social Media:
+- GitHub: https://github.com/Swastik45
+- LinkedIn: https://www.linkedin.com/in/swastik-paudel-591b61274/
+- Twitter / X: https://x.com/SwastikPaudel45
+- WhatsApp: +977 976-7929476
+- Email: psamarpaudel@gmail.com
+
+Quick navigation:
 - prepNep case study
 - Projects
 - Contact`

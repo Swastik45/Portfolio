@@ -54,7 +54,7 @@ export default function ExperienceApp() {
                       Visit prepnep.com <ExternalLink className="h-3.5 w-3.5" />
                     </a>
                   </div>
-                  <p className="font-mono text-xs text-[#a9b6c5]">Lead Software Engineer · Architecture, State Engine &amp; Full-Stack Infrastructure</p>
+                  <p className="font-mono text-xs text-[#a9b6c5]">Software Engineer · Architecture, State Engine &amp; Full-Stack Infrastructure</p>
                 </header>
 
                 <div className="overflow-hidden rounded-xl border border-[#354250] bg-[#141c24]">
