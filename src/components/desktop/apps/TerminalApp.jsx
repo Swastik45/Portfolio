@@ -327,7 +327,7 @@ Host     : Kathmandu Station (UTC+5:45)
 Kernel   : 6.8.0-generic-rust-preempt
 Uptime   : ${Math.floor((Date.now() - startTime) / 60000)} minutes
 Shell    : bash 5.2.21
-Role     : Lead Engineer @ prepNep (prepnep.com)
+Role     : Software Engineering Intern @ prepNep (prepnep.com)
 Stack    : Rust · Next.js · TypeScript · Postgres · Redis
 Theme    : ${currentWallpaper}
 Memory   : 168MB / 16384MB`
@@ -353,12 +353,81 @@ Memory   : 168MB / 16384MB`
 
       case 'curl':
         if (!arg) {
-          newItems.push({ type: 'error', text: 'Usage: curl <domain> (e.g. curl prepnep.com)' })
+          newItems.push({ 
+            type: 'output', 
+            text: `Usage: curl <target>
+Endpoints:
+  curl activity   - Curl live GitHub public events & repositories
+  curl education  - Curl undergraduate academic degree & current year
+  curl social     - Curl verified social links & contact endpoints
+  curl <domain>   - Simulate HTTP request to domain (e.g. curl prepnep.com)` 
+          })
         } else {
-          const domain = arg.replace(/^https?:\/\//, '')
-          newItems.push({
-            type: 'output',
-            text: `HTTP/2 200 OK
+          const target = arg.toLowerCase().trim()
+          if (target === 'activity' || target === 'github' || target === 'recent') {
+            newItems.push({
+              type: 'output',
+              text: `HTTP/2 200 OK
+date: ${new Date().toUTCString()}
+server: GitHub.com API v3
+content-type: application/json; charset=utf-8
+
+{
+  "user": "Swastik45",
+  "name": "Swastik Paudel",
+  "bio": "Developer & Technical Freelancer. Specialized in Next.js, TypeScript, and C.",
+  "public_repos": 16,
+  "recent_activity": [
+    { "type": "PushEvent", "repo": "Swastik45/Portfolio", "status": "Live Production Deployed" },
+    { "type": "PushEvent", "repo": "Swastik45/CarbonCredit", "desc": "Ecological offset ledger" },
+    { "type": "PushEvent", "repo": "Swastik45/LibraryManagementSystem", "lang": "C (Terminal CRUD)" },
+    { "type": "PushEvent", "repo": "Swastik45/Lumino", "desc": "AI visual discovery platform" }
+  ],
+  "profile_url": "https://github.com/Swastik45"
+}`
+            })
+          } else if (target === 'education' || target === 'degree' || target === 'year') {
+            newItems.push({
+              type: 'output',
+              text: `HTTP/2 200 OK
+date: ${new Date().toUTCString()}
+content-type: application/json; charset=utf-8
+
+{
+  "degree": "Bachelor's in Computer Science / Information Technology",
+  "academic_level": "Undergraduate",
+  "current_year": "4th Year / Senior Undergraduate (2022–Present)",
+  "location": "Kathmandu, Nepal",
+  "key_coursework": [
+    "Data Structures & Algorithms",
+    "Database Management Systems (PostgreSQL, SQL)",
+    "Operating Systems & Linux Internals",
+    "Computer Networks & Socket Protocols",
+    "Distributed Systems & Web Architecture"
+  ],
+  "practical_industry_experience": "Software Engineering Intern at Madargaach Holdings (prepNep)"
+}`
+            })
+          } else if (target === 'social' || target === 'links' || target === 'contacts') {
+            newItems.push({
+              type: 'output',
+              text: `HTTP/2 200 OK
+content-type: application/json; charset=utf-8
+
+{
+  "github": "https://github.com/Swastik45",
+  "linkedin": "https://www.linkedin.com/in/swastik-paudel-591b61274/",
+  "twitter": "https://x.com/SwastikPaudel45",
+  "whatsapp": "https://wa.me/9779767929476",
+  "email": "psamarpaudel@gmail.com",
+  "portfolio": "https://swastik-portfolio-eight.vercel.app"
+}`
+            })
+          } else {
+            const domain = arg.replace(/^https?:\/\//, '')
+            newItems.push({
+              type: 'output',
+              text: `HTTP/2 200 OK
 date: ${new Date().toUTCString()}
 server: cloudflare
 content-type: text/html; charset=utf-8
@@ -371,7 +440,8 @@ content-length: 14820
   <head><title>${domain}</title></head>
   <body>Connected to ${domain} with sub-50ms latency.</body>
 </html>`
-          })
+            })
+          }
         }
         break
 
@@ -456,7 +526,7 @@ Systems/Ops : Docker, Linux, Git, CI/CD pipelines, Vercel, Microservices`
       case 'experience':
         newItems.push({
           type: 'output',
-          text: `Role        : Software Engineer
+          text: `Role        : Software Engineering Intern
 Organization: Madargaach Holdings
 Product     : prepNep (prepnep.com)
 Highlights  :

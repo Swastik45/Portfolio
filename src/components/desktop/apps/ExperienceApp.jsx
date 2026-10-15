@@ -119,7 +119,7 @@ export default function ExperienceApp() {
                 </div>
                 <div className="rounded-xl border border-[#354250] p-4">
                   <h3 className="text-sm font-semibold text-[#e8edf3]">What I worked on</h3>
-                  <p className="mt-2 text-sm leading-relaxed text-[#b7c4d1]">As Lead Software Engineer, my work covered system architecture, the exam state engine, real-time synchronization, and full-stack infrastructure for the live platform.</p>
+                  <p className="mt-2 text-sm leading-relaxed text-[#b7c4d1]">As a Software Engineering Intern, my work covered the exam state engine, real-time synchronization, and full-stack features for the live platform.</p>
                 </div>
                 <a href="https://prepnep.com" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 rounded-lg bg-[#2878d0] px-4 py-2 text-xs font-semibold text-white hover:bg-[#1f67b8]">Open live platform <ExternalLink className="h-3.5 w-3.5" /></a>
               </div>
