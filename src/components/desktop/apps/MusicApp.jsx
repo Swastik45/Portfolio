@@ -1,175 +1,29 @@
-import React, { useState, useEffect, useRef } from 'react'
-import { Play, Pause, SkipForward, SkipBack, Volume2, VolumeX, Disc, Music, ListMusic } from 'lucide-react'
+import React, { useState } from 'react'
+import { Play, Pause, SkipForward, SkipBack, Volume2, VolumeX, Disc, Music, ListMusic, Sparkles } from 'lucide-react'
+import { CLASSIC_TRACKS } from '../musicTracks'
 
-const TRACKS = [
-  {
-    id: 'apple-juice',
-    title: 'Apple Juice',
-    artist: 'Chillhop Music',
-    album: 'Chillhop Essentials',
-    src: '/audio/apple-juice.mp3',
-    fallbackSrc: 'https://stream.chillhop.com/mp3/9476',
-    color: '#DCA561',
-    accent: 'from-[#DCA561] to-[#8C6239]'
-  },
-  {
-    id: 'tozen',
-    title: 'Tôzen',
-    artist: 'Chillhop Music',
-    album: 'Lofi Horizons',
-    src: '/audio/tozen.mp3',
-    fallbackSrc: 'https://stream.chillhop.com/mp3/8448',
-    color: '#7E9CD8',
-    accent: 'from-[#7E9CD8] to-[#2D4F67]'
-  },
-  {
-    id: 'swiss',
-    title: 'Swiss',
-    artist: 'Chillhop Music',
-    album: 'Alps & Rain',
-    src: '/audio/swiss.mp3',
-    fallbackSrc: 'https://stream.chillhop.com/mp3/8878',
-    color: '#76946A',
-    accent: 'from-[#76946A] to-[#2E4F28]'
-  },
-  {
-    id: 'like-this-one',
-    title: 'Like This One',
-    artist: 'Chillhop Music',
-    album: 'Afternoon Solitude',
-    src: 'https://stream.chillhop.com/mp3/8603',
-    fallbackSrc: '/audio/apple-juice.mp3',
-    color: '#957FB8',
-    accent: 'from-[#957FB8] to-[#43325B]'
-  },
-  {
-    id: 'secret-meetings',
-    title: 'Secret Meetings',
-    artist: 'Chillhop Music',
-    album: 'Midnight Tokyo',
-    src: 'https://stream.chillhop.com/mp3/8598',
-    fallbackSrc: '/audio/tozen.mp3',
-    color: '#E46876',
-    accent: 'from-[#E46876] to-[#7A2832]'
-  }
-]
-
-export default function MusicApp() {
-  const [trackIdx, setTrackIdx] = useState(0)
-  const [isPlaying, setIsPlaying] = useState(false)
-  const [currentTime, setCurrentTime] = useState(0)
-  const [duration, setDuration] = useState(0)
-  const [volume, setVolume] = useState(0.7)
-  const [isMuted, setIsMuted] = useState(false)
+export default function MusicApp({ musicPlayer }) {
   const [showPlaylist, setShowPlaylist] = useState(false)
-  const [isLoading, setIsLoading] = useState(false)
 
-  const audioRef = useRef(null)
-  const track = TRACKS[trackIdx]
-
-  // Initialize and handle track source changes
-  useEffect(() => {
-    const audio = audioRef.current
-    if (!audio) return
-
-    const handleTimeUpdate = () => setCurrentTime(audio.currentTime)
-    const handleLoadedMetadata = () => {
-      setDuration(audio.duration || 0)
-      setIsLoading(false)
-    }
-    const handleEnded = () => {
-      setTrackIdx((prev) => (prev + 1) % TRACKS.length)
-    }
-    const handleLoadStart = () => setIsLoading(true)
-    const handleWaiting = () => setIsLoading(true)
-    const handleCanPlay = () => setIsLoading(false)
-    const handleError = () => {
-      // If primary src fails, attempt fallback
-      if (audio.src !== track.fallbackSrc && track.fallbackSrc) {
-        audio.src = track.fallbackSrc
-        if (isPlaying) {
-          audio.play().catch((e) => { void e })
-        }
-      }
-      setIsLoading(false)
-    }
-
-    audio.addEventListener('timeupdate', handleTimeUpdate)
-    audio.addEventListener('loadedmetadata', handleLoadedMetadata)
-    audio.addEventListener('ended', handleEnded)
-    audio.addEventListener('loadstart', handleLoadStart)
-    audio.addEventListener('waiting', handleWaiting)
-    audio.addEventListener('canplay', handleCanPlay)
-    audio.addEventListener('error', handleError)
-
-    // Load current track
-    audio.src = track.src
-    audio.load()
-
-    if (isPlaying) {
-      audio.play().catch((e) => {
-        void e
-        setIsPlaying(false)
-      })
-    }
-
-    return () => {
-      audio.removeEventListener('timeupdate', handleTimeUpdate)
-      audio.removeEventListener('loadedmetadata', handleLoadedMetadata)
-      audio.removeEventListener('ended', handleEnded)
-      audio.removeEventListener('loadstart', handleLoadStart)
-      audio.removeEventListener('waiting', handleWaiting)
-      audio.removeEventListener('canplay', handleCanPlay)
-      audio.removeEventListener('error', handleError)
-    }
-  }, [trackIdx]) // eslint-disable-line react-hooks/exhaustive-deps
-
-  // Handle Play/Pause
-  useEffect(() => {
-    const audio = audioRef.current
-    if (!audio) return
-
-    if (isPlaying) {
-      audio.play().catch((e) => {
-        void e
-        setIsPlaying(false)
-      })
-    } else {
-      audio.pause()
-    }
-  }, [isPlaying])
-
-  // Handle Volume & Mute
-  useEffect(() => {
-    const audio = audioRef.current
-    if (!audio) return
-    audio.volume = isMuted ? 0 : volume
-  }, [volume, isMuted])
-
-  const togglePlay = () => {
-    setIsPlaying((prev) => !prev)
-  }
-
-  const handleNext = () => {
-    setTrackIdx((prev) => (prev + 1) % TRACKS.length)
-  }
-
-  const handlePrev = () => {
-    // If playing past 3s, restart track
-    if (audioRef.current && audioRef.current.currentTime > 3) {
-      audioRef.current.currentTime = 0
-    } else {
-      setTrackIdx((prev) => (prev - 1 + TRACKS.length) % TRACKS.length)
-    }
-  }
-
-  const handleSeek = (e) => {
-    const newTime = parseFloat(e.target.value)
-    setCurrentTime(newTime)
-    if (audioRef.current) {
-      audioRef.current.currentTime = newTime
-    }
-  }
+  // Use props from persistent musicPlayer controller
+  const {
+    tracks = CLASSIC_TRACKS,
+    track = CLASSIC_TRACKS[0],
+    trackIdx = 0,
+    isPlaying = false,
+    currentTime = 0,
+    duration = 0,
+    volume = 0.65,
+    isMuted = false,
+    isLoading = false,
+    togglePlay,
+    playTrack,
+    handleNext,
+    handlePrev,
+    handleSeek,
+    setVolume,
+    toggleMute
+  } = musicPlayer || {}
 
   const formatTime = (secs) => {
     if (isNaN(secs) || secs < 0) return '0:00'
@@ -180,15 +34,21 @@ export default function MusicApp() {
 
   return (
     <div className="flex flex-col h-full bg-[#181824] text-[#dcd7ba] select-none justify-between overflow-hidden relative">
-      <audio ref={audioRef} preload="metadata" />
-
       {/* Top Bar with Playlist Toggle */}
       <div className="flex items-center justify-between px-4 py-2.5 border-b border-white/10 bg-[#20202e] shrink-0">
         <div className="flex items-center gap-2">
-          <Disc className={`w-4 h-4 text-[${track.color}] ${isPlaying ? 'animate-spin' : ''}`} style={{ color: track.color }} />
-          <span className="text-xs font-mono font-bold text-white tracking-wide">
-            Chillhop OS Player
-          </span>
+          <Disc
+            className={`w-4 h-4 transition-transform ${isPlaying ? 'animate-[spin_4s_linear_infinite]' : ''}`}
+            style={{ color: track.color || '#DCA561' }}
+          />
+          <div className="flex items-center gap-1.5">
+            <span className="text-xs font-mono font-bold text-white tracking-wide">
+              Stellar Classics
+            </span>
+            <span className="text-[10px] font-mono px-1.5 py-0.2 rounded bg-amber-500/20 text-amber-300 font-semibold">
+              EN
+            </span>
+          </div>
         </div>
         <button
           type="button"
@@ -199,7 +59,7 @@ export default function MusicApp() {
           title="Toggle Track List"
         >
           <ListMusic className="w-3.5 h-3.5" />
-          <span>Tracks ({TRACKS.length})</span>
+          <span>Tracks ({tracks.length})</span>
         </button>
       </div>
 
@@ -207,26 +67,26 @@ export default function MusicApp() {
       <div className="flex-1 flex flex-col items-center justify-center p-4 relative overflow-y-auto">
         {showPlaylist ? (
           <div className="w-full max-w-sm space-y-1.5 py-2">
-            <div className="text-[11px] font-mono uppercase tracking-wider text-white/40 mb-2 px-1">
-              Select Chillhop Track:
+            <div className="flex items-center justify-between text-[11px] font-mono uppercase tracking-wider text-white/50 mb-2 px-1">
+              <span className="flex items-center gap-1">
+                <Sparkles className="w-3 h-3 text-[#dca561]" /> Classic English Hits
+              </span>
+              <span>{tracks.length} Songs</span>
             </div>
-            {TRACKS.map((t, idx) => {
+            {tracks.map((t, idx) => {
               const isActive = idx === trackIdx
               return (
                 <button
                   key={t.id}
                   type="button"
-                  onClick={() => {
-                    setTrackIdx(idx)
-                    setIsPlaying(true)
-                  }}
+                  onClick={() => playTrack?.(idx)}
                   className={`w-full text-left p-2.5 rounded-xl flex items-center justify-between transition-colors cursor-pointer ${
                     isActive
-                      ? 'bg-white/15 border border-white/20 text-white'
+                      ? 'bg-white/15 border border-white/20 text-white shadow-sm'
                       : 'hover:bg-white/5 text-white/80 border border-transparent'
                   }`}
                 >
-                  <div className="flex items-center gap-3 truncate">
+                  <div className="flex items-center gap-3 truncate min-w-0">
                     <div
                       className="w-7 h-7 rounded-lg flex items-center justify-center font-mono text-xs font-bold shrink-0 shadow"
                       style={{ backgroundColor: t.color, color: '#181824' }}
@@ -239,7 +99,7 @@ export default function MusicApp() {
                     </div>
                   </div>
                   {isActive && (
-                    <div className="flex items-center gap-0.5 ml-2">
+                    <div className="flex items-center gap-0.5 ml-2 shrink-0">
                       <span className="w-1 h-3 bg-[#76946a] rounded-full animate-pulse" />
                       <span className="w-1 h-4 bg-[#76946a] rounded-full animate-pulse [animation-delay:150ms]" />
                       <span className="w-1 h-2 bg-[#76946a] rounded-full animate-pulse [animation-delay:300ms]" />
@@ -251,7 +111,7 @@ export default function MusicApp() {
           </div>
         ) : (
           <div className="flex flex-col items-center justify-center space-y-4 my-auto">
-            {/* Spinning Vinyl Record with Album Cover Art */}
+            {/* Spinning Vinyl Record */}
             <div className="relative group">
               <div
                 className={`w-40 h-40 sm:w-44 sm:h-44 rounded-full bg-gradient-to-tr from-[#0a0a0f] via-[#1c1c24] to-[#0a0a0f] shadow-[0_15px_40px_rgba(0,0,0,0.8),_inset_0_0_0_4px_#2a2a38,_inset_0_0_0_12px_#14141d,_inset_0_0_0_24px_#242432] flex items-center justify-center transition-transform duration-700 ${
@@ -260,7 +120,7 @@ export default function MusicApp() {
               >
                 {/* Center Vinyl Label */}
                 <div
-                  className={`w-16 h-16 rounded-full bg-gradient-to-tr ${track.accent} flex items-center justify-center shadow-lg border-2 border-white/20`}
+                  className={`w-16 h-16 rounded-full bg-gradient-to-tr ${track.accent || 'from-[#DCA561] to-[#8C6239]'} flex items-center justify-center shadow-lg border-2 border-white/20`}
                 >
                   <div className="w-4 h-4 rounded-full bg-[#181824] border border-white/40 shadow-inner" />
                 </div>
@@ -280,13 +140,13 @@ export default function MusicApp() {
             {/* Track Title and Album Info */}
             <div className="text-center space-y-1 max-w-xs px-2">
               <div className="flex items-center justify-center gap-1.5">
-                <Music className="w-3.5 h-3.5" style={{ color: track.color }} />
+                <Music className="w-3.5 h-3.5" style={{ color: track.color || '#DCA561' }} />
                 <h3 className="text-sm sm:text-base font-bold text-white tracking-tight truncate">
                   {track.title}
                 </h3>
               </div>
               <p className="text-xs font-mono text-[#938aa9]">
-                {track.artist} · <span className="text-white/40">{track.album}</span>
+                {track.artist} · <span className="text-white/50">{track.album}</span>
               </p>
             </div>
 
@@ -299,7 +159,7 @@ export default function MusicApp() {
                   style={{
                     height: isPlaying ? `${h}%` : '15%',
                     animationDelay: `${(i * 120) % 600}ms`,
-                    backgroundColor: isPlaying ? track.color : '#3c3c4e'
+                    backgroundColor: isPlaying ? track.color || '#DCA561' : '#3c3c4e'
                   }}
                 />
               ))}
@@ -317,10 +177,10 @@ export default function MusicApp() {
             min={0}
             max={duration || 100}
             value={currentTime}
-            onChange={handleSeek}
+            onChange={(e) => handleSeek?.(e.target.value)}
             disabled={!duration}
-            className="w-full h-1.5 bg-white/10 rounded-lg appearance-none cursor-pointer accent-[#7e9cd8]"
-            style={{ accentColor: track.color }}
+            className="w-full h-1.5 bg-white/10 rounded-lg appearance-none cursor-pointer"
+            style={{ accentColor: track.color || '#DCA561' }}
           />
           <div className="flex justify-between text-[11px] font-mono text-[#938aa9]">
             <span>{formatTime(currentTime)}</span>
@@ -345,7 +205,7 @@ export default function MusicApp() {
               type="button"
               onClick={togglePlay}
               className="p-3 rounded-2xl text-[#181824] font-bold shadow-lg transition-transform hover:scale-105 active:scale-95 cursor-pointer"
-              style={{ backgroundColor: track.color }}
+              style={{ backgroundColor: track.color || '#DCA561' }}
               title={isPlaying ? 'Pause' : 'Play'}
             >
               {isPlaying ? <Pause className="w-5 h-5 fill-current" /> : <Play className="w-5 h-5 fill-current ml-0.5" />}
@@ -365,7 +225,7 @@ export default function MusicApp() {
           <div className="flex items-center gap-2">
             <button
               type="button"
-              onClick={() => setIsMuted((prev) => !prev)}
+              onClick={toggleMute}
               className="p-1.5 rounded-lg text-white/60 hover:text-white transition-colors cursor-pointer"
               title={isMuted ? 'Unmute' : 'Mute'}
             >
@@ -377,11 +237,9 @@ export default function MusicApp() {
               max={1}
               step={0.05}
               value={isMuted ? 0 : volume}
-              onChange={(e) => {
-                setVolume(parseFloat(e.target.value))
-                if (isMuted) setIsMuted(false)
-              }}
-              className="w-16 sm:w-24 h-1.5 bg-white/10 rounded-lg appearance-none cursor-pointer accent-[#7e9cd8]"
+              onChange={(e) => setVolume?.(e.target.value)}
+              className="w-16 sm:w-24 h-1.5 bg-white/10 rounded-lg appearance-none cursor-pointer"
+              style={{ accentColor: track.color || '#DCA561' }}
             />
           </div>
         </div>

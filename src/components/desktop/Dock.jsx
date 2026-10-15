@@ -69,7 +69,7 @@ const DOCK_ITEMS = [
   }
 ]
 
-const MOBILE_TASKBAR_APP_IDS = new Set(['ask', 'projects', 'terminal'])
+const MOBILE_TASKBAR_APP_IDS = new Set(['ask', 'projects', 'music', 'terminal'])
 
 export default function Dock({
   openApps = {},
@@ -81,7 +81,8 @@ export default function Dock({
   onToggleMissionControl,
   onToggleControlCenter,
   onShowDesktop,
-  isControlCenterOpen
+  isControlCenterOpen,
+  isMusicPlaying = false
 }) {
   const [clock, setClock] = useState({ time: '', date: '' })
 
@@ -172,6 +173,16 @@ export default function Dock({
                   {item.badge && (
                     <span className="absolute -right-1 -top-1 rounded-full bg-[#e46876] px-1 text-[7px] font-bold leading-3 text-white">
                       {item.badge}
+                    </span>
+                  )}
+                  {item.appId === 'music' && isMusicPlaying && (
+                    <span
+                      className="absolute -right-1 -top-1 flex items-end gap-[1.5px] h-3 px-1 rounded-full bg-emerald-500/90 shadow ring-1 ring-emerald-400/50"
+                      title="Music Playing in Background"
+                    >
+                      <span className="w-[1.5px] h-1.5 bg-white rounded-full animate-pulse" />
+                      <span className="w-[1.5px] h-2.5 bg-white rounded-full animate-pulse [animation-delay:150ms]" />
+                      <span className="w-[1.5px] h-1 bg-white rounded-full animate-pulse [animation-delay:300ms]" />
                     </span>
                   )}
                 </span>

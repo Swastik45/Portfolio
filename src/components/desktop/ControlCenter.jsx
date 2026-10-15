@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { WALLPAPERS } from './wallpapersData'
-import { Terminal, Folder, Mail, Github, Volume2, VolumeX, Check, Sparkles, Maximize, Minimize, PanelsTopLeft } from 'lucide-react'
+import { Terminal, Folder, Mail, Github, Volume2, VolumeX, Check, Sparkles, Maximize, Minimize, PanelsTopLeft, Play, Pause, SkipForward, SkipBack, Music } from 'lucide-react'
 import { soundFX } from './soundEffects'
 
 export default function ControlCenter({
@@ -11,7 +11,8 @@ export default function ControlCenter({
   onOpenApp,
   onToggleMissionControl,
   soundEnabled,
-  onToggleSound
+  onToggleSound,
+  musicPlayer
 }) {
   const [isFullscreen, setIsFullscreen] = useState(false)
 
@@ -105,6 +106,82 @@ export default function ControlCenter({
           })}
         </div>
       </div>
+
+      {/* Background Music Card */}
+      {musicPlayer && (
+        <div className="my-3 p-2.5 rounded-xl bg-white/5 border border-white/10 space-y-2">
+          <div className="flex items-center justify-between text-[11px] font-mono text-[#938aa9]">
+            <span className="flex items-center gap-1.5 text-white/90 font-medium">
+              <span className={`w-2 h-2 rounded-full ${musicPlayer.isPlaying ? 'bg-emerald-400 animate-pulse' : 'bg-white/40'}`} />
+              Background Music
+            </span>
+            <button
+              type="button"
+              onClick={() => {
+                soundFX.play('open')
+                onOpenApp('music')
+                onClose()
+              }}
+              className="text-[10px] text-[#7e9cd8] hover:underline cursor-pointer"
+            >
+              Open Player →
+            </button>
+          </div>
+          <div className="flex items-center justify-between gap-2">
+            <div className="truncate min-w-0 flex items-center gap-2">
+              <div
+                className="w-7 h-7 rounded-lg flex items-center justify-center shrink-0 shadow text-xs"
+                style={{ backgroundColor: musicPlayer.track?.color || '#DCA561', color: '#181824' }}
+              >
+                <Music className="w-3.5 h-3.5" />
+              </div>
+              <div className="truncate">
+                <div className="text-xs font-bold text-white truncate">
+                  {musicPlayer.track?.title || 'Classic Music'}
+                </div>
+                <div className="text-[10px] text-white/50 truncate">
+                  {musicPlayer.track?.artist || 'English Classic'}
+                </div>
+              </div>
+            </div>
+            <div className="flex items-center gap-1 shrink-0">
+              <button
+                type="button"
+                onClick={() => {
+                  soundFX.play('click')
+                  musicPlayer.handlePrev?.()
+                }}
+                className="p-1 rounded-md text-white/70 hover:text-white hover:bg-white/10 cursor-pointer"
+                title="Previous Track"
+              >
+                <SkipBack className="w-3.5 h-3.5" />
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  soundFX.play('click')
+                  musicPlayer.togglePlay?.()
+                }}
+                className="p-1.5 rounded-lg bg-white/15 hover:bg-white/25 text-white transition-colors cursor-pointer"
+                title={musicPlayer.isPlaying ? 'Pause' : 'Play'}
+              >
+                {musicPlayer.isPlaying ? <Pause className="w-3.5 h-3.5 fill-current" /> : <Play className="w-3.5 h-3.5 fill-current ml-0.5" />}
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  soundFX.play('click')
+                  musicPlayer.handleNext?.()
+                }}
+                className="p-1 rounded-md text-white/70 hover:text-white hover:bg-white/10 cursor-pointer"
+                title="Next Track"
+              >
+                <SkipForward className="w-3.5 h-3.5" />
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Real Quick Toggles */}
       <div className="grid grid-cols-2 gap-2 my-3">

@@ -92,7 +92,7 @@ const HELP_TEXT = `Developer Terminal v2.6 — Interactive bash emulator
 System & Desktop Commands:
   theme [name|number]  - Switch wallpaper (kathmandu, samurai, fuji, sakura, kanagawa)
   open <app>           - Launch desktop window (projects, resume, mail, prepnep, ask, music)
-  music [play|next]    - Control Chillhop audio player or launch window
+  music [play|next]    - Control Stellar Classics audio player or launch window
   top / htop           - Live system process monitor & resource stats
   neofetch / fetch     - Display system info & developer profile
   calc <expression>    - Evaluate math expressions (e.g. calc 1024 * 768 / 60)
@@ -302,7 +302,7 @@ Usage: theme <name or number> (e.g. theme fuji, theme 3)`
         const sub = arg.toLowerCase().trim()
         if (sub === 'play' || sub === 'open' || !sub) {
           onOpenApp?.('music')
-          newItems.push({ type: 'output', text: '[System]: Opened Chillhop Music Player.' })
+          newItems.push({ type: 'output', text: '[System]: Opened Stellar Classics Music Player.' })
         } else {
           onOpenApp?.('music')
           newItems.push({ type: 'output', text: `[Music Engine]: Command '${sub}' dispatched to player.` })

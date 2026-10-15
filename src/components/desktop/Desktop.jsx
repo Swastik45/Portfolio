@@ -20,6 +20,7 @@ import SkillsApp from './apps/SkillsApp'
 import ResumeApp from './apps/ResumeApp'
 import MailApp from './apps/MailApp'
 import MusicApp from './apps/MusicApp'
+import { useMusicPlayer } from './useMusicPlayer'
 
 const getCenteredCoords = (w, h) => {
   if (typeof window === 'undefined') return { x: 60, y: 50 }
@@ -103,9 +104,9 @@ const DEFAULT_APPS = {
   },
   music: {
     id: 'music',
-    title: 'Music Player — Chillhop',
+    title: 'Music Player — English Classics',
     icon: 'music',
-    isOpen: false,
+    isOpen: true,
     isMinimized: false,
     isMaximized: false,
     size: { w: 420, h: 480 }
@@ -113,20 +114,27 @@ const DEFAULT_APPS = {
 }
 
 export default function Desktop() {
+  const musicPlayer = useMusicPlayer()
+
   const [windows, setWindows] = useState(() => {
+    const isMobile = typeof window !== 'undefined' ? window.innerWidth < 1024 : false
     const initial = {}
     Object.keys(DEFAULT_APPS).forEach((key) => {
       const app = DEFAULT_APPS[key]
       initial[key] = {
         ...app,
+        isMinimized: key === 'music' && isMobile ? true : app.isMinimized,
         position: getCenteredCoords(app.size.w, app.size.h),
-        zIndex: 5
+        zIndex: key === 'music' && !isMobile ? 10 : 5
       }
     })
     return initial
   })
 
-  const [activeWindowId, setActiveWindowId] = useState(null)
+  const [activeWindowId, setActiveWindowId] = useState(() => {
+    const isMobile = typeof window !== 'undefined' ? window.innerWidth < 1024 : false
+    return isMobile ? null : 'music'
+  })
   const highestZRef = useRef(20)
 
   // Wallpaper persistence
@@ -188,6 +196,9 @@ export default function Desktop() {
     if (appId === 'projects') setSpotlightProjectQuery('')
 
     soundFX.play('open')
+    if (appId === 'music') {
+      musicPlayer.resumeMusic()
+    }
     const target = windows[appId]
     const isSmallScreen = typeof window !== 'undefined' && window.innerWidth < 1024
 
@@ -269,12 +280,15 @@ export default function Desktop() {
   // Close app
   const closeApp = React.useCallback((appId) => {
     soundFX.play('close')
+    if (appId === 'music') {
+      musicPlayer.stopMusic()
+    }
     setWindows((prev) => ({
       ...prev,
       [appId]: { ...prev[appId], isOpen: false, isMinimized: false }
     }))
     setActiveWindowId((current) => (current === appId ? null : current))
-  }, [])
+  }, [musicPlayer])
 
   // Minimize app
   const minimizeApp = (appId) => {
@@ -380,6 +394,7 @@ export default function Desktop() {
     >
       {/* 1. Wallpaper Background Canvas */}
       <WallpaperBackground wallpaperId={wallpaper} />
+
 
       {/* 2. Personal desktop home */}
       <DesktopWorkspace onOpenApp={openApp} />
@@ -511,7 +526,7 @@ export default function Desktop() {
           onUpdatePosition={(pos) => updatePosition('music', pos)}
           onUpdateSize={(size) => updateSize('music', size)}
         >
-          <MusicApp />
+          <MusicApp musicPlayer={musicPlayer} />
         </WindowFrame>
       </div>
 
@@ -530,6 +545,7 @@ export default function Desktop() {
         }}
         soundEnabled={soundEnabled}
         onToggleSound={handleToggleSound}
+        musicPlayer={musicPlayer}
       />
 
       {/* 6. Windows-style taskbar */}
@@ -537,6 +553,7 @@ export default function Desktop() {
         openApps={openAppsMap}
         activeWindowId={activeWindowId}
         onOpenApp={openApp}
+        isMusicPlaying={musicPlayer.isPlaying}
         onToggleLaunchpad={() => {
           soundFX.play('click')
           setIsLaunchpadOpen((prev) => !prev)
