@@ -397,7 +397,7 @@ export default function Desktop() {
 
 
       {/* 2. Personal desktop home */}
-      <DesktopWorkspace onOpenApp={openApp} />
+      <DesktopWorkspace wallpaper={wallpaper} onOpenApp={openApp} />
       <DesktopIcons onOpenApp={openApp} />
 
       {/* 3. Windows Manager Layer */}
