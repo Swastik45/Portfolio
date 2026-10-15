@@ -61,7 +61,7 @@ export default function ControlCenter({
         <div>
           <div className="text-[11px] font-bold text-white">Status: Available</div>
           <div className="text-[10px] text-[#938aa9] leading-tight">
-            Open to senior engineering roles &amp; high-impact contracts
+            Open to software engineering roles &amp; high-impact contracts
           </div>
         </div>
       </div>

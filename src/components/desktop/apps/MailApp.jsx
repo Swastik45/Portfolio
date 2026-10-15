@@ -5,9 +5,9 @@ import { sendContactMessage } from '../../../lib/contactApi'
 
 const TEMPLATES = [
   {
-    label: '💼 Full-Time Role',
-    subject: 'Senior Engineering Role Opportunity',
-    message: 'Hi Swastik,\n\nWe came across your portfolio and prepNep engineering work. We are currently looking for a Senior / Full-Stack Engineer and would love to connect for a conversation.'
+    label: '💼 Engineering Role',
+    subject: 'Engineering Role Opportunity',
+    message: 'Hi Swastik,\n\nWe came across your portfolio and prepNep engineering work. We are currently looking for a Software / Full-Stack Engineer and would love to connect for a conversation.'
   },
   {
     label: '🚀 Contract Project',

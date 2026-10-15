@@ -7,7 +7,7 @@ const TOPICS = [
   { label: 'Rust & Systems', prompt: 'Tell me about your Rust and low-level systems experience.' },
   { label: 'Flagship Projects', prompt: 'What are your top production projects?' },
   { label: 'Tech Stack', prompt: 'What is your complete engineering stack?' },
-  { label: 'Hiring & Availability', prompt: 'Are you available for remote senior roles or contract work?' }
+  { label: 'Hiring & Availability', prompt: 'Are you available for remote engineering roles or contract work?' }
 ]
 
 function generateAiResponse(query) {
@@ -111,7 +111,7 @@ function generateAiResponse(query) {
     q.includes('rate') || q.includes('salary') || q.includes('contract')
   ) {
     return {
-      text: `Swastik is open to **Senior Full-Stack**, **Backend Systems**, and **Contract Roles** with forward-thinking teams.\n\n### Quick Details:\n• **Location**: Kathmandu, Nepal (UTC+5:45)\n• **Remote Flexibility**: Experienced working across global time zones (US, Europe, APAC)\n• **Email**: psamarpaudel@gmail.com\n• **Phone / WhatsApp**: +977 976-7929476\n• **GitHub**: [github.com/Swastik45](https://github.com/Swastik45)`,
+      text: `Swastik is open to **Software Engineering**, **Full-Stack / Backend Systems**, and **Contract Roles** with forward-thinking teams.\n\n### Quick Details:\n• **Location**: Kathmandu, Nepal (UTC+5:45)\n• **Remote Flexibility**: Experienced working across global time zones (US, Europe, APAC)\n• **Email**: psamarpaudel@gmail.com\n• **Phone / WhatsApp**: +977 976-7929476\n• **GitHub**: [github.com/Swastik45](https://github.com/Swastik45)`,
       links: [
         { label: 'Compose Mail', appId: 'mail' },
         { label: 'View Résumé', appId: 'resume' }

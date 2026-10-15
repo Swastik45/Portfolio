@@ -156,7 +156,7 @@ export default function Projects() {
               ))}
             </div>
 
-            {/* View Mode Toggle: Grid vs Table (Choice loved by senior UI devs) */}
+            {/* View Mode Toggle: Grid vs Table */}
             <div className="flex items-center p-1 rounded-lg bg-zinc-900 border border-zinc-800 text-zinc-400">
               <button
                 onClick={() => setViewMode('grid')}
@@ -315,7 +315,7 @@ export default function Projects() {
           </div>
         )}
 
-        {/* VIEW MODE 2: DENSE TABLE / LIST VIEW (Classic senior developer portfolio choice) */}
+        {/* VIEW MODE 2: DENSE TABLE / LIST VIEW */}
         {viewMode === 'table' && (
           <div className="rounded-2xl border border-zinc-800 bg-zinc-900/40 overflow-hidden font-mono text-xs shadow-xl">
             <div className="overflow-x-auto">

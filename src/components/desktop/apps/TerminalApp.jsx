@@ -64,7 +64,7 @@ echo "Email    : psamarpaudel@gmail.com"
 echo "Phone    : +977 976-7929476 (WhatsApp)"
 echo "Location : Kathmandu, Nepal (UTC+5:45)"
 echo "GitHub   : https://github.com/Swastik45"
-echo "Status   : Open for senior full-stack & systems roles"`
+echo "Status   : Open for software engineering & systems roles"`
 }
 
 const PROJECT_FILES = {
@@ -471,7 +471,7 @@ Highlights  :
 Phone       : +977 976-7929476
 Location    : Kathmandu, Nepal (UTC+5:45)
 GitHub      : https://github.com/Swastik45
-Status      : Open to senior roles & contracts`
+Status      : Open to engineering roles & contracts`
         })
         break
 
