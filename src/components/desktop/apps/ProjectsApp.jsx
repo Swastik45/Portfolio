@@ -8,6 +8,7 @@ import {
   LayoutGrid, 
   List, 
   ArrowUpRight,
+  ArrowLeft,
   CheckCircle2,
   X, 
   Copy, 
@@ -19,6 +20,7 @@ import {
   HardDrive, 
   Globe2, 
   ChevronRight, 
+  ChevronLeft,
   RefreshCw,
   Zap
 } from 'lucide-react'
@@ -72,25 +74,28 @@ export default function ProjectsApp({ onOpenApp, search = '', onSearchChange }) 
   const [selectedCategory, setSelectedCategory] = useState('All')
   const [selectedTag, setSelectedTag] = useState(null)
   const [viewMode, setViewMode] = useState('grid') // 'grid' | 'list'
-  const [inspectProject, setInspectProject] = useState(null)
+  const [activeProject, setActiveProject] = useState(null)
   const [previewDevice, setPreviewDevice] = useState('desktop') // 'desktop' | 'mobile'
   const [copiedUrl, setCopiedUrl] = useState(false)
   const [selectedProjectId, setSelectedProjectId] = useState(null)
 
-  // Close inspector on Escape key
+  // Keyboard navigation: Escape or Backspace returns to projects grid
   useEffect(() => {
     const handleKeyDown = (e) => {
-      if (e.key === 'Escape' && inspectProject) {
-        setInspectProject(null)
+      if (activeProject) {
+        if (e.key === 'Escape') {
+          soundFX.play('click')
+          setActiveProject(null)
+        }
       }
     }
     window.addEventListener('keydown', handleKeyDown)
     return () => window.removeEventListener('keydown', handleKeyDown)
-  }, [inspectProject])
+  }, [activeProject])
 
   const openProject = (project) => {
     soundFX.play('open')
-    setInspectProject(project)
+    setActiveProject(project)
     setSelectedProjectId(project.id)
   }
 
@@ -139,6 +144,317 @@ export default function ProjectsApp({ onOpenApp, search = '', onSearchChange }) 
 
   const hasActiveFilters = selectedCategory !== 'All' || selectedTag !== null || (search && search.trim() !== '')
 
+  // Next / Previous Project Navigation in Detail View
+  const currentProjectIndex = activeProject 
+    ? PROJECTS_DATA.findIndex((p) => p.id === activeProject.id) 
+    : -1
+
+  const navigateProject = (direction) => {
+    soundFX.play('click')
+    const nextIdx = (currentProjectIndex + direction + PROJECTS_DATA.length) % PROJECTS_DATA.length
+    setActiveProject(PROJECTS_DATA[nextIdx])
+  }
+
+  // =========================================================================
+  // VIEW A: IN-WINDOW PROJECT DETAIL SHOWCASE (No modals, fully resizable)
+  // =========================================================================
+  if (activeProject) {
+    const catBadge = getCategoryBadge(activeProject.category)
+
+    return (
+      <div className="flex h-full w-full flex-col bg-[#0f141c] text-[#e2e8f0] select-none">
+        {/* Navigation Breadcrumb Bar */}
+        <header className="flex h-11 shrink-0 items-center justify-between border-b border-[#253040] bg-[#141b24] px-3 text-xs">
+          <div className="flex min-w-0 items-center gap-2 overflow-hidden text-[#8e9cae]">
+            <button
+              type="button"
+              onClick={() => {
+                soundFX.play('click')
+                setActiveProject(null)
+              }}
+              className="inline-flex items-center gap-1 rounded-md bg-[#1f2937] px-2.5 py-1 text-xs font-semibold text-white hover:bg-[#2b394c] transition-colors shrink-0"
+              title="Return to projects list (Esc)"
+            >
+              <ArrowLeft className="h-3.5 w-3.5" />
+              <span>Back</span>
+            </button>
+
+            <span className="text-[#3b495c] font-light">|</span>
+
+            <HardDrive className="h-4 w-4 shrink-0 text-[#4da3ff]" />
+            <button
+              type="button"
+              onClick={() => setActiveProject(null)}
+              className="hover:text-[#4da3ff] transition-colors shrink-0 font-medium text-[#c0ccdc]"
+            >
+              Projects
+            </button>
+            <ChevronRight className="h-3 w-3 shrink-0 text-[#4e5d71]" />
+            <span className={`inline-flex items-center rounded-md px-1.5 py-0.5 text-[10px] font-semibold ${catBadge.bg} ${catBadge.text}`}>
+              {activeProject.category}
+            </span>
+            <ChevronRight className="h-3 w-3 shrink-0 text-[#4e5d71]" />
+            <span className="truncate font-semibold text-white">{activeProject.title}</span>
+          </div>
+
+          {/* Quick External Actions & Next/Prev */}
+          <div className="flex items-center gap-1.5 shrink-0">
+            <button
+              type="button"
+              onClick={() => navigateProject(-1)}
+              className="rounded-md border border-[#2b3848] bg-[#141d27] p-1 text-[#94a3b8] hover:bg-[#1e2a38] hover:text-white transition-colors"
+              title="Previous project"
+            >
+              <ChevronLeft className="h-3.5 w-3.5" />
+            </button>
+            <button
+              type="button"
+              onClick={() => navigateProject(1)}
+              className="rounded-md border border-[#2b3848] bg-[#141d27] p-1 text-[#94a3b8] hover:bg-[#1e2a38] hover:text-white transition-colors"
+              title="Next project"
+            >
+              <ChevronRight className="h-3.5 w-3.5" />
+            </button>
+
+            {activeProject.liveUrl && (
+              <a
+                href={activeProject.liveUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hidden sm:inline-flex items-center gap-1 rounded-lg bg-[#2563eb] px-3 py-1 text-xs font-semibold text-white hover:bg-[#1d4ed8] transition-colors"
+              >
+                Live Site <ExternalLink className="h-3 w-3" />
+              </a>
+            )}
+          </div>
+        </header>
+
+        {/* Scrollable Project Content (Adapts seamlessly to any window size) */}
+        <main className="min-h-0 flex-1 overflow-y-auto p-4 sm:p-6 space-y-6">
+          {/* Hero Header */}
+          <div className="space-y-2">
+            <div className="flex flex-wrap items-center gap-2">
+              <span className={`inline-flex items-center gap-1 rounded-full border px-2.5 py-0.5 text-xs font-semibold ${catBadge.bg} ${catBadge.text} ${catBadge.border}`}>
+                <span className={`h-1.5 w-1.5 rounded-full ${catBadge.dot}`} />
+                {activeProject.category}
+              </span>
+              {activeProject.badge && (
+                <span className="rounded-full border border-white/10 bg-[#16202c] px-2.5 py-0.5 font-mono text-xs text-[#94a3b8]">
+                  {activeProject.badge}
+                </span>
+              )}
+            </div>
+
+            <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-white">
+              {activeProject.title}
+            </h1>
+
+            <p className="text-sm sm:text-base text-[#94a3b8] leading-relaxed max-w-3xl">
+              {activeProject.headline}
+            </p>
+          </div>
+
+          {/* Live Preview Banner Frame */}
+          {activeProject.previewImg ? (
+            <div className="space-y-2">
+              <div className="flex items-center justify-between text-xs">
+                <span className="font-mono text-[10px] uppercase tracking-wider text-[#64748b]">
+                  Interactive Interface Preview
+                </span>
+                <div className="flex items-center rounded-lg border border-[#2a3648] bg-[#0d131c] p-0.5 text-[11px]">
+                  <button
+                    type="button"
+                    onClick={() => setPreviewDevice('desktop')}
+                    className={`flex items-center gap-1 rounded px-2.5 py-1 transition-colors ${
+                      previewDevice === 'desktop' ? 'bg-[#253245] font-semibold text-[#38bdf8]' : 'text-[#8e9eb3]'
+                    }`}
+                  >
+                    <Monitor className="h-3.5 w-3.5" /> Desktop
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setPreviewDevice('mobile')}
+                    className={`flex items-center gap-1 rounded px-2.5 py-1 transition-colors ${
+                      previewDevice === 'mobile' ? 'bg-[#253245] font-semibold text-[#38bdf8]' : 'text-[#8e9eb3]'
+                    }`}
+                  >
+                    <Smartphone className="h-3.5 w-3.5" /> Mobile
+                  </button>
+                </div>
+              </div>
+
+              <div
+                className={`mx-auto overflow-hidden rounded-2xl border border-[#2b3848] bg-[#0c1117] shadow-xl transition-all duration-300 ${
+                  previewDevice === 'mobile' ? 'max-w-[300px] h-80' : 'w-full max-h-[380px]'
+                }`}
+              >
+                <img
+                  src={activeProject.previewImg}
+                  alt={activeProject.title}
+                  className="h-full w-full object-cover object-top"
+                />
+              </div>
+            </div>
+          ) : (
+            /* Systems Engine Canvas */
+            <div className="rounded-2xl border border-amber-500/20 bg-gradient-to-br from-[#1c1b2d] via-[#151d28] to-[#121922] p-6 text-center space-y-3">
+              <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-amber-500/10 border border-amber-500/30 text-amber-400">
+                <Cpu className="h-7 w-7" />
+              </div>
+              <h3 className="text-base font-bold text-amber-300">
+                Rust &bull; Bevy ECS Engine Prototype
+              </h3>
+              <p className="max-w-md mx-auto text-xs text-[#94a3b8] leading-relaxed">
+                Deterministic 2D physics simulation built using Entity-Component-System (ECS) architecture, spatial partitioning, zero GC overhead, and 120 FPS frame locks.
+              </p>
+            </div>
+          )}
+
+          {/* Action Links Bar */}
+          <div className="flex flex-wrap items-center gap-2.5 rounded-2xl border border-[#232f3f] bg-[#121924] p-3 sm:p-4">
+            {activeProject.liveUrl && (
+              <>
+                <a
+                  href={activeProject.liveUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1.5 rounded-xl bg-[#2563eb] px-4 py-2 text-xs font-bold text-white shadow hover:bg-[#1d4ed8] transition-colors"
+                >
+                  Open Live Site <ExternalLink className="h-3.5 w-3.5" />
+                </a>
+
+                <button
+                  type="button"
+                  onClick={() => handleCopyUrl(activeProject.liveUrl)}
+                  className="inline-flex items-center gap-1.5 rounded-xl border border-[#2d3a4d] bg-[#16202c] px-3 py-2 text-xs text-[#cbd5e1] hover:bg-[#202c3d] hover:text-white transition-colors"
+                  title="Copy Live URL"
+                >
+                  {copiedUrl ? <Check className="h-3.5 w-3.5 text-emerald-400" /> : <Copy className="h-3.5 w-3.5" />}
+                  <span>{copiedUrl ? 'Copied URL!' : 'Copy Link'}</span>
+                </button>
+              </>
+            )}
+
+            {activeProject.githubUrl && (
+              <a
+                href={activeProject.githubUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1.5 rounded-xl border border-[#2d3a4d] bg-[#16202c] px-3.5 py-2 text-xs font-medium text-[#e2e8f0] hover:bg-[#202c3d] hover:text-white transition-colors"
+              >
+                GitHub Repository <Github className="h-3.5 w-3.5" />
+              </a>
+            )}
+
+            {activeProject.id === 'prepnep' && (
+              <button
+                type="button"
+                onClick={() => onOpenApp?.('experience')}
+                className="inline-flex items-center gap-1.5 rounded-xl border border-amber-500/30 bg-amber-500/10 px-3.5 py-2 text-xs font-semibold text-amber-300 hover:bg-amber-500/20 transition-colors"
+              >
+                Deep-Dive Case Study &rarr;
+              </button>
+            )}
+          </div>
+
+          {/* Two-Column Responsive Details Grid */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            {/* Left 2 Cols: Overview & Architecture Deliverables */}
+            <div className="lg:col-span-2 space-y-6">
+              <section className="space-y-2">
+                <h3 className="font-mono text-xs uppercase tracking-wider text-[#64748b]">
+                  Overview &amp; Architecture
+                </h3>
+                <p className="text-xs sm:text-sm text-[#cbd5e1] leading-relaxed">
+                  {activeProject.description}
+                </p>
+              </section>
+
+              {/* Engineering Highlights & Benchmarks */}
+              {activeProject.metrics && activeProject.metrics.length > 0 && (
+                <section className="rounded-2xl border border-[#232f3f] bg-[#121924] p-4 sm:p-5 space-y-3">
+                  <h3 className="font-mono text-xs uppercase tracking-wider text-[#38bdf8] flex items-center gap-1.5">
+                    <Zap className="h-3.5 w-3.5 text-amber-400" /> Key Engineering Deliverables
+                  </h3>
+                  <div className="space-y-2">
+                    {activeProject.metrics.map((m, idx) => (
+                      <div key={idx} className="flex items-start gap-2 text-xs sm:text-sm text-[#e2e8f0]">
+                        <CheckCircle2 className="h-4 w-4 text-emerald-400 shrink-0 mt-0.5" />
+                        <span>{m}</span>
+                      </div>
+                    ))}
+                  </div>
+                </section>
+              )}
+            </div>
+
+            {/* Right 1 Col: Tech Stack & Specs */}
+            <div className="space-y-5">
+              <section className="rounded-2xl border border-[#232f3f] bg-[#121924] p-4 space-y-3">
+                <h3 className="font-mono text-xs uppercase tracking-wider text-[#64748b]">
+                  Technologies Applied
+                </h3>
+                <div className="flex flex-wrap gap-1.5">
+                  {activeProject.tech.map((t) => (
+                    <span
+                      key={t}
+                      className="rounded-lg border border-[#263548] bg-[#0e141d] px-2.5 py-1 font-mono text-xs text-[#93c5fd]"
+                    >
+                      {t}
+                    </span>
+                  ))}
+                </div>
+              </section>
+
+              <section className="rounded-2xl border border-[#232f3f] bg-[#121924] p-4 space-y-2.5 text-xs">
+                <h3 className="font-mono text-xs uppercase tracking-wider text-[#64748b]">
+                  Project Specifications
+                </h3>
+                <div className="flex justify-between border-b border-[#1f2937] pb-1.5 text-[#94a3b8]">
+                  <span>Category:</span>
+                  <span className="font-medium text-white">{activeProject.category}</span>
+                </div>
+                <div className="flex justify-between border-b border-[#1f2937] pb-1.5 text-[#94a3b8]">
+                  <span>Domain:</span>
+                  <span className="font-medium text-white">{activeProject.badge}</span>
+                </div>
+                <div className="flex justify-between text-[#94a3b8]">
+                  <span>Status:</span>
+                  <span className="font-medium text-emerald-400">Production / Live</span>
+                </div>
+              </section>
+            </div>
+          </div>
+
+          {/* Footer Navigation */}
+          <div className="flex items-center justify-between border-t border-[#202b3a] pt-5">
+            <button
+              type="button"
+              onClick={() => {
+                soundFX.play('click')
+                setActiveProject(null)
+              }}
+              className="inline-flex items-center gap-1.5 rounded-xl border border-[#2b3848] bg-[#16202c] px-4 py-2 text-xs font-medium text-white hover:bg-[#202c3d] transition-colors"
+            >
+              <ArrowLeft className="h-3.5 w-3.5" /> Back to All Projects
+            </button>
+
+            <button
+              type="button"
+              onClick={() => navigateProject(1)}
+              className="inline-flex items-center gap-1.5 rounded-xl border border-[#2b3848] bg-[#16202c] px-4 py-2 text-xs font-medium text-white hover:bg-[#202c3d] transition-colors"
+            >
+              Next Project <ChevronRight className="h-3.5 w-3.5" />
+            </button>
+          </div>
+        </main>
+      </div>
+    )
+  }
+
+  // =========================================================================
+  // VIEW B: MAIN EXPLORER GRID & LIST VIEW (Fluid, fully resizable)
+  // =========================================================================
   return (
     <div className="flex h-full w-full flex-col bg-[#0f141c] text-[#e2e8f0] select-none">
       {/* 1. Explorer Navigation & Breadcrumbs Bar */}
@@ -371,20 +687,18 @@ export default function ProjectsApp({ onOpenApp, search = '', onSearchChange }) 
               return (
                 <article
                   key={p.id}
-                  onClick={() => setSelectedProjectId(p.id)}
-                  onDoubleClick={() => openProject(p)}
+                  onClick={() => openProject(p)}
                   onKeyDown={(e) => {
                     if (e.target !== e.currentTarget) return
-                    if (e.key === 'Enter') openProject(p)
-                    if (e.key === ' ') {
+                    if (e.key === 'Enter' || e.key === ' ') {
                       e.preventDefault()
-                      setSelectedProjectId(p.id)
+                      openProject(p)
                     }
                   }}
                   tabIndex={0}
                   role="button"
                   aria-pressed={isSelected}
-                  aria-label={`${p.title} project details`}
+                  aria-label={`Open ${p.title} project showcase`}
                   className={`group relative flex flex-col rounded-2xl border bg-[#141b24] overflow-hidden transition-all duration-200 cursor-pointer hover:-translate-y-0.5 hover:shadow-[0_12px_28px_rgba(0,0,0,0.5)] ${
                     isSelected 
                       ? 'border-[#38bdf8] ring-1 ring-[#38bdf8]' 
@@ -477,16 +791,9 @@ export default function ProjectsApp({ onOpenApp, search = '', onSearchChange }) 
 
                     {/* Card Footer Actions */}
                     <div className="flex items-center justify-between border-t border-[#202b3a] pt-3 text-xs">
-                      <button
-                        type="button"
-                        onClick={(e) => {
-                          e.stopPropagation()
-                          openProject(p)
-                        }}
-                        className="inline-flex items-center gap-1 text-[11px] font-medium text-[#38bdf8] hover:text-[#7dd3fc] transition-colors"
-                      >
-                        Inspect Details &rarr;
-                      </button>
+                      <span className="text-[11px] font-semibold text-[#38bdf8] group-hover:underline">
+                        Open Showcase &rarr;
+                      </span>
 
                       <div className="flex items-center gap-1.5" onClick={(e) => e.stopPropagation()}>
                         {p.liveUrl && (
@@ -495,7 +802,7 @@ export default function ProjectsApp({ onOpenApp, search = '', onSearchChange }) 
                             target="_blank"
                             rel="noopener noreferrer"
                             className="inline-flex items-center gap-1 rounded-md bg-[#1d4ed8]/20 border border-[#1d4ed8]/40 px-2 py-1 text-[10px] font-semibold text-[#93c5fd] hover:bg-[#1d4ed8] hover:text-white transition-all"
-                            title="Open live site"
+                            title="Open live site directly"
                           >
                             Live <ExternalLink className="h-2.5 w-2.5" />
                           </a>
@@ -542,14 +849,12 @@ export default function ProjectsApp({ onOpenApp, search = '', onSearchChange }) 
               return (
                 <div
                   key={p.id}
-                  onClick={() => setSelectedProjectId(p.id)}
-                  onDoubleClick={() => openProject(p)}
+                  onClick={() => openProject(p)}
                   onKeyDown={(e) => {
                     if (e.target !== e.currentTarget) return
-                    if (e.key === 'Enter') openProject(p)
-                    if (e.key === ' ') {
+                    if (e.key === 'Enter' || e.key === ' ') {
                       e.preventDefault()
-                      setSelectedProjectId(p.id)
+                      openProject(p)
                     }
                   }}
                   tabIndex={0}
@@ -596,7 +901,7 @@ export default function ProjectsApp({ onOpenApp, search = '', onSearchChange }) 
                         target="_blank"
                         rel="noopener noreferrer"
                         className="rounded-lg border border-[#2b3848] bg-[#16202c] p-1.5 text-[#93c5fd] hover:bg-[#1e2e42] transition-colors"
-                        title="Open live site"
+                        title="Open live site directly"
                       >
                         <ExternalLink className="h-3.5 w-3.5" />
                       </a>
@@ -615,9 +920,9 @@ export default function ProjectsApp({ onOpenApp, search = '', onSearchChange }) 
                     <button
                       type="button"
                       onClick={() => openProject(p)}
-                      className="rounded-lg bg-[#2563eb] px-2.5 py-1 text-[11px] font-semibold text-white hover:bg-[#1d4ed8] transition-colors"
+                      className="rounded-lg bg-[#2563eb] px-3 py-1.5 text-[11px] font-semibold text-white hover:bg-[#1d4ed8] transition-colors"
                     >
-                      Inspect
+                      Open
                     </button>
                   </div>
                 </div>
@@ -640,196 +945,9 @@ export default function ProjectsApp({ onOpenApp, search = '', onSearchChange }) 
           )}
         </div>
         <span className="hidden sm:inline">
-          Double-click card or click Inspect to view full details
+          Click any project card to open showcase &bull; Double click to inspect
         </span>
       </footer>
-
-      {/* 6. Comprehensive Project Details Inspector Modal */}
-      {inspectProject && (
-        <div
-          className="fixed inset-0 z-[120] flex items-center justify-center bg-black/70 backdrop-blur-sm p-3 sm:p-5 pointer-events-auto animate-in fade-in duration-150"
-          onClick={() => setInspectProject(null)}
-        >
-          <div
-            className="flex max-h-[90vh] w-full max-w-2xl flex-col rounded-2xl border border-[#2f3d50] bg-[#141b24] shadow-[0_20px_50px_rgba(0,0,0,0.7)] overflow-hidden"
-            onClick={(e) => e.stopPropagation()}
-          >
-            {/* Modal Header */}
-            <header className="flex shrink-0 items-center justify-between border-b border-[#243142] bg-[#18212d] px-5 py-3.5">
-              <div className="flex items-center gap-2 min-w-0">
-                <span className={`rounded-full px-2 py-0.5 text-xs font-semibold ${getCategoryBadge(inspectProject.category).bg} ${getCategoryBadge(inspectProject.category).text}`}>
-                  {inspectProject.category}
-                </span>
-                <span className="rounded-full bg-[#101722] border border-[#2b3848] px-2 py-0.5 font-mono text-[11px] text-[#94a3b8]">
-                  {inspectProject.badge}
-                </span>
-                <h3 className="text-base font-bold text-white truncate">{inspectProject.title}</h3>
-              </div>
-
-              <button
-                type="button"
-                onClick={() => setInspectProject(null)}
-                aria-label="Close dialog"
-                className="rounded-lg p-1.5 text-[#94a3b8] hover:bg-[#253245] hover:text-white transition-colors"
-              >
-                <X className="h-4 w-4" />
-              </button>
-            </header>
-
-            {/* Modal Body (Scrollable) */}
-            <div className="flex-1 overflow-y-auto p-5 sm:p-6 space-y-5 text-xs text-[#cbd5e1] leading-relaxed">
-              {/* Preview Banner Frame */}
-              {inspectProject.previewImg ? (
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between">
-                    <span className="font-mono text-[10px] uppercase tracking-wider text-[#64748b]">
-                      Live Visual Preview
-                    </span>
-                    <div className="flex items-center rounded-lg border border-[#2a3648] bg-[#0d131c] p-0.5 text-[11px]">
-                      <button
-                        type="button"
-                        onClick={() => setPreviewDevice('desktop')}
-                        className={`flex items-center gap-1 rounded px-2 py-1 transition-colors ${
-                          previewDevice === 'desktop' ? 'bg-[#253245] font-semibold text-[#38bdf8]' : 'text-[#8e9eb3]'
-                        }`}
-                      >
-                        <Monitor className="h-3 w-3" /> Desktop
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => setPreviewDevice('mobile')}
-                        className={`flex items-center gap-1 rounded px-2 py-1 transition-colors ${
-                          previewDevice === 'mobile' ? 'bg-[#253245] font-semibold text-[#38bdf8]' : 'text-[#8e9eb3]'
-                        }`}
-                      >
-                        <Smartphone className="h-3 w-3" /> Mobile
-                      </button>
-                    </div>
-                  </div>
-
-                  <div
-                    className={`mx-auto overflow-hidden rounded-xl border border-[#2b3848] bg-[#0c1117] shadow-inner transition-all duration-300 ${
-                      previewDevice === 'mobile' ? 'max-w-[280px] h-64' : 'w-full max-h-60'
-                    }`}
-                  >
-                    <img
-                      src={inspectProject.previewImg}
-                      alt={inspectProject.title}
-                      className="h-full w-full object-cover object-top"
-                    />
-                  </div>
-                </div>
-              ) : (
-                /* Systems Engine Highlights */
-                <div className="rounded-xl border border-[#2b3848] bg-gradient-to-br from-[#121924] to-[#0c1118] p-4 text-center">
-                  <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-amber-500/10 border border-amber-500/30 text-amber-400">
-                    <Cpu className="h-6 w-6" />
-                  </div>
-                  <h4 className="mt-2 text-sm font-bold text-amber-300">Rust &bull; Bevy ECS Engine Prototype</h4>
-                  <p className="mt-1 text-xs text-[#94a3b8]">
-                    Deterministic real-time systems programming, zero-allocation game loop, and spatial hashing physics.
-                  </p>
-                </div>
-              )}
-
-              {/* Engineering Overview */}
-              <div>
-                <h4 className="font-mono text-[10px] uppercase tracking-wider text-[#64748b]">
-                  Overview &amp; Architecture
-                </h4>
-                <p className="mt-1.5 text-xs sm:text-sm text-[#e2e8f0] leading-relaxed">
-                  {inspectProject.description}
-                </p>
-              </div>
-
-              {/* Key Deliverables & Highlights */}
-              {inspectProject.metrics && inspectProject.metrics.length > 0 && (
-                <div className="rounded-xl border border-[#232f3f] bg-[#0d141e] p-3.5 space-y-2">
-                  <span className="block font-mono text-[10px] uppercase tracking-wider text-[#38bdf8]">
-                    Key Deliverables &amp; Metrics
-                  </span>
-                  <div className="space-y-1.5">
-                    {inspectProject.metrics.map((m, idx) => (
-                      <div key={idx} className="flex items-start gap-2 text-xs text-[#cbd5e1]">
-                        <CheckCircle2 className="h-4 w-4 text-emerald-400 shrink-0 mt-0.5" />
-                        <span>{m}</span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* Technologies Applied */}
-              <div>
-                <span className="block font-mono text-[10px] uppercase tracking-wider text-[#64748b]">
-                  Technologies Applied
-                </span>
-                <div className="mt-1.5 flex flex-wrap gap-1.5">
-                  {inspectProject.tech.map((t) => (
-                    <span
-                      key={t}
-                      className="rounded-lg border border-[#27364a] bg-[#111924] px-2.5 py-1 font-mono text-xs text-[#93c5fd]"
-                    >
-                      {t}
-                    </span>
-                  ))}
-                </div>
-              </div>
-            </div>
-
-            {/* Modal Footer Actions */}
-            <footer className="flex shrink-0 flex-wrap items-center justify-between gap-2 border-t border-[#243142] bg-[#18212d] px-5 py-3.5">
-              <div className="flex items-center gap-2">
-                {inspectProject.liveUrl && (
-                  <>
-                    <a
-                      href={inspectProject.liveUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center gap-1.5 rounded-xl bg-[#2563eb] px-4 py-2 text-xs font-bold text-white shadow hover:bg-[#1d4ed8] transition-colors"
-                    >
-                      Open Live Site <ExternalLink className="h-3.5 w-3.5" />
-                    </a>
-
-                    <button
-                      type="button"
-                      onClick={() => handleCopyUrl(inspectProject.liveUrl)}
-                      className="rounded-xl border border-[#2d3a4d] bg-[#131b26] p-2 text-[#cbd5e1] hover:bg-[#202c3d] hover:text-white transition-colors"
-                      title="Copy URL"
-                    >
-                      {copiedUrl ? <Check className="h-3.5 w-3.5 text-emerald-400" /> : <Copy className="h-3.5 w-3.5" />}
-                    </button>
-                  </>
-                )}
-
-                {inspectProject.githubUrl && (
-                  <a
-                    href={inspectProject.githubUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1.5 rounded-xl border border-[#2d3a4d] bg-[#131b26] px-3.5 py-2 text-xs font-medium text-[#e2e8f0] hover:bg-[#202c3d] hover:text-white transition-colors"
-                  >
-                    GitHub Code <Github className="h-3.5 w-3.5" />
-                  </a>
-                )}
-              </div>
-
-              {inspectProject.id === 'prepnep' && (
-                <button
-                  type="button"
-                  onClick={() => {
-                    setInspectProject(null)
-                    onOpenApp?.('experience')
-                  }}
-                  className="rounded-xl border border-amber-500/30 bg-amber-500/10 px-3.5 py-2 text-xs font-semibold text-amber-300 hover:bg-amber-500/20 transition-colors"
-                >
-                  Deep-Dive prepNep Case Study &rarr;
-                </button>
-              )}
-            </footer>
-          </div>
-        </div>
-      )}
     </div>
   )
 }

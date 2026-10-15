@@ -215,14 +215,14 @@ export default function WindowFrame({
       {!isMobile && !isMaximized && (
         <>
           {[
-            ['n', 'top-0 left-2 right-2 h-1.5 cursor-ns-resize'],
-            ['s', 'bottom-0 left-2 right-2 h-1.5 cursor-ns-resize'],
-            ['e', 'right-0 top-2 bottom-2 w-1.5 cursor-ew-resize'],
-            ['w', 'left-0 top-2 bottom-2 w-1.5 cursor-ew-resize'],
-            ['ne', 'right-0 top-0 h-3 w-3 cursor-nesw-resize'],
-            ['nw', 'left-0 top-0 h-3 w-3 cursor-nwse-resize'],
-            ['se', 'right-0 bottom-0 h-3 w-3 cursor-nwse-resize'],
-            ['sw', 'left-0 bottom-0 h-3 w-3 cursor-nesw-resize']
+            ['n', '-top-1 left-3 right-3 h-3 cursor-ns-resize'],
+            ['s', '-bottom-1 left-3 right-3 h-3 cursor-ns-resize'],
+            ['e', '-right-1 top-3 bottom-3 w-3 cursor-ew-resize'],
+            ['w', '-left-1 top-3 bottom-3 w-3 cursor-ew-resize'],
+            ['ne', '-right-1.5 -top-1.5 h-5 w-5 cursor-nesw-resize'],
+            ['nw', '-left-1.5 -top-1.5 h-5 w-5 cursor-nwse-resize'],
+            ['se', '-right-1.5 -bottom-1.5 h-5 w-5 cursor-nwse-resize'],
+            ['sw', '-left-1.5 -bottom-1.5 h-5 w-5 cursor-nesw-resize']
           ].map(([direction, classes]) => (
             <button
               key={direction}
