@@ -396,7 +396,7 @@ content-type: application/json; charset=utf-8
 {
   "degree": "Bachelor's in Computer Science / Information Technology",
   "academic_level": "Undergraduate",
-  "current_year": "4th Year / Senior Undergraduate (2022–Present)",
+  "current_year": "2nd Year Undergraduate (2024–Present)",
   "location": "Kathmandu, Nepal",
   "key_coursework": [
     "Data Structures & Algorithms",

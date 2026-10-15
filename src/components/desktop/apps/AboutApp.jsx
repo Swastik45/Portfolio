@@ -5,7 +5,7 @@ const STORAGE_KEY = 'swastik_notepad_document'
 const DEFAULT_DOCUMENT = `# About Swastik Paudel
 
 Software Engineer & Full-Stack Systems Developer
-Kathmandu, Nepal · UTC+5:45 · Age: 22
+Kathmandu, Nepal · UTC+5:45 · Age: 21
 
 I build dependable web platforms, real-time systems, and software that stays useful under pressure. My work spans product engineering and lower-level systems experiments.
 
