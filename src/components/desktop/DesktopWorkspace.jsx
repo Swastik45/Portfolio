@@ -4,41 +4,41 @@ import { MapPin } from 'lucide-react'
 const THEME_ADAPTATIONS = {
   kathmandu: {
     name: 'Kathmandu Valley at Dusk',
-    rimFilter: 'drop-shadow(0 20px 45px rgba(0,0,0,0.6)) drop-shadow(0 0 28px rgba(237,170,132,0.42)) drop-shadow(0 0 8px rgba(255,208,160,0.32))',
-    colorGrading: 'sepia(10%) saturate(106%) contrast(103%) brightness(96%)',
-    backlightColor: 'radial-gradient(ellipse at 75% 55%, rgba(237,170,132,0.35) 0%, rgba(184,105,93,0.18) 45%, transparent 70%)',
+    depthShadow: 'drop-shadow(0 26px 52px rgba(0,0,0,0.7))',
+    colorGrading: 'sepia(5%) saturate(104%) contrast(102%) brightness(98%)',
+    backlightColor: 'radial-gradient(ellipse at 82% 52%, rgba(237,170,132,0.24) 0%, rgba(184,105,93,0.1) 45%, transparent 70%)',
     particleColor: '#ffd0a0',
     particleType: 'dust'
   },
   samurai: {
     name: 'Samurai at Dusk',
-    rimFilter: 'drop-shadow(0 22px 50px rgba(0,0,0,0.7)) drop-shadow(0 0 32px rgba(220,90,85,0.52)) drop-shadow(0 0 10px rgba(152,43,53,0.42))',
-    colorGrading: 'saturate(112%) contrast(108%) brightness(93%)',
-    backlightColor: 'radial-gradient(ellipse at 80% 45%, rgba(220,90,85,0.38) 0%, rgba(152,43,53,0.2) 50%, transparent 75%)',
+    depthShadow: 'drop-shadow(0 26px 52px rgba(0,0,0,0.75))',
+    colorGrading: 'saturate(108%) contrast(106%) brightness(96%)',
+    backlightColor: 'radial-gradient(ellipse at 84% 45%, rgba(220,90,85,0.28) 0%, rgba(152,43,53,0.12) 50%, transparent 75%)',
     particleColor: '#dc5a55',
     particleType: 'ember'
   },
   fuji: {
     name: 'Fuji at Twilight',
-    rimFilter: 'drop-shadow(0 20px 45px rgba(0,0,0,0.65)) drop-shadow(0 0 30px rgba(126,156,216,0.42)) drop-shadow(0 0 10px rgba(228,104,118,0.28))',
-    colorGrading: 'hue-rotate(-4deg) saturate(102%) contrast(104%) brightness(95%)',
-    backlightColor: 'radial-gradient(ellipse at 70% 60%, rgba(126,156,216,0.28) 0%, rgba(228,104,118,0.16) 48%, transparent 72%)',
+    depthShadow: 'drop-shadow(0 26px 52px rgba(0,0,0,0.7))',
+    colorGrading: 'hue-rotate(-2deg) saturate(102%) contrast(103%) brightness(97%)',
+    backlightColor: 'radial-gradient(ellipse at 78% 55%, rgba(126,156,216,0.22) 0%, rgba(228,104,118,0.1) 48%, transparent 72%)',
     particleColor: '#7e9cd8',
     particleType: 'mist'
   },
   sakura: {
     name: 'Moonlit Sakura',
-    rimFilter: 'drop-shadow(0 20px 45px rgba(0,0,0,0.65)) drop-shadow(0 0 30px rgba(210,126,153,0.42)) drop-shadow(0 0 10px rgba(242,236,214,0.32))',
-    colorGrading: 'hue-rotate(4deg) saturate(105%) contrast(103%) brightness(96%)',
-    backlightColor: 'radial-gradient(ellipse at 75% 45%, rgba(210,126,153,0.28) 0%, rgba(242,236,214,0.15) 45%, transparent 70%)',
+    depthShadow: 'drop-shadow(0 26px 52px rgba(0,0,0,0.7))',
+    colorGrading: 'hue-rotate(3deg) saturate(104%) contrast(102%) brightness(98%)',
+    backlightColor: 'radial-gradient(ellipse at 80% 45%, rgba(210,126,153,0.22) 0%, rgba(242,236,214,0.1) 45%, transparent 70%)',
     particleColor: '#d27e99',
     particleType: 'petal'
   },
   kanagawa: {
     name: 'Kanagawa Minimal',
-    rimFilter: 'drop-shadow(0 20px 45px rgba(0,0,0,0.65)) drop-shadow(0 0 28px rgba(126,156,216,0.38)) drop-shadow(0 0 8px rgba(85,182,255,0.25))',
-    colorGrading: 'saturate(98%) contrast(105%) brightness(95%)',
-    backlightColor: 'radial-gradient(ellipse at 80% 60%, rgba(85,182,255,0.22) 0%, rgba(126,156,216,0.12) 50%, transparent 70%)',
+    depthShadow: 'drop-shadow(0 26px 52px rgba(0,0,0,0.7))',
+    colorGrading: 'saturate(99%) contrast(103%) brightness(97%)',
+    backlightColor: 'radial-gradient(ellipse at 82% 55%, rgba(85,182,255,0.18) 0%, rgba(126,156,216,0.08) 50%, transparent 70%)',
     particleColor: '#8fd0ea',
     particleType: 'cyan'
   }
@@ -73,35 +73,33 @@ export default function DesktopWorkspace({ wallpaper = 'kathmandu' }) {
       <div className="absolute inset-0 bg-gradient-to-r from-[#101522]/55 via-[#101522]/15 to-transparent pointer-events-none" />
       <div className="absolute inset-0 bg-gradient-to-b from-[#101522]/25 via-transparent to-[#101522]/35 sm:hidden pointer-events-none" />
 
-      {/* 2. THEME-ADAPTIVE ATMOSPHERIC BACKLIGHT (Projects depth behind Swastik) */}
+      {/* 2. THEME-ADAPTIVE ATMOSPHERIC BACKLIGHT (Soft ambient glow behind subject) */}
       <div
-        className="absolute bottom-0 right-0 w-[55vw] sm:w-[48vw] h-[85vh] transition-all duration-1000 ease-out pointer-events-none"
+        className="absolute bottom-0 right-0 w-[55vw] sm:w-[46vw] h-[86vh] transition-all duration-1000 ease-out pointer-events-none"
         style={{ background: theme.backlightColor }}
       />
 
-      {/* 3. SWASTIK'S PHOTO — LIVING WITHIN THE SCENE */}
+      {/* 3. SWASTIK'S PHOTO — CLEAN, BORDERLESS HIGH-RES ROYAL PORTRAIT */}
       <div
-        className="absolute bottom-0 right-[-9%] z-0 h-[64%] w-auto max-w-none min-[380px]:right-[-4%] sm:right-[4%] sm:h-[84%] sm:max-w-[48%] transition-transform duration-300 ease-out pointer-events-none select-none"
+        className="absolute bottom-0 right-[-3%] sm:right-[1%] z-0 h-[68%] sm:h-[88%] w-auto max-w-[85vw] sm:max-w-[48vw] transition-transform duration-300 ease-out pointer-events-none select-none flex items-end justify-end"
         style={{
-          transform: `translate3d(${mouseOffset.x * -14}px, ${mouseOffset.y * -8}px, 0)`
+          transform: `translate3d(${mouseOffset.x * -12}px, ${mouseOffset.y * -7}px, 0)`
         }}
       >
         {/* Breathing Subject Wrapper */}
-        <div className="relative w-full h-full animate-[subject-breathe_7s_ease-in-out_infinite]">
-          {/* Portrait Cutout with Theme Adaptation & Feathered Ground Contact */}
+        <div className="relative h-full w-auto flex items-end justify-end animate-[subject-breathe_7.5s_ease-in-out_infinite]">
+          {/* High-Res Defringed Portrait with Pure Depth Shadow (Zero Border / Outlines) */}
           <img
             src="/swastik-cutout.png"
             alt="Swastik Paudel"
             className="h-full w-auto object-contain object-bottom transition-all duration-1000 ease-out"
             style={{
-              filter: `${theme.colorGrading} ${theme.rimFilter}`,
-              maskImage: 'linear-gradient(to top, transparent 0%, rgba(0,0,0,0.6) 5%, black 14%, black 100%)',
-              WebkitMaskImage: 'linear-gradient(to top, transparent 0%, rgba(0,0,0,0.6) 5%, black 14%, black 100%)'
+              filter: `${theme.colorGrading} ${theme.depthShadow}`
             }}
           />
 
-          {/* Ground Horizon Fog Blend (Anchors silhouette seamlessly into the earth) */}
-          <div className="absolute bottom-0 inset-x-0 h-16 bg-gradient-to-t from-black/40 via-transparent to-transparent pointer-events-none" />
+          {/* Soft Ground Horizon Mist Blend */}
+          <div className="absolute bottom-0 inset-x-0 h-16 bg-gradient-to-t from-black/35 via-transparent to-transparent pointer-events-none" />
 
           {/* FOREGROUND ENVIRONMENTAL PARTICLES (Layered IN FRONT OF Swastik) */}
           <div className="absolute inset-0 pointer-events-none overflow-hidden z-10">
