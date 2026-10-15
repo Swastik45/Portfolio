@@ -208,7 +208,7 @@ export default function WindowFrame({
       </div>
 
       {/* Window Body Container */}
-      <div className="flex-1 overflow-y-auto overflow-x-hidden text-[#dcd7ba] text-sm relative overscroll-contain">
+      <div className="flex-1 min-h-0 flex flex-col overflow-hidden text-[#dcd7ba] text-sm relative overscroll-contain">
         {children}
       </div>
 
