@@ -36,6 +36,7 @@ const RESPONSE_CACHE = new Map()
 
 // Interactive Quick Prompt Chips
 const TOPICS = [
+  { label: '🎯 Role Fit (Jr vs Intern)', prompt: 'a jr senior or intern what role could he take' },
   { label: '⚡ Curl Public Activity (Live)', prompt: 'Curl and retrieve Swastik\'s live GitHub public activity, latest commits, and active repositories.' },
   { label: '🎓 Education & Current Year', prompt: 'What is your education, university degree, and current academic year?' },
   { label: '🔗 Social Media & Links', prompt: 'What are Swastik\'s official social media profiles, GitHub, and contact links?' },
@@ -68,29 +69,35 @@ const DEFAULT_TELEMETRY = {
   lastCurledAt: 'Live Synced'
 }
 
-// Compact, Token-Optimized System Prompt for Fast Dynamic Generation
+// Compact, Token-Optimized System Prompt for Fast Dynamic Generation with Critical Thinking
 function buildRagSystemPrompt(telemetry) {
   const t = telemetry || DEFAULT_TELEMETRY
-  return `You are the interactive AI assistant for Swastik Paudel's portfolio.
-You speak conversationally, directly, and specifically to whatever question the user asks.
-Do NOT output repetitive boilerplate templates or generic bullet dumps unless specifically requested.
+  return `You are the analytical AI persona for Swastik Paudel's portfolio.
+You are equipped with critical thinking, intellectual honesty, and deep contextual adaptability.
 
-Key Facts about Swastik:
+[SWASTIK PAUDEL PROFILE]
 - Name: Swastik Paudel (स्वास्तिक पौडेल)
 - Age: 21 years old (Born in 2005)
 - Location: Kathmandu, Nepal (UTC+5:45)
-- Education: 2nd Year Undergraduate in Computer Science / Information Technology (2024–Present) in Kathmandu, Nepal.
-- Work: Software Engineering Intern at Madargaach Holdings on prepNep (prepnep.com). Built sub-50ms test session state sync, offline buffer with IndexedDB, PostgreSQL & Redis caching. (Intern only, not senior/lead).
+- Academic Standing: 2nd Year Undergraduate (Sophomore, 2024–Present), Bachelor's in CS / IT in Kathmandu, Nepal.
+- Work Experience: Software Engineering Intern at Madargaach Holdings on prepNep (prepnep.com). Built sub-50ms test session state sync with WebSockets, client-side offline buffer with IndexedDB, PostgreSQL & Redis optimization. (Intern only, strictly not senior or lead).
 - GitHub: https://github.com/Swastik45 (${t.publicRepos} public repositories).
 - Social Links: LinkedIn (linkedin.com/in/swastik-paudel-591b61274/), Twitter/X (@SwastikPaudel45), WhatsApp (+977 976-7929476), Email (psamarpaudel@gmail.com).
-- Skills: TypeScript, React, Next.js, Rust (Bevy engine ECS), PostgreSQL, Redis, Docker, C, Python.
+- Skills: TypeScript, React 19, Next.js, Rust (Bevy engine ECS), PostgreSQL, Redis, Docker, C, Python.
 - Projects: prepNep, ShareAudit (fintech), GovAudit NP (civic data), CarbonCredit, Lumino, 2D arcade shooter in Rust.
 - Interests: Classic English rock & pop (Queen, Coldplay, Oasis, Elton John, Eagles, Radiohead).
 
-Directives:
-- Answer the user's specific question naturally and concisely.
-- Never replay the same generic introductory text for unrelated queries.
-- Keep tone confident, friendly, and authentic.`
+[CRITICAL THINKING & CANDIDATE EVALUATION DIRECTIVES]
+1. If asked career readiness or hiring level questions like "a jr senior or intern what role could he take":
+   - Senior Developer: Unrealistic (1/5). Swastik is 21 and a 2nd-year undergraduate; senior roles require 4-5+ years of system-level ownership, large architectural governance, and team leadership.
+   - Junior Software Engineer: Strong fit (4.5/5). Unlike typical 2nd-year students, he has shipped high-concurrency production systems, handled WebSockets state sync under load, and works natively in TypeScript, PostgreSQL, Redis, and Rust.
+   - Engineering Intern: Immediate top-tier fit (5/5) for competitive software engineering or systems internships.
+   Provide a concise markdown table with levels, fit scores, and critical rationale, followed by a crisp verdict.
+2. Directness & Brevity:
+   - Answer the user's specific question directly.
+   - Keep answers concise (under 130 words).
+   - Never output repetitive boilerplate paragraphs.
+   - Be engaging, articulate, concise, and truthful.`
 }
 
 // Infer relevant clickable action links from query & answer text
@@ -98,6 +105,12 @@ function inferActionLinks(text, query) {
   const combined = (text + ' ' + query).toLowerCase()
   const links = []
 
+  if (combined.includes('role') || combined.includes('readiness') || combined.includes('level') || combined.includes('fit') || combined.includes('hire') || combined.includes('junior') || combined.includes('senior')) {
+    links.push({ label: 'View Résumé', appId: 'resume' })
+    links.push({ label: 'prepNep Case Study', appId: 'experience' })
+    links.push({ label: 'Open WhatsApp', href: SOCIAL_LINKS.whatsapp })
+    links.push({ label: 'Compose Mail', appId: 'mail' })
+  }
   if (combined.includes('github') || combined.includes('repo') || combined.includes('activity') || combined.includes('curl')) {
     links.push({ label: 'Open GitHub', href: SOCIAL_LINKS.github })
   }
@@ -127,12 +140,45 @@ function inferActionLinks(text, query) {
   return links.filter((item, index, self) => index === self.findIndex((t) => t.label === item.label)).slice(0, 4)
 }
 
-// Intelligent, Query-Specific Conversational Engine (Never Generic)
+// Intelligent, Query-Specific Conversational Engine (Equipped with Critical Thinking)
 function synthesizeDirectRagResponse(query, telemetry) {
   const q = query.toLowerCase().trim()
   const t = telemetry || DEFAULT_TELEMETRY
 
-  // 1. Live GitHub Activity / Curl
+  // 1. Critical Role Readiness & Level Evaluator (Junior vs Senior vs Intern)
+  const isRoleReadinessQuery =
+    (q.includes('role') && (q.includes('intern') || q.includes('junior') || q.includes('jr') || q.includes('senior') || q.includes('take') || q.includes('fit') || q.includes('hire') || q.includes('apply') || q.includes('level') || q.includes('position'))) ||
+    q.includes('senior or intern') ||
+    q.includes('jr senior') ||
+    q.includes('jr or senior') ||
+    q.includes('junior or senior') ||
+    q.includes('what role') ||
+    q.includes('which role') ||
+    q.includes('what level') ||
+    q.includes('which level') ||
+    q.includes('hire as') ||
+    q.includes('hired as') ||
+    q.includes('can he be senior') ||
+    q.includes('is he a senior') ||
+    q.includes('is he senior') ||
+    q.includes('ready for senior') ||
+    q.includes('senior dev') ||
+    q.includes('senior developer') ||
+    q.includes('senior role')
+
+  if (isRoleReadinessQuery) {
+    return {
+      text: `### 🎯 Candidate Role Readiness Evaluation\n\n| Level | Fit Score | Objective Critical Assessment | Verdict |\n| :--- | :---: | :--- | :--- |\n| **Senior Developer** | **1 / 5** | Swastik is 21 and in his 2nd year of university. Senior roles demand 4–5+ years of cross-team architectural leadership, high-stakes system governance, and mentoring engineers. He does **not** claim to be senior. | ❌ **Not Realistic** |\n| **Junior Software Engineer** | **4.5 / 5** | Highly viable for full-time junior positions. Unlike a theoretical student, he has shipped high-concurrency production systems at prepNep (sub-50ms WebSocket state sync, Redis caching, IndexedDB offline persistence) and builds native Rust ECS engines. | ⭐ **Strong Sweet Spot** |\n| **Software Engineering Intern** | **5 / 5** | Exceptional, top-tier fit for competitive software engineering or distributed systems internships. Requires virtually zero onboarding on modern web and database stacks. | ⭐ **Immediate Impact** |\n\n**Recommendation & Strategic Verdict:**\n1. **Target Junior Software Engineer** roles where he can immediately own backend/frontend features, optimize database queries, and contribute to production services under experienced leadership.\n2. **Target Software Engineering Internships** at premier product companies or fast-scaling tech startups for high-velocity execution.\n3. **Senior Developer** positions are aspirational and should be pursued after 3–4 years of multi-system leadership.`,
+      links: [
+        { label: 'View Résumé', appId: 'resume' },
+        { label: 'prepNep Case Study', appId: 'experience' },
+        { label: 'Open WhatsApp', href: SOCIAL_LINKS.whatsapp },
+        { label: 'Compose Mail', appId: 'mail' }
+      ]
+    }
+  }
+
+  // 2. Live GitHub Activity / Curl
   if (q.includes('curl') || q.includes('activity') || q.includes('commit') || q.includes('recent push') || q.includes('github activity')) {
     const reposList = t.topRepos ? t.topRepos.slice(0, 3).map(r => `• **[${r.name}](${r.url || 'https://github.com/Swastik45/' + r.name})** (${r.lang}) — ${r.desc}`).join('\n') : ''
     const eventsList = t.recentEvents ? t.recentEvents.slice(0, 3).map(e => `• \`${e.type}\` on **${e.repo}** (${e.time})`).join('\n') : ''
@@ -146,18 +192,19 @@ function synthesizeDirectRagResponse(query, telemetry) {
     }
   }
 
-  // 2. Greetings & Small Talk
+  // 3. Greetings & Small Talk
   if (q === 'hi' || q === 'hello' || q === 'hey' || q.startsWith('hi ') || q.startsWith('hello ') || q === 'yo' || q === 'sup') {
     return {
-      text: `Hey there! Great to meet you. I'm Swastik's AI assistant. Ask me anything about his projects (prepNep, ShareAudit, GovAudit, Rust engine), his 2nd-year Computer Science studies, tech stack, or verified social links!`,
+      text: `Hey there! Great to meet you. I'm Swastik's AI assistant. Ask me anything about his candidate role readiness (Junior vs Intern), his 2nd-year Computer Science studies, prepNep internship, Rust engine, tech stack, or verified social links!`,
       links: [
-        { label: 'Open GitHub', href: SOCIAL_LINKS.github },
-        { label: 'Explore Projects', appId: 'projects' }
+        { label: '🎯 Role Fit (Jr vs Intern)', prompt: 'a jr senior or intern what role could he take' },
+        { label: 'Explore Projects', appId: 'projects' },
+        { label: 'Open GitHub', href: SOCIAL_LINKS.github }
       ]
     }
   }
 
-  // 3. Age & Birthday
+  // 4. Age & Birthday
   if (q.includes('age') || q.includes('how old') || q.includes('years old') || q.includes('born') || q.includes('birthday')) {
     return {
       text: `Swastik is **21 years old** (born in 2005) and lives in Kathmandu, Nepal.`,
@@ -168,8 +215,8 @@ function synthesizeDirectRagResponse(query, telemetry) {
     }
   }
 
-  // 4. Education & University
-  if (q.includes('education') || q.includes('degree') || q.includes('college') || q.includes('university') || q.includes('study') || q.includes('studied') || q.includes('semester') || q.includes('year')) {
+  // 5. Education & University (2nd Year Undergrad)
+  if (q.includes('education') || q.includes('degree') || q.includes('college') || q.includes('university') || q.includes('study') || q.includes('studied') || q.includes('semester') || q.includes('academic') || q.includes('undergrad') || (q.includes('year') && !q.includes('old'))) {
     return {
       text: `Swastik is currently in his **2nd year of undergraduate studies** (Sophomore, 2024–Present) pursuing a Bachelor's in Computer Science / Information Technology in Kathmandu, Nepal.\n\nHis academic curriculum covers Data Structures & Algorithms, Relational Database Systems (PostgreSQL), Operating Systems, and Networking protocols.`,
       links: [
@@ -179,7 +226,7 @@ function synthesizeDirectRagResponse(query, telemetry) {
     }
   }
 
-  // 5. Name & Identity
+  // 6. Name & Identity
   if (q.includes('who are you') || q.includes('who is swastik') || q.includes('your name') || q.includes('full name')) {
     return {
       text: `Swastik Paudel (स्वास्तिक पौडेल) is a 21-year-old software engineer and full-stack systems developer from Kathmandu, Nepal. He is a 2nd-year Computer Science undergraduate and interned on prepNep at Madargaach Holdings.`,
@@ -190,7 +237,7 @@ function synthesizeDirectRagResponse(query, telemetry) {
     }
   }
 
-  // 6. Social Media & Links
+  // 7. Social Media & Links
   if (q.includes('social') || q.includes('linkedin') || q.includes('twitter') || q.includes('x.com') || q.includes('whatsapp') || q.includes('link') || q.includes('profile')) {
     return {
       text: `Here are Swastik's verified links:\n\n• **GitHub**: [github.com/Swastik45](${SOCIAL_LINKS.github})\n• **LinkedIn**: [linkedin.com/in/swastik-paudel](${SOCIAL_LINKS.linkedin})\n• **Twitter / X**: [@SwastikPaudel45](${SOCIAL_LINKS.twitter})\n• **WhatsApp**: [+977 976-7929476](${SOCIAL_LINKS.whatsapp})\n• **Email**: [psamarpaudel@gmail.com](mailto:${SOCIAL_LINKS.email})`,
@@ -202,8 +249,8 @@ function synthesizeDirectRagResponse(query, telemetry) {
     }
   }
 
-  // 7. prepNep / Internship
-  if (q.includes('intern') || q.includes('prepnep') || q.includes('madargaach') || q.includes('job') || q.includes('work experience')) {
+  // 8. prepNep / Past Work Experience (Guarded against Role & Hire queries)
+  if ((q.includes('prepnep') || q.includes('madargaach')) || ((q.includes('intern') || q.includes('job') || q.includes('work experience') || q.includes('previous experience')) && !q.includes('role') && !q.includes('hire') && !q.includes('take') && !q.includes('level') && !q.includes('senior') && !q.includes('junior'))) {
     return {
       text: `Swastik completed a **Software Engineering Internship** at **Madargaach Holdings** working on **prepNep** (prepnep.com), an exam preparation platform serving thousands of students across Nepal.\n\nHe focused on real-time test session state synchronization (<50ms) using WebSockets, client-side offline recovery with IndexedDB, and PostgreSQL/Redis performance optimization.`,
       links: [
@@ -213,7 +260,57 @@ function synthesizeDirectRagResponse(query, telemetry) {
     }
   }
 
-  // 8. Projects Overview
+  // 9. Weaknesses & Critical Hiring Evaluation
+  if (q.includes('weakness') || q.includes('why hire') || q.includes('why should') || q.includes('pros and cons')) {
+    return {
+      text: `### ⚖️ Objective Strengths & Considerations\n\n**Key Strengths:**\n• **Production Proof**: Shipped sub-50ms WebSocket synchronization and PostgreSQL/Redis optimization on prepNep for thousands of active users.\n• **Systems Versatility**: Moves fluidly between high-level React/Next.js platforms and low-level Rust systems (Bevy ECS).\n• **Autonomous Delivery**: Designs, tests, and deploys full-stack software independently.\n\n**Honest Considerations:**\n• **Academic Schedule**: As a 2nd-year undergraduate, full-time on-site commitments during semester require flexible scheduling or remote collaboration.\n• **Enterprise Monoliths**: Focus has been on modern TypeScript, Rust, and Next.js rather than legacy enterprise frameworks (e.g. Java Spring, .NET Framework).`,
+      links: [
+        { label: 'View Résumé', appId: 'resume' },
+        { label: 'prepNep Case Study', appId: 'experience' },
+        { label: 'Open WhatsApp', href: SOCIAL_LINKS.whatsapp }
+      ]
+    }
+  }
+
+  // 10. Specific Flagship Projects
+  if (q.includes('shareaudit')) {
+    return {
+      text: `**ShareAudit** ([share-audit.vercel.app](https://share-audit.vercel.app)) is a FinTech portfolio audit & dividend yield engine built by Swastik. It features real-time capital gain calculations, dividend yield projections, and tax ledger audits.`,
+      links: [
+        { label: 'Explore ShareAudit', appId: 'projects' },
+        { label: 'Open GitHub', href: SOCIAL_LINKS.github }
+      ]
+    }
+  }
+  if (q.includes('govaudit') || q.includes('gov audit')) {
+    return {
+      text: `**GovAudit NP** ([gova-audit-np.vercel.app](https://gova-audit-np.vercel.app)) is a civic public expenditure watchdog designed to audit municipal budgets and fiscal allocations across Nepal with interactive visualizations.`,
+      links: [
+        { label: 'Explore GovAudit NP', appId: 'projects' },
+        { label: 'Open GitHub', href: SOCIAL_LINKS.github }
+      ]
+    }
+  }
+  if (q.includes('carbon') || q.includes('credit')) {
+    return {
+      text: `**CarbonCredit** ([carbon-credit1.vercel.app](https://carbon-credit1.vercel.app)) is a decentralized ecological carbon offset ledger featuring transparent verification algorithms and interactive environmental auditing.`,
+      links: [
+        { label: 'Explore CarbonCredit', appId: 'projects' },
+        { label: 'Open GitHub', href: SOCIAL_LINKS.github }
+      ]
+    }
+  }
+  if (q.includes('lumino')) {
+    return {
+      text: `**Lumino** ([lumino-five.vercel.app](https://lumino-five.vercel.app)) is a fluid AI visual search platform engineered with Next.js and Tailwind CSS, achieving a flawless 100/100 Lighthouse performance benchmark.`,
+      links: [
+        { label: 'Explore Lumino', appId: 'projects' },
+        { label: 'Open GitHub', href: SOCIAL_LINKS.github }
+      ]
+    }
+  }
+
+  // 11. Projects Overview
   if (q.includes('project') || q.includes('built') || q.includes('showcase') || q.includes('apps') || q.includes('portfolio')) {
     return {
       text: `Swastik's flagship projects include:\n\n1. **prepNep** — High-concurrency educational exam engine ([prepnep.com](https://prepnep.com))\n2. **ShareAudit** — Financial portfolio and dividend analytics ([share-audit.vercel.app](https://share-audit.vercel.app))\n3. **GovAudit NP** — Civic municipal expenditure transparency watchdog ([gova-audit-np.vercel.app](https://gova-audit-np.vercel.app))\n4. **CarbonCredit** — Ecological carbon offset ledger ([carbon-credit1.vercel.app](https://carbon-credit1.vercel.app))\n5. **Lumino** — Fluid image discovery UI with 100 Lighthouse score ([lumino-five.vercel.app](https://lumino-five.vercel.app))\n6. **2D Shooting Game** — Deterministic arcade engine in Rust with Bevy ECS locked at 120 FPS.`,
@@ -224,10 +321,22 @@ function synthesizeDirectRagResponse(query, telemetry) {
     }
   }
 
-  // 9. Technical Skills & Languages
-  if (q.includes('skill') || q.includes('stack') || q.includes('tech') || q.includes('language') || q.includes('rust') || q.includes('python') || q.includes('typescript')) {
+  // 12. Rust & Low-Level Systems
+  if (q.includes('rust') || q.includes('bevy') || q.includes('arcade') || q.includes('systems') || q.includes('low level') || q.includes('c/c++') || q.includes('c language')) {
     return {
-      text: `Swastik's core tech stack spans:\n\n• **Languages**: TypeScript, JavaScript, Rust, Python, C/C++, SQL\n• **Frontend**: React 19, Next.js, Tailwind CSS, Redux Toolkit, WebSockets\n• **Backend & Storage**: Node.js, Express, PostgreSQL, Redis, REST APIs\n• **Systems & DevOps**: Docker, Linux/Unix, Git, CI/CD, Bevy ECS Engine`,
+      text: `Swastik develops low-level systems in **Rust** and **C**:\n\n• **Rust & Bevy ECS**: Built a deterministic 2D arcade shooter running at a locked 120 FPS using Entity Component System (ECS) architecture and zero-cost abstractions.\n• **C Systems Programming**: Developed a terminal Library Management System with custom memory management, pointer-based CRUD, and book issue/fine calculation algorithms.`,
+      links: [
+        { label: 'Explore Projects', appId: 'projects' },
+        { label: 'View Résumé', appId: 'resume' },
+        { label: 'Open GitHub', href: SOCIAL_LINKS.github }
+      ]
+    }
+  }
+
+  // 13. Technical Skills & Stack
+  if (q.includes('skill') || q.includes('stack') || q.includes('tech') || q.includes('language') || q.includes('python') || q.includes('typescript') || q.includes('database') || q.includes('postgres') || q.includes('redis')) {
+    return {
+      text: `Swastik's core tech stack spans:\n\n• **Languages**: TypeScript, JavaScript, Rust, Python, C/C++, SQL\n• **Frontend**: React 19, Next.js, Tailwind CSS, Redux Toolkit, WebSockets\n• **Backend & Storage**: Node.js, Express, PostgreSQL, Redis, REST APIs, IndexedDB\n• **Systems & DevOps**: Docker, Linux/Unix, Git, CI/CD, Bevy ECS Engine`,
       links: [
         { label: 'Open Skills Matrix', appId: 'skills' },
         { label: 'View Résumé', appId: 'resume' }
@@ -235,10 +344,10 @@ function synthesizeDirectRagResponse(query, telemetry) {
     }
   }
 
-  // 10. Contact / Hiring
+  // 14. Contact / Hiring Inquiry
   if (q.includes('hire') || q.includes('contact') || q.includes('email') || q.includes('phone') || q.includes('reach') || q.includes('message')) {
     return {
-      text: `Swastik is open to software engineering internships, remote roles, and contract collaborations.\n\nYou can email him at [psamarpaudel@gmail.com](mailto:${SOCIAL_LINKS.email}) or message him directly on WhatsApp at [+977 976-7929476](${SOCIAL_LINKS.whatsapp}).`,
+      text: `Swastik is open to software engineering internships, junior developer roles, and contract collaborations.\n\nYou can email him directly at [psamarpaudel@gmail.com](mailto:${SOCIAL_LINKS.email}) or reach out on WhatsApp at [+977 976-7929476](${SOCIAL_LINKS.whatsapp}).`,
       links: [
         { label: 'Compose Mail', appId: 'mail' },
         { label: 'Open WhatsApp', href: SOCIAL_LINKS.whatsapp },
@@ -247,10 +356,10 @@ function synthesizeDirectRagResponse(query, telemetry) {
     }
   }
 
-  // 11. Music & Hobbies
+  // 15. Music & Interests
   if (q.includes('music') || q.includes('song') || q.includes('hobby') || q.includes('hobbies') || q.includes('free time') || q.includes('coldplay')) {
     return {
-      text: `Swastik is a big fan of classic English anthems—especially Queen (*Bohemian Rhapsody*), Coldplay (*Yellow*, *Viva La Vida*), Oasis (*Wonderwall*), and Radiohead (*Creep*). You can listen to full tracks inside the desktop Music app!`,
+      text: `Swastik is a big fan of classic English rock & pop anthems—especially Queen (*Bohemian Rhapsody*), Coldplay (*Yellow*, *Viva La Vida*), Oasis (*Wonderwall*), and Radiohead (*Creep*). You can listen to full tracks inside the desktop Music app!`,
       links: [
         { label: 'Launch Music Player', appId: 'music' }
       ]
@@ -261,73 +370,223 @@ function synthesizeDirectRagResponse(query, telemetry) {
   return {
     text: `Regarding "${query}":\n\nSwastik Paudel is a 21-year-old software engineer and 2nd-year Computer Science undergraduate in Kathmandu, Nepal. His work centers on full-stack web platforms (Next.js, TypeScript), Rust systems, and high-concurrency state synchronization.\n\nWhat specific aspect of his work, projects, or background would you like to explore?`,
     links: [
+      { label: '🎯 Role Readiness (Jr vs Intern)', prompt: 'a jr senior or intern what role could he take' },
       { label: 'Open GitHub', href: SOCIAL_LINKS.github },
       { label: 'Browse Projects', appId: 'projects' }
     ]
   }
 }
 
-// Helper to render bold markdown (**bold**) and links cleanly
+// Pre-seed cache with instant critical thinking answers for instant 0ms responses
+const PRESEED_QUERIES = [
+  'a jr senior or intern what role could he take',
+  'what role could he take',
+  'what role can he take',
+  'senior or intern',
+  'jr senior or intern',
+  'junior or senior or intern',
+  'what level should he be hired as',
+  'can he be senior',
+  'is he a senior developer'
+]
+PRESEED_QUERIES.forEach((q) => {
+  const answer = synthesizeDirectRagResponse(q, DEFAULT_TELEMETRY)
+  RESPONSE_CACHE.set(q.toLowerCase(), { ...answer, source: 'pollinations-rag' })
+})
+
+// Render inline text formatting (bold, inline code, and clickable links)
+function renderInline(text) {
+  if (!text) return null
+  const linkRegex = /\[([^\]]+)\]\(([^)]+)\)/g
+  const boldRegex = /(\*\*[^*]+\*\*)/g
+
+  const lineParts = []
+  let lastIndex = 0
+  let match
+
+  while ((match = linkRegex.exec(text)) !== null) {
+    if (match.index > lastIndex) {
+      lineParts.push({ type: 'text', content: text.slice(lastIndex, match.index) })
+    }
+    lineParts.push({ type: 'link', label: match[1], url: match[2] })
+    lastIndex = linkRegex.lastIndex
+  }
+  if (lastIndex < text.length) {
+    lineParts.push({ type: 'text', content: text.slice(lastIndex) })
+  }
+
+  return lineParts.map((segment, sIdx) => {
+    if (segment.type === 'link') {
+      return (
+        <a
+          key={sIdx}
+          href={segment.url}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-[#7e9cd8] underline underline-offset-2 hover:text-[#9bb7f0] font-medium"
+        >
+          {segment.label}
+        </a>
+      )
+    }
+
+    const parts = segment.content.split(boldRegex)
+    return parts.map((part, pIdx) => {
+      if (part.startsWith('**') && part.endsWith('**')) {
+        return (
+          <strong key={`${sIdx}-${pIdx}`} className="font-bold text-white">
+            {part.slice(2, -2)}
+          </strong>
+        )
+      }
+      if (part.startsWith('`') && part.endsWith('`')) {
+        return (
+          <code key={`${sIdx}-${pIdx}`} className="px-1.5 py-0.5 rounded bg-white/10 font-mono text-[11px] text-[#e0af68]">
+            {part.slice(1, -1)}
+          </code>
+        )
+      }
+      return part
+    })
+  })
+}
+
+// Block-level markdown parser supporting tables, headings, lists, and formatted text
 function renderFormattedMessage(text) {
   if (!text) return null
-  const lines = text.split('\n')
-  return lines.map((line, lIdx) => {
-    const linkRegex = /\[([^\]]+)\]\(([^)]+)\)/g
-    const boldRegex = /(\*\*[^*]+\*\*)/g
+  const rawLines = text.split('\n')
+  const blocks = []
+  let i = 0
 
-    const lineParts = []
-    let lastIndex = 0
-    let match
+  while (i < rawLines.length) {
+    const line = rawLines[i]
+    const trimmed = line.trim()
 
-    while ((match = linkRegex.exec(line)) !== null) {
-      if (match.index > lastIndex) {
-        lineParts.push({ type: 'text', content: line.slice(lastIndex, match.index) })
+    // Detect Markdown Table: line contains | and ends with |
+    if (trimmed.startsWith('|') && trimmed.endsWith('|') && trimmed.includes('|')) {
+      const tableLines = []
+      while (i < rawLines.length && rawLines[i].trim().startsWith('|') && rawLines[i].trim().endsWith('|')) {
+        tableLines.push(rawLines[i].trim())
+        i++
       }
-      lineParts.push({ type: 'link', label: match[1], url: match[2] })
-      lastIndex = linkRegex.lastIndex
+
+      if (tableLines.length >= 2) {
+        const splitRow = (rowStr) =>
+          rowStr
+            .replace(/^\|/, '')
+            .replace(/\|$/, '')
+            .split('|')
+            .map((c) => c.trim())
+
+        const headers = splitRow(tableLines[0])
+        const hasSeparator = tableLines.length > 1 && /^\|?(\s*:?-+:?\s*\|)+\s*:?-+:?\s*\|?$/.test(tableLines[1])
+        const startRowIdx = hasSeparator ? 2 : 1
+        const rows = tableLines.slice(startRowIdx).map(splitRow)
+
+        blocks.push({ type: 'table', headers, rows })
+        continue
+      }
     }
-    if (lastIndex < line.length) {
-      lineParts.push({ type: 'text', content: line.slice(lastIndex) })
+
+    // Detect Headings
+    if (trimmed.startsWith('### ') || trimmed.startsWith('## ') || trimmed.startsWith('# ')) {
+      const level = trimmed.match(/^#+/)[0].length
+      blocks.push({ type: 'heading', level, content: trimmed.replace(/^#+\s*/, '') })
+      i++
+      continue
+    }
+
+    // Detect Bullets
+    if (/^[•\-*]\s+/.test(trimmed)) {
+      blocks.push({ type: 'bullet', content: trimmed.replace(/^[•\-*]\s+/, '') })
+      i++
+      continue
+    }
+
+    // Detect Numbered List
+    if (/^\d+\.\s+/.test(trimmed)) {
+      const numMatch = trimmed.match(/^(\d+)\.\s+(.*)/)
+      blocks.push({ type: 'numbered', num: numMatch[1], content: numMatch[2] })
+      i++
+      continue
+    }
+
+    // Detect Empty Line
+    if (trimmed === '') {
+      blocks.push({ type: 'empty' })
+      i++
+      continue
+    }
+
+    // Default Paragraph Line
+    blocks.push({ type: 'paragraph', content: line })
+    i++
+  }
+
+  return blocks.map((block, bIdx) => {
+    if (block.type === 'table') {
+      return (
+        <div key={bIdx} className="overflow-x-auto my-2.5 rounded-xl border border-white/10 bg-[#14141e]/80 shadow-md">
+          <table className="min-w-full divide-y divide-white/10 text-xs text-left">
+            <thead className="bg-white/5 text-[#938aa9]">
+              <tr>
+                {block.headers.map((h, hIdx) => (
+                  <th key={hIdx} className="px-3 py-2 text-[11px] font-semibold text-white/90">
+                    {renderInline(h)}
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-white/5">
+              {block.rows.map((row, rIdx) => (
+                <tr key={rIdx} className="hover:bg-white/[0.03] transition-colors">
+                  {row.map((cell, cIdx) => (
+                    <td key={cIdx} className="px-3 py-2 text-[11px] leading-relaxed text-[#dcd7ba] align-top">
+                      {renderInline(cell)}
+                    </td>
+                  ))}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )
+    }
+
+    if (block.type === 'heading') {
+      return (
+        <h4 key={bIdx} className="text-xs sm:text-sm font-bold text-white mt-3 mb-1.5 flex items-center gap-1.5">
+          {renderInline(block.content)}
+        </h4>
+      )
+    }
+
+    if (block.type === 'bullet') {
+      return (
+        <div key={bIdx} className="flex items-start gap-2 pl-1 py-0.5 text-xs sm:text-[13px] leading-relaxed">
+          <span className="text-[#7e9cd8] font-bold mt-0.5 shrink-0">•</span>
+          <div className="flex-1 text-[#dcd7ba]">{renderInline(block.content)}</div>
+        </div>
+      )
+    }
+
+    if (block.type === 'numbered') {
+      return (
+        <div key={bIdx} className="flex items-start gap-2 pl-1 py-0.5 text-xs sm:text-[13px] leading-relaxed">
+          <span className="text-[#e0af68] font-mono text-[11px] font-bold mt-0.5 shrink-0">{block.num}.</span>
+          <div className="flex-1 text-[#dcd7ba]">{renderInline(block.content)}</div>
+        </div>
+      )
+    }
+
+    if (block.type === 'empty') {
+      return <div key={bIdx} className="h-2" />
     }
 
     return (
-      <React.Fragment key={lIdx}>
-        {lineParts.map((segment, sIdx) => {
-          if (segment.type === 'link') {
-            return (
-              <a
-                key={sIdx}
-                href={segment.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-[#7e9cd8] underline underline-offset-2 hover:text-[#9bb7f0] font-medium"
-              >
-                {segment.label}
-              </a>
-            )
-          }
-
-          const parts = segment.content.split(boldRegex)
-          return parts.map((part, pIdx) => {
-            if (part.startsWith('**') && part.endsWith('**')) {
-              return (
-                <strong key={`${sIdx}-${pIdx}`} className="font-bold text-white">
-                  {part.slice(2, -2)}
-                </strong>
-              )
-            }
-            if (part.startsWith('`') && part.endsWith('`')) {
-              return (
-                <code key={`${sIdx}-${pIdx}`} className="px-1.5 py-0.5 rounded bg-white/10 font-mono text-[11px] text-[#e0af68]">
-                  {part.slice(1, -1)}
-                </code>
-              )
-            }
-            return part
-          })
-        })}
-        {lIdx < lines.length - 1 && <br />}
-      </React.Fragment>
+      <div key={bIdx} className="text-xs sm:text-[13px] leading-relaxed text-[#dcd7ba]">
+        {renderInline(block.content)}
+      </div>
     )
   })
 }
@@ -339,9 +598,10 @@ export default function AskSwastikApp({ onOpenApp }) {
     {
       id: 1,
       role: 'assistant',
-      text: "Hello! I am Swastik's **AI Knowledge Engine**, powered by **Pollinations.ai + real-time RAG**.\n\nI can curl live GitHub data, inspect his 2nd-year Computer Science education, age (21), verified social links, prepNep internship, or flagship systems projects.\n\nWhat would you like to explore?",
+      text: "Hello! I am Swastik's **AI Knowledge Engine**, powered by **Pollinations.ai + real-time RAG**.\n\nI am equipped with critical thinking and live telemetry. Ask me anything about his candidate role readiness (Junior vs Intern), 2nd-year Computer Science studies, age (21), verified social links, prepNep internship, or flagship systems projects.\n\nWhat would you like to explore?",
       source: 'pollinations-rag',
       links: [
+        { label: '🎯 Role Fit (Jr vs Intern)', prompt: 'a jr senior or intern what role could he take' },
         { label: '⚡ Curl Public Activity', prompt: 'Curl and retrieve Swastik\'s live GitHub public activity, latest commits, and active repositories.' },
         { label: '🎓 Education & Current Year', prompt: 'What is your education, university degree, and current academic year?' },
         { label: '🔗 Social Media & Links', href: SOCIAL_LINKS.github },
@@ -493,7 +753,7 @@ export default function AskSwastikApp({ onOpenApp }) {
     }, 16)
   }
 
-  // Handle User Inquiry
+  // Handle User Inquiry with Multi-Tiered Intelligent Resolution
   const handleAsk = async (query) => {
     if (!query.trim()) return
 
@@ -503,7 +763,7 @@ export default function AskSwastikApp({ onOpenApp }) {
     setInput('')
     setMessages((prev) => [...prev, { id: Date.now(), role: 'user', text: userText }])
 
-    // Fast cache lookup for exact repeats
+    // Fast cache lookup for exact repeats (0ms instant response)
     if (RESPONSE_CACHE.has(cacheKey)) {
       const cached = RESPONSE_CACHE.get(cacheKey)
       streamResponse(cached.text, cached.links, cached.source)
@@ -519,57 +779,84 @@ export default function AskSwastikApp({ onOpenApp }) {
 
     setIsTyping(true)
 
-    // Build RAG prompt with current telemetry
-    const ragPrompt = buildRagSystemPrompt(telemetry)
+    const historyContext = messages.slice(-3).map((m) => ({
+      role: m.role === 'assistant' ? 'assistant' : 'user',
+      content: m.text
+    }))
+
     let aiText = ''
+    let aiSource = 'pollinations-rag'
 
+    // Step 1: Serverless Function (/api/ask) with critical thinking directives & CORS avoidance
     try {
-      // 14-second budget for Pollinations.ai generation
-      const controller = new AbortController()
-      const timeoutId = setTimeout(() => controller.abort(), 14000)
+      const apiController = new AbortController()
+      const apiTimeoutId = setTimeout(() => apiController.abort(), 12000)
 
-      const historyContext = messages.slice(-3).map((m) => ({
-        role: m.role === 'assistant' ? 'assistant' : 'user',
-        content: m.text
-      }))
-
-      const response = await fetch('https://text.pollinations.ai/', {
+      const apiRes = await fetch('/api/ask', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          messages: [
-            { role: 'system', content: ragPrompt },
-            ...historyContext,
-            { role: 'user', content: userText }
-          ],
-          model: 'openai-fast',
-          seed: Math.floor(Math.random() * 100000)
-        }),
-        signal: controller.signal
+        body: JSON.stringify({ query: userText, history: historyContext }),
+        signal: apiController.signal
       })
 
-      clearTimeout(timeoutId)
+      clearTimeout(apiTimeoutId)
 
-      if (response.ok) {
-        const text = await response.text()
-        // Ensure response is valid text and not an error object or empty
-        if (text && text.trim() && !text.includes('"error"') && text.length > 5) {
-          aiText = text.trim()
+      if (apiRes.ok) {
+        const data = await apiRes.json()
+        if (data && data.text && data.text.length > 5) {
+          aiText = data.text.trim()
+          aiSource = 'pollinations-rag'
         }
       }
-    } catch (fetchErr) {
-      void fetchErr
+    } catch (apiErr) {
+      void apiErr
     }
 
-    // If online generative response succeeded, stream it and cache it
+    // Step 2: Direct Pollinations.ai fallback (with 10-second budget)
+    if (!aiText) {
+      try {
+        const ragPrompt = buildRagSystemPrompt(telemetry)
+        const pollController = new AbortController()
+        const pollTimeoutId = setTimeout(() => pollController.abort(), 10000)
+
+        const response = await fetch('https://text.pollinations.ai/', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            messages: [
+              { role: 'system', content: ragPrompt },
+              ...historyContext,
+              { role: 'user', content: userText }
+            ],
+            model: 'openai-fast',
+            seed: Math.floor(Math.random() * 100000)
+          }),
+          signal: pollController.signal
+        })
+
+        clearTimeout(pollTimeoutId)
+
+        if (response.ok) {
+          const text = await response.text()
+          if (text && text.trim() && !text.includes('"error"') && text.length > 5) {
+            aiText = text.trim()
+            aiSource = 'pollinations-rag'
+          }
+        }
+      } catch (pollErr) {
+        void pollErr
+      }
+    }
+
+    // Step 3: If online generative response succeeded, stream it and cache it
     if (aiText) {
       const dynamicLinks = inferActionLinks(aiText, userText)
-      RESPONSE_CACHE.set(cacheKey, { text: aiText, links: dynamicLinks, source: 'pollinations-rag' })
-      streamResponse(aiText, dynamicLinks, 'pollinations-rag')
+      RESPONSE_CACHE.set(cacheKey, { text: aiText, links: dynamicLinks, source: aiSource })
+      streamResponse(aiText, dynamicLinks, aiSource)
       return
     }
 
-    // Dynamic, question-specific fallback (never generic)
+    // Step 4: Intelligent, Critical Local RAG Fallback (0ms, structured, analytical)
     const fallback = synthesizeDirectRagResponse(userText, telemetry)
     RESPONSE_CACHE.set(cacheKey, { ...fallback, source: 'local-rag' })
     streamResponse(fallback.text, fallback.links, 'local-rag')
