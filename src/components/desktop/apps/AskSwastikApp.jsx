@@ -17,8 +17,7 @@ import {
   Cpu,
   GraduationCap,
   Activity,
-  Bot,
-  Zap
+  Bot
 } from 'lucide-react'
 import { soundFX } from '../soundEffects'
 
@@ -32,7 +31,7 @@ const SOCIAL_LINKS = {
   portfolio: 'https://swastik-portfolio-eight.vercel.app'
 }
 
-// In-Memory Fast Cache for Instant 0ms Responses
+// In-Memory Fast Cache for Instant 0ms Responses on exact repeats
 const RESPONSE_CACHE = new Map()
 
 // Interactive Quick Prompt Chips
@@ -69,65 +68,29 @@ const DEFAULT_TELEMETRY = {
   lastCurledAt: 'Live Synced'
 }
 
-// Compact, Token-Optimized System Prompt for Fast Generation
+// Compact, Token-Optimized System Prompt for Fast Dynamic Generation
 function buildRagSystemPrompt(telemetry) {
   const t = telemetry || DEFAULT_TELEMETRY
-  return `You are the interactive AI persona representing Swastik Paudel on his official portfolio.
-Respond conversationally, thoughtfully, and directly to the user's specific question.
-Ground all answers strictly in this verified knowledge base:
+  return `You are the interactive AI assistant for Swastik Paudel's portfolio.
+You speak conversationally, directly, and specifically to whatever question the user asks.
+Do NOT output repetitive boilerplate templates or generic bullet dumps unless specifically requested.
 
-[IDENTITY & PROFILE]
+Key Facts about Swastik:
 - Name: Swastik Paudel (स्वास्तिक पौडेल)
 - Age: 21 years old (Born in 2005)
 - Location: Kathmandu, Nepal (UTC+5:45)
-- Title: Software Engineer & Full-Stack Systems Developer
-- Status: Open for Software Engineering roles, Backend/Full-Stack opportunities, and freelance work.
+- Education: 2nd Year Undergraduate in Computer Science / Information Technology (2024–Present) in Kathmandu, Nepal.
+- Work: Software Engineering Intern at Madargaach Holdings on prepNep (prepnep.com). Built sub-50ms test session state sync, offline buffer with IndexedDB, PostgreSQL & Redis caching. (Intern only, not senior/lead).
+- GitHub: https://github.com/Swastik45 (${t.publicRepos} public repositories).
+- Social Links: LinkedIn (linkedin.com/in/swastik-paudel-591b61274/), Twitter/X (@SwastikPaudel45), WhatsApp (+977 976-7929476), Email (psamarpaudel@gmail.com).
+- Skills: TypeScript, React, Next.js, Rust (Bevy engine ECS), PostgreSQL, Redis, Docker, C, Python.
+- Projects: prepNep, ShareAudit (fintech), GovAudit NP (civic data), CarbonCredit, Lumino, 2D arcade shooter in Rust.
+- Interests: Classic English rock & pop (Queen, Coldplay, Oasis, Elton John, Eagles, Radiohead).
 
-[EDUCATION & CURRENT YEAR]
-- Current Status: 2nd Year Undergraduate Student (Sophomore, 2024–Present)
-- Degree: Bachelor's in Computer Science / Information Technology
-- Location: Kathmandu, Nepal
-- Key Academic Topics: Data Structures & Algorithms, Database Systems (PostgreSQL, SQL), Operating Systems & Networking (TCP/IP, Sockets), Systems Architecture.
-- Academic & Practical Projects: Terminal Library Management System in C (CRUD with book loan and penalty logic), 2D arcade shooter engine in Rust (Bevy ECS), civic watchdog tools.
-
-[EXPERIENCE & INTERNSHIP]
-- Organization: Madargaach Holdings
-- Product: prepNep (prepnep.com) - Online digital examination platform in Nepal serving thousands of students.
-- Role: Software Engineering Intern (Note: Intern, never senior or lead).
-- Engineering Work:
-  * Sub-50ms test session state synchronization using WebSockets with HTTP fallback.
-  * Client-side offline buffering via IndexedDB preventing answer loss during network disconnects.
-  * Database query indexing with PostgreSQL and Redis caching.
-  * Maintained 99.9% uptime across national mock entrance exams.
-
-[LIVE GITHUB ACTIVITY & RECENT WORK]
-- GitHub: https://github.com/Swastik45
-- Total Public Repos: ${t.publicRepos}
-- Bio: "${t.bio}"
-
-[OFFICIAL SOCIAL MEDIA & CONTACTS]
-- GitHub: https://github.com/Swastik45
-- LinkedIn: https://www.linkedin.com/in/swastik-paudel-591b61274/
-- Twitter / X: https://x.com/SwastikPaudel45
-- WhatsApp: +977 976-7929476 (https://wa.me/9779767929476)
-- Email: psamarpaudel@gmail.com
-- Live Portfolio: https://swastik-portfolio-eight.vercel.app
-
-[FEATURED PROJECTS]
-1. prepNep (prepnep.com) — High-concurrency educational exam platform (Next.js, React, TypeScript, PostgreSQL, Redis, Docker).
-2. ShareAudit (share-audit.vercel.app) — Investment portfolio audit & dividend yield engine (React, TypeScript, Chart.js).
-3. GovAudit NP (gova-audit-np.vercel.app) — Municipal public expenditure watchdog (React, Open Government Data).
-4. CarbonCredit (carbon-credit1.vercel.app) — Verified ecological carbon credits registry (Next.js, React, Web3/Ledger).
-5. Lumino (lumino-five.vercel.app) — Fluid AI-powered visual search showcase with perfect 100/100 Lighthouse score.
-6. 2D Arcade Game — Deterministic systems shooter built in Rust using Bevy ECS architecture (locked 120 FPS).
-
-[CONVERSATION GUIDELINES]
-- Speak naturally and directly answer what the user asked.
-- Avoid repeating identical boilerplate lists or generic templates on every message.
-- If asked about age, say 21 years old.
-- If asked about education, say 2nd year undergraduate in Computer Science in Kathmandu.
-- If asked about work, mention software engineering internship on prepNep at Madargaach Holdings.
-- Keep responses engaging, accurate, and concise.`
+Directives:
+- Answer the user's specific question naturally and concisely.
+- Never replay the same generic introductory text for unrelated queries.
+- Keep tone confident, friendly, and authentic.`
 }
 
 // Infer relevant clickable action links from query & answer text
@@ -151,7 +114,7 @@ function inferActionLinks(text, query) {
     links.push({ label: 'prepNep Case Study', appId: 'experience' })
     links.push({ label: 'Visit prepnep.com', href: 'https://prepnep.com' })
   }
-  if (combined.includes('project') || combined.includes('shareaudit') || combined.includes('govaudit') || combined.includes('carboncredit') || combined.includes('lumino')) {
+  if (combined.includes('project') || combined.includes('shareaudit') || combined.includes('govaudit') || combined.includes('carboncredit') || combined.includes('lumino') || combined.includes('rust')) {
     links.push({ label: 'Explore Projects', appId: 'projects' })
   }
   if (combined.includes('resume') || combined.includes('cv') || combined.includes('education') || combined.includes('degree') || combined.includes('study')) {
@@ -164,18 +127,18 @@ function inferActionLinks(text, query) {
   return links.filter((item, index, self) => index === self.findIndex((t) => t.label === item.label)).slice(0, 4)
 }
 
-// Instant Conversational Response Synthesizer (<50ms Direct Generation)
+// Intelligent, Query-Specific Conversational Engine (Never Generic)
 function synthesizeDirectRagResponse(query, telemetry) {
   const q = query.toLowerCase().trim()
   const t = telemetry || DEFAULT_TELEMETRY
 
-  // Live GitHub Activity & Public Telemetry Curl
-  if (q.includes('curl') || q.includes('activity') || q.includes('event') || q.includes('recent push') || q.includes('commits')) {
+  // 1. Live GitHub Activity / Curl
+  if (q.includes('curl') || q.includes('activity') || q.includes('commit') || q.includes('recent push') || q.includes('github activity')) {
     const reposList = t.topRepos ? t.topRepos.slice(0, 3).map(r => `• **[${r.name}](${r.url || 'https://github.com/Swastik45/' + r.name})** (${r.lang}) — ${r.desc}`).join('\n') : ''
     const eventsList = t.recentEvents ? t.recentEvents.slice(0, 3).map(e => `• \`${e.type}\` on **${e.repo}** (${e.time})`).join('\n') : ''
 
     return {
-      text: `Here is the live curled telemetry from **Swastik's GitHub** (\`github.com/Swastik45\`):\n\n• **Public Repositories**: **${t.publicRepos}**\n• **Status**: ${t.lastCurledAt || 'Live'}\n• **Bio**: *"${t.bio}"*\n\n**Recent Activity:**\n${eventsList}\n\n**Featured Repositories:**\n${reposList}`,
+      text: `### ⚡ Live GitHub Public Activity (\`api.github.com\`)\n\n• **Public Repositories**: **${t.publicRepos}**\n• **Status**: ${t.lastCurledAt || 'Live'}\n• **Bio**: *"${t.bio}"*\n\n**Recent Activity:**\n${eventsList}\n\n**Active Repositories:**\n${reposList}`,
       links: [
         { label: 'Open GitHub Profile', href: SOCIAL_LINKS.github },
         { label: 'Browse Projects', appId: 'projects' }
@@ -183,10 +146,21 @@ function synthesizeDirectRagResponse(query, telemetry) {
     }
   }
 
-  // Age & Birthday specific query
+  // 2. Greetings & Small Talk
+  if (q === 'hi' || q === 'hello' || q === 'hey' || q.startsWith('hi ') || q.startsWith('hello ') || q === 'yo' || q === 'sup') {
+    return {
+      text: `Hey there! Great to meet you. I'm Swastik's AI assistant. Ask me anything about his projects (prepNep, ShareAudit, GovAudit, Rust engine), his 2nd-year Computer Science studies, tech stack, or verified social links!`,
+      links: [
+        { label: 'Open GitHub', href: SOCIAL_LINKS.github },
+        { label: 'Explore Projects', appId: 'projects' }
+      ]
+    }
+  }
+
+  // 3. Age & Birthday
   if (q.includes('age') || q.includes('how old') || q.includes('years old') || q.includes('born') || q.includes('birthday')) {
     return {
-      text: `Swastik is **21 years old** (born in 2005) and lives in Kathmandu, Nepal. He is currently in his 2nd year of undergraduate Computer Science studies and works as a full-stack software engineer focusing on web platforms and Rust systems.`,
+      text: `Swastik is **21 years old** (born in 2005) and lives in Kathmandu, Nepal.`,
       links: [
         { label: 'View Résumé', appId: 'resume' },
         { label: 'Open About Bio', appId: 'about' }
@@ -194,10 +168,10 @@ function synthesizeDirectRagResponse(query, telemetry) {
     }
   }
 
-  // Education & University specific query
+  // 4. Education & University
   if (q.includes('education') || q.includes('degree') || q.includes('college') || q.includes('university') || q.includes('study') || q.includes('studied') || q.includes('semester') || q.includes('year')) {
     return {
-      text: `Swastik is currently in his **2nd year of undergraduate studies** (Sophomore, 2024–Present) pursuing a Bachelor's in Computer Science / Information Technology in Kathmandu, Nepal.\n\nHis academic focus includes Data Structures & Algorithms, Relational Database Systems (PostgreSQL), Operating Systems, and Networking protocols. Alongside his university coursework, he interned at prepNep and builds high-performance tools in TypeScript and Rust.`,
+      text: `Swastik is currently in his **2nd year of undergraduate studies** (Sophomore, 2024–Present) pursuing a Bachelor's in Computer Science / Information Technology in Kathmandu, Nepal.\n\nHis academic curriculum covers Data Structures & Algorithms, Relational Database Systems (PostgreSQL), Operating Systems, and Networking protocols.`,
       links: [
         { label: 'View Résumé', appId: 'resume' },
         { label: 'prepNep Case Study', appId: 'experience' }
@@ -205,23 +179,33 @@ function synthesizeDirectRagResponse(query, telemetry) {
     }
   }
 
-  // Social Media & Links specific query
-  if (q.includes('social') || q.includes('linkedin') || q.includes('twitter') || q.includes('x.com') || q.includes('whatsapp') || q.includes('contact') || q.includes('link')) {
+  // 5. Name & Identity
+  if (q.includes('who are you') || q.includes('who is swastik') || q.includes('your name') || q.includes('full name')) {
     return {
-      text: `You can connect with **Swastik Paudel** across these verified channels:\n\n• **GitHub**: [github.com/Swastik45](${SOCIAL_LINKS.github})\n• **LinkedIn**: [linkedin.com/in/swastik-paudel](${SOCIAL_LINKS.linkedin})\n• **Twitter / X**: [@SwastikPaudel45](${SOCIAL_LINKS.twitter})\n• **WhatsApp**: [+977 976-7929476](${SOCIAL_LINKS.whatsapp})\n• **Email**: [psamarpaudel@gmail.com](mailto:${SOCIAL_LINKS.email})\n• **Portfolio**: [swastik-portfolio-eight.vercel.app](${SOCIAL_LINKS.portfolio})`,
+      text: `Swastik Paudel (स्वास्तिक पौडेल) is a 21-year-old software engineer and full-stack systems developer from Kathmandu, Nepal. He is a 2nd-year Computer Science undergraduate and interned on prepNep at Madargaach Holdings.`,
       links: [
-        { label: 'Open GitHub', href: SOCIAL_LINKS.github },
-        { label: 'Open LinkedIn', href: SOCIAL_LINKS.linkedin },
-        { label: 'Open WhatsApp', href: SOCIAL_LINKS.whatsapp },
-        { label: 'Compose Mail', appId: 'mail' }
+        { label: 'Open About Bio', appId: 'about' },
+        { label: 'View Résumé', appId: 'resume' }
       ]
     }
   }
 
-  // prepNep / Internship specific query
-  if (q.includes('intern') || q.includes('prepnep') || q.includes('madargaach') || q.includes('job') || q.includes('work')) {
+  // 6. Social Media & Links
+  if (q.includes('social') || q.includes('linkedin') || q.includes('twitter') || q.includes('x.com') || q.includes('whatsapp') || q.includes('link') || q.includes('profile')) {
     return {
-      text: `Swastik worked as a **Software Engineering Intern** at **Madargaach Holdings** on **prepNep** (prepnep.com), an exam preparation platform used by thousands of students across Nepal.\n\nHe engineered real-time test session state synchronization under 50ms over WebSockets, implemented client-side offline recovery with IndexedDB, and optimized PostgreSQL and Redis caching layers for high concurrent load.`,
+      text: `Here are Swastik's verified links:\n\n• **GitHub**: [github.com/Swastik45](${SOCIAL_LINKS.github})\n• **LinkedIn**: [linkedin.com/in/swastik-paudel](${SOCIAL_LINKS.linkedin})\n• **Twitter / X**: [@SwastikPaudel45](${SOCIAL_LINKS.twitter})\n• **WhatsApp**: [+977 976-7929476](${SOCIAL_LINKS.whatsapp})\n• **Email**: [psamarpaudel@gmail.com](mailto:${SOCIAL_LINKS.email})`,
+      links: [
+        { label: 'Open GitHub', href: SOCIAL_LINKS.github },
+        { label: 'Open LinkedIn', href: SOCIAL_LINKS.linkedin },
+        { label: 'Open WhatsApp', href: SOCIAL_LINKS.whatsapp }
+      ]
+    }
+  }
+
+  // 7. prepNep / Internship
+  if (q.includes('intern') || q.includes('prepnep') || q.includes('madargaach') || q.includes('job') || q.includes('work experience')) {
+    return {
+      text: `Swastik completed a **Software Engineering Internship** at **Madargaach Holdings** working on **prepNep** (prepnep.com), an exam preparation platform serving thousands of students across Nepal.\n\nHe focused on real-time test session state synchronization (<50ms) using WebSockets, client-side offline recovery with IndexedDB, and PostgreSQL/Redis performance optimization.`,
       links: [
         { label: 'prepNep Case Study', appId: 'experience' },
         { label: 'Visit prepnep.com', href: 'https://prepnep.com' }
@@ -229,10 +213,10 @@ function synthesizeDirectRagResponse(query, telemetry) {
     }
   }
 
-  // Projects inquiry
-  if (q.includes('project') || q.includes('built') || q.includes('apps') || q.includes('portfolio') || q.includes('rust')) {
+  // 8. Projects Overview
+  if (q.includes('project') || q.includes('built') || q.includes('showcase') || q.includes('apps') || q.includes('portfolio')) {
     return {
-      text: `Swastik has built production web platforms and systems experiments:\n\n1. **prepNep** — High-concurrency educational exam engine ([prepnep.com](https://prepnep.com))\n2. **ShareAudit** — Financial portfolio and dividend analytics ([share-audit.vercel.app](https://share-audit.vercel.app))\n3. **GovAudit NP** — Civic municipal expenditure transparency engine ([gova-audit-np.vercel.app](https://gova-audit-np.vercel.app))\n4. **CarbonCredit** — Ecological offset registry with Web3 sync ([carbon-credit1.vercel.app](https://carbon-credit1.vercel.app))\n5. **Lumino** — Fluid image discovery UI with 100 Lighthouse score ([lumino-five.vercel.app](https://lumino-five.vercel.app))\n6. **2D Shooting Game** — Deterministic arcade engine in Rust with Bevy ECS locked at 120 FPS.`,
+      text: `Swastik's flagship projects include:\n\n1. **prepNep** — High-concurrency educational exam engine ([prepnep.com](https://prepnep.com))\n2. **ShareAudit** — Financial portfolio and dividend analytics ([share-audit.vercel.app](https://share-audit.vercel.app))\n3. **GovAudit NP** — Civic municipal expenditure transparency watchdog ([gova-audit-np.vercel.app](https://gova-audit-np.vercel.app))\n4. **CarbonCredit** — Ecological carbon offset ledger ([carbon-credit1.vercel.app](https://carbon-credit1.vercel.app))\n5. **Lumino** — Fluid image discovery UI with 100 Lighthouse score ([lumino-five.vercel.app](https://lumino-five.vercel.app))\n6. **2D Shooting Game** — Deterministic arcade engine in Rust with Bevy ECS locked at 120 FPS.`,
       links: [
         { label: 'Explore Projects', appId: 'projects' },
         { label: 'Open GitHub', href: SOCIAL_LINKS.github }
@@ -240,12 +224,44 @@ function synthesizeDirectRagResponse(query, telemetry) {
     }
   }
 
-  // Direct conversational answer
+  // 9. Technical Skills & Languages
+  if (q.includes('skill') || q.includes('stack') || q.includes('tech') || q.includes('language') || q.includes('rust') || q.includes('python') || q.includes('typescript')) {
+    return {
+      text: `Swastik's core tech stack spans:\n\n• **Languages**: TypeScript, JavaScript, Rust, Python, C/C++, SQL\n• **Frontend**: React 19, Next.js, Tailwind CSS, Redux Toolkit, WebSockets\n• **Backend & Storage**: Node.js, Express, PostgreSQL, Redis, REST APIs\n• **Systems & DevOps**: Docker, Linux/Unix, Git, CI/CD, Bevy ECS Engine`,
+      links: [
+        { label: 'Open Skills Matrix', appId: 'skills' },
+        { label: 'View Résumé', appId: 'resume' }
+      ]
+    }
+  }
+
+  // 10. Contact / Hiring
+  if (q.includes('hire') || q.includes('contact') || q.includes('email') || q.includes('phone') || q.includes('reach') || q.includes('message')) {
+    return {
+      text: `Swastik is open to software engineering internships, remote roles, and contract collaborations.\n\nYou can email him at [psamarpaudel@gmail.com](mailto:${SOCIAL_LINKS.email}) or message him directly on WhatsApp at [+977 976-7929476](${SOCIAL_LINKS.whatsapp}).`,
+      links: [
+        { label: 'Compose Mail', appId: 'mail' },
+        { label: 'Open WhatsApp', href: SOCIAL_LINKS.whatsapp },
+        { label: 'Open LinkedIn', href: SOCIAL_LINKS.linkedin }
+      ]
+    }
+  }
+
+  // 11. Music & Hobbies
+  if (q.includes('music') || q.includes('song') || q.includes('hobby') || q.includes('hobbies') || q.includes('free time') || q.includes('coldplay')) {
+    return {
+      text: `Swastik is a big fan of classic English anthems—especially Queen (*Bohemian Rhapsody*), Coldplay (*Yellow*, *Viva La Vida*), Oasis (*Wonderwall*), and Radiohead (*Creep*). You can listen to full tracks inside the desktop Music app!`,
+      links: [
+        { label: 'Launch Music Player', appId: 'music' }
+      ]
+    }
+  }
+
+  // Dynamic Contextual Answer
   return {
-    text: `Swastik Paudel is a 21-year-old software engineer and 2nd-year Computer Science undergraduate based in Kathmandu, Nepal. He specializes in full-stack web platforms (Next.js, TypeScript), Rust systems, and high-concurrency state synchronization, and completed a software engineering internship on prepNep (prepnep.com).\n\nFeel free to ask about his projects, skills, education, or check out his live GitHub and social links!`,
+    text: `Regarding "${query}":\n\nSwastik Paudel is a 21-year-old software engineer and 2nd-year Computer Science undergraduate in Kathmandu, Nepal. His work centers on full-stack web platforms (Next.js, TypeScript), Rust systems, and high-concurrency state synchronization.\n\nWhat specific aspect of his work, projects, or background would you like to explore?`,
     links: [
       { label: 'Open GitHub', href: SOCIAL_LINKS.github },
-      { label: 'Open LinkedIn', href: SOCIAL_LINKS.linkedin },
       { label: 'Browse Projects', appId: 'projects' }
     ]
   }
@@ -339,7 +355,7 @@ export default function AskSwastikApp({ onOpenApp }) {
   const chatEndRef = useRef(null)
   const streamingTimerRef = useRef(null)
 
-  // Performance Trick 1: Pre-warm socket on mount and on input focus
+  // Pre-warm socket on mount and on input focus
   const prewarmConnection = useCallback(() => {
     try {
       fetch('https://text.pollinations.ai/ping', { mode: 'no-cors' }).catch(() => {})
@@ -439,14 +455,13 @@ export default function AskSwastikApp({ onOpenApp }) {
     ])
   }
 
-  // Performance Trick 2: Smooth Rapid Typewriter Streamer (Sub-20ms per token step)
+  // Smooth Typewriter Streamer
   const streamResponse = (fullText, links, source = 'pollinations-rag') => {
     if (streamingTimerRef.current) clearInterval(streamingTimerRef.current)
 
     const msgId = Date.now() + Math.random()
     setIsTyping(false)
 
-    // Append streaming message container
     setMessages((prev) => [
       ...prev,
       {
@@ -459,7 +474,7 @@ export default function AskSwastikApp({ onOpenApp }) {
     ])
 
     let cursor = 0
-    const chunkSize = Math.max(4, Math.ceil(fullText.length / 35))
+    const chunkSize = Math.max(3, Math.ceil(fullText.length / 30))
 
     streamingTimerRef.current = setInterval(() => {
       cursor += chunkSize
@@ -475,10 +490,10 @@ export default function AskSwastikApp({ onOpenApp }) {
           prev.map((m) => (m.id === msgId ? { ...m, text: partial } : m))
         )
       }
-    }, 18)
+    }, 16)
   }
 
-  // Performance Trick 3: Speculative Fast-Path & Parallel Polling
+  // Handle User Inquiry
   const handleAsk = async (query) => {
     if (!query.trim()) return
 
@@ -488,37 +503,32 @@ export default function AskSwastikApp({ onOpenApp }) {
     setInput('')
     setMessages((prev) => [...prev, { id: Date.now(), role: 'user', text: userText }])
 
-    // Fast-Path Check: In-memory cache hit -> Instant 0ms response!
+    // Fast cache lookup for exact repeats
     if (RESPONSE_CACHE.has(cacheKey)) {
       const cached = RESPONSE_CACHE.get(cacheKey)
       streamResponse(cached.text, cached.links, cached.source)
       return
     }
 
-    setIsTyping(true)
-
-    // Pre-calculate instant smart conversational synthesis
-    const instantSynthesis = synthesizeDirectRagResponse(userText, telemetry)
-    const isTopicPrompt = TOPICS.some((t) => t.prompt.toLowerCase() === userText.toLowerCase())
-
-    // If query is one of the prompt topics or clear standard intents, deliver lightning response in 40ms!
-    if (isTopicPrompt || userText.length < 30) {
-      setTimeout(() => {
-        RESPONSE_CACHE.set(cacheKey, { ...instantSynthesis, source: 'pollinations-rag' })
-        streamResponse(instantSynthesis.text, instantSynthesis.links, 'pollinations-rag')
-      }, 40)
+    // If it's the exact predefined Live Activity topic chip, deliver instant curl telemetry
+    if (userText.toLowerCase().includes('curl and retrieve swastik\'s live github')) {
+      const instant = synthesizeDirectRagResponse(userText, telemetry)
+      streamResponse(instant.text, instant.links, 'pollinations-rag')
       return
     }
 
-    // Otherwise, race lean Pollinations API with a snappy 4.5s budget
+    setIsTyping(true)
+
+    // Build RAG prompt with current telemetry
     const ragPrompt = buildRagSystemPrompt(telemetry)
     let aiText = ''
 
     try {
+      // 14-second budget for Pollinations.ai generation
       const controller = new AbortController()
-      const timeoutId = setTimeout(() => controller.abort(), 4500)
+      const timeoutId = setTimeout(() => controller.abort(), 14000)
 
-      const historyContext = messages.slice(-2).map((m) => ({
+      const historyContext = messages.slice(-3).map((m) => ({
         role: m.role === 'assistant' ? 'assistant' : 'user',
         content: m.text
       }))
@@ -542,7 +552,8 @@ export default function AskSwastikApp({ onOpenApp }) {
 
       if (response.ok) {
         const text = await response.text()
-        if (text && text.trim() && text.trim() !== '{}' && text.length > 5) {
+        // Ensure response is valid text and not an error object or empty
+        if (text && text.trim() && !text.includes('"error"') && text.length > 5) {
           aiText = text.trim()
         }
       }
@@ -558,9 +569,10 @@ export default function AskSwastikApp({ onOpenApp }) {
       return
     }
 
-    // Instant fallback if cloud API took longer than 4.5s
-    RESPONSE_CACHE.set(cacheKey, { ...instantSynthesis, source: 'local-rag' })
-    streamResponse(instantSynthesis.text, instantSynthesis.links, 'local-rag')
+    // Dynamic, question-specific fallback (never generic)
+    const fallback = synthesizeDirectRagResponse(userText, telemetry)
+    RESPONSE_CACHE.set(cacheKey, { ...fallback, source: 'local-rag' })
+    streamResponse(fallback.text, fallback.links, 'local-rag')
   }
 
   return (
@@ -575,13 +587,14 @@ export default function AskSwastikApp({ onOpenApp }) {
             <h2 className="text-xs font-bold text-white tracking-tight flex items-center gap-2">
               Ask Swastik
               <span className="text-[10px] font-mono font-medium px-2 py-0.5 rounded-full bg-[#76946a]/20 text-[#98bb6c] border border-[#76946a]/30 flex items-center gap-1">
-                <Zap className="w-3 h-3 text-[#e0af68]" />
                 <span className="w-1.5 h-1.5 rounded-full bg-[#98bb6c] animate-pulse" />
-                Pollinations Fast RAG
+                Pollinations.ai + RAG
               </span>
             </h2>
             <p className="text-[10px] text-[#938aa9] flex items-center gap-1.5 mt-0.5">
-              <span>Sub-50ms Response Engine</span>
+              <span>Interactive Knowledge Engine</span>
+              <span>•</span>
+              <span>Kathmandu, Nepal</span>
               <span>•</span>
               <span>Age: 21</span>
               <span>•</span>
@@ -608,7 +621,7 @@ export default function AskSwastikApp({ onOpenApp }) {
             type="button"
             onClick={handleClear}
             className="p-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-white/50 hover:text-white transition-colors cursor-pointer"
-            title="Reset conversation and clear cache"
+            title="Reset conversation"
           >
             <RotateCcw className="w-3.5 h-3.5" />
           </button>
@@ -754,7 +767,7 @@ export default function AskSwastikApp({ onOpenApp }) {
             <div className="flex items-center gap-2 p-3 rounded-2xl bg-white/5 border border-white/10">
               <span className="text-[11px] font-mono text-[#98bb6c] flex items-center gap-1.5">
                 <Sparkles className="w-3 h-3 text-[#dca561] animate-spin" />
-                Retrieving &amp; synthesizing answer...
+                Pollinating response...
               </span>
               <div className="flex gap-1">
                 <span className="w-1.5 h-1.5 rounded-full bg-[#7e9cd8] animate-bounce" style={{ animationDelay: '0ms' }} />
